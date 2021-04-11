@@ -26,27 +26,25 @@ void frameUp() {
         frame = 0;
     }
 
-    //TODO: DEBUG MS instead of US
-//    unsigned long frameEndUs = micros();
-    unsigned long frameEndMs = millis();
+    unsigned long frameEndUs = micros();
+//    unsigned long frameEndMs = millis();
 
-    //TODO: this is removed because of debug!
-//    unsigned int delayLength = FRAME_DURATION_US - (frameEndUs - frameStartUs);
-//    //debug
-////    if (delayLength < 100) {
-////        Serial.print("Delay length ");
-////        Serial.println(delayLength);
-////    }
-//    delayMicroseconds(delayLength > 0 ? delayLength : 1);
-
-    //TODO: DEBUG MS instead of US
-    unsigned int delayLength = FRAME_DURATION_US - (frameEndMs - frameStartMs);
+    unsigned int delayLength = FRAME_DURATION_US - (frameEndUs - frameStartUs);
     //debug
 //    if (delayLength < 100) {
 //        Serial.print("Delay length ");
 //        Serial.println(delayLength);
 //    }
-    delay(delayLength > 0 ? delayLength : 1);
+    delayMicroseconds(delayLength > 0 ? delayLength : 1);
+
+    //DEBUG MS instead of US
+//    unsigned int delayLength = FRAME_DURATION_US - (frameEndMs - frameStartMs);
+//    //debug
+////    if (delayLength < 100) {
+////        Serial.print("Delay length ");
+////        Serial.println(delayLength);
+////    }
+//    delay(delayLength > 0 ? delayLength : 1);
 }
 
 void resetMultiplexingPulse() {
