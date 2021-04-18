@@ -34,6 +34,32 @@ const byte SEGMENT_DICT[] = { //TODO
     0b11100000, //7
     0b11111110, //8
     0b11110110, //9
+    0b11101110, //a
+    0b00111110, //b
+    0b00011010, //c
+    0b01111010, //d
+    0b10011110, //e
+    0b10001110, //f
+    0b10111100, //g
+    0b01101110, //h
+    0b00100000, //i
+    0b01111000, //j
+    0b00001110, //k //ugly
+    0b00011100, //l
+    0b00101010, //m //ugly & same as n!
+    0b00101010, //n
+    0b00111010, //o
+    0b11001110, //p
+    0b11100110, //q
+    0b00001010, //r
+    0b10110110, //s //same as 5!
+    0b11100000, //t //ugly
+    0b01111100, //u
+    0b01111100, //v //same as u, w ugly!
+    0b01111100, //w //same as u, v ugly!
+    0b01101110, //x //same as h, ugly!
+    0b01110110, //y
+    0b11011010, //z //same as 2!
 };
 
 char currentString[SEGMENT_CNT+1] = "   jurek";
@@ -169,7 +195,7 @@ void loop() {
 
 //    clearChar();
 //    delayMicroseconds(AFTER_GLOW_DELAY_US);
-    setChar(intToChar(frame + 1));
+    setChar(currentString[FRAMES_IN_CYCLE - (frame + 1)]);//intToChar(frame + 1));
 
     frameUp();
 }
