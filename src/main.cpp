@@ -23,33 +23,40 @@ const int SEGMENTS[SEGMENT_CNT] = {5, 6, 7, 8, 9, 10, 11, 12};
 //    '8',
 //    '9'
 //};
-const bool SEGMENT_DICT[][8] = { //TODO
-    {true, true, true, true, true, true, false, false},
-    {false, true, true, false, false, false, false, false},
-    {true, true, false, true, true, false, true, false},
-    {true, true, true, true, false ,false, true, false},
-    {false, true, true, false, false, true, true, false},
-    {true, false, true, true, false, true, true, false},
-    {true, false, true, true, true, true, true, false},
-    {true, true, true, false, false, false, false, false},
-    {true, true, true, true, true, true, true, false},
-    {true, true, true, true, false, true, true, false}
+const byte SEGMENT_DICT[] = { //TODO
+    0b00000000, //0
+    0b01100000, //1
+    0b11011010, //2
+    0b11110010, //3
+    0b01100110, //4
+    0b10110110, //5
+    0b10111110, //6
+    0b11100000, //7
+    0b11111110, //8
+    0b11110110, //9
 };
 
+char currentString[SEGMENT_CNT+1] = "   jurek";
 int frame = 0;
 unsigned long frameStartUs = 0;
 unsigned long frameStartMs = 0;
 
 //TODO: nicer implementation with letters!
 void setChar(char val) {
-    int idx = val - '0';
-    int arrSize = sizeof(SEGMENT_DICT)/sizeof(SEGMENT_DICT[0]);
-
-    if (idx >= 0 && idx < arrSize) {
-        for (int i = 0; i < SEGMENT_CNT; i++) {
-            digitalWrite(SEGMENTS[i], SEGMENT_DICT[idx][i]);
-        }
+    int idx = 0; //default index - TODO: there should probably be a special "character" for it
+    if (val >= '0' && val <= '9') {
+        idx = val - '0';
     }
+    if (val >= 'a' && val <= 'z') {
+        idx = val - 'a' + 10;
+    }
+    //theoretically not necessary (if there's no error anywhere)
+//    int arrSize = sizeof(SEGMENT_DICT)/sizeof(SEGMENT_DICT[0]);
+//    if (idx >= 0 && idx < arrSize) {
+        for (int i = 0; i < SEGMENT_CNT; i++) {
+            digitalWrite(SEGMENTS[i], SEGMENT_DICT[idx] & (0b10000000 >> i));
+        }
+//    }
 }
 
 void clearChar() {
