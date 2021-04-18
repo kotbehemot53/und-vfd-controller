@@ -11,18 +11,6 @@ const int MUX_CL = 3;
 const int MUX_MR = 4;
 const int SEGMENTS[SEGMENT_CNT] = {5, 6, 7, 8, 9, 10, 11, 12};
 
-//const char ALPHABET[] = { //TODO
-//    '0',
-//    '1',
-//    '2',
-//    '3',
-//    '4',
-//    '5',
-//    '6',
-//    '7',
-//    '8',
-//    '9'
-//};
 const byte SEGMENT_DICT[] = { //TODO
     0b00000000, //0
     0b01100000, //1
@@ -195,6 +183,9 @@ void loop() {
 
 //    clearChar();
 //    delayMicroseconds(AFTER_GLOW_DELAY_US);
+
+    //TODO: this is debug
+//    setChar('8');
     setChar(currentString[FRAMES_IN_CYCLE - (frame + 1)]);//intToChar(frame + 1));
 
     frameUp();
