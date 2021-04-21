@@ -1,5 +1,9 @@
 #include <Arduino.h>
 
+//TODO: PWM brightness
+//TODO: I2C (?) + COMMANDS
+//TODO: ability to send custom array of bytes representing raw segments, not ASCII characters
+
 const int SEGMENT_CNT = 8;
 const unsigned int FRAME_DURATION_US = 1000;
 //const unsigned int AFTER_GLOW_DELAY_US = 10; //TODO: seems unnecessary
@@ -11,6 +15,7 @@ const int MUX_CL = 3;
 const int MUX_MR = 4;
 const int SEGMENTS[SEGMENT_CNT] = {5, 6, 7, 8, 9, 10, 11, 12};
 
+//each bit is one segment in order: abcdefg.
 const byte SEGMENT_DICT[] = { //TODO
     0b00000000, //0
     0b01100000, //1
@@ -22,6 +27,9 @@ const byte SEGMENT_DICT[] = { //TODO
     0b11100000, //7
     0b11111110, //8
     0b11110110, //9
+
+    0b00010000, //_
+    0b10000000, //` sort of
     0b11101110, //a
     0b00111110, //b
     0b00011010, //c
@@ -50,19 +58,20 @@ const byte SEGMENT_DICT[] = { //TODO
     0b11011010, //z //same as 2!
 };
 
-char currentString[SEGMENT_CNT+1] = "   jurek";
+//TODO: this initial value is debug - will be set by command
+char currentString[SEGMENT_CNT+1] = "foo_bar`";
 int frame = 0;
 unsigned long frameStartUs = 0;
 unsigned long frameStartMs = 0;
 
-//TODO: nicer implementation with letters!
+
 void setChar(char val) {
     int idx = 0; //default index - TODO: there should probably be a special "character" for it
     if (val >= '0' && val <= '9') {
         idx = val - '0';
     }
-    if (val >= 'a' && val <= 'z') {
-        idx = val - 'a' + 10;
+    if (val >= '_' && val <= 'z') {
+        idx = val - '_' + 10;
     }
     //theoretically not necessary (if there's no error anywhere)
 //    int arrSize = sizeof(SEGMENT_DICT)/sizeof(SEGMENT_DICT[0]);
@@ -185,8 +194,8 @@ void loop() {
 //    delayMicroseconds(AFTER_GLOW_DELAY_US);
 
     //TODO: this is debug
-    setChar('8');
-//    setChar(currentString[FRAMES_IN_CYCLE - (frame + 1)]);//intToChar(frame + 1));
+//    setChar('8');
+    setChar(currentString[FRAMES_IN_CYCLE - (frame + 1)]);//intToChar(frame + 1));
 
     frameUp();
 }
