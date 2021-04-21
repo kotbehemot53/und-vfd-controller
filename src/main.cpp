@@ -185,8 +185,8 @@ void loop() {
 //    delayMicroseconds(AFTER_GLOW_DELAY_US);
 
     //TODO: this is debug
-//    setChar('8');
-    setChar(currentString[FRAMES_IN_CYCLE - (frame + 1)]);//intToChar(frame + 1));
+    setChar('8');
+//    setChar(currentString[FRAMES_IN_CYCLE - (frame + 1)]);//intToChar(frame + 1));
 
     frameUp();
 }
