@@ -4,14 +4,10 @@
 //TODO: I2C (?) + COMMANDS
 //TODO: ability to send custom array of bytes representing raw segments, not ASCII characters
 
-//TODO: support small dots (set last bit to 1 based on a separate array & the output of of regular SEGMENT_DICT?) - WIP
-
-//TODO: support big dot/minus (frames + 1 in frameUp, multiplexViaShiftRegister, ...?) - WIP
-
 const int SEGMENT_CNT = 8;
 const unsigned int FRAME_DURATION_US = 1000; //default 1000
-//const unsigned int AFTER_GLOW_DELAY_US = 300; //it's only needed because the GRID9 optocoupler goes off with a noticeable delay
-const int FRAMES_IN_CYCLE = 9; //main grids + dot/minus
+const unsigned int AFTER_GLOW_DELAY_US = 200; //it's only needed because the GRID9 optocoupler goes off with a noticeable delay
+const int FRAMES_IN_CYCLE = 10; //main grids + dot/minus
 const int SERIAL_REG_CLK_PULSE_LEN_US = 100;   //clock/reset pulse length for the shift registers
 
 const int MUX_DA = 2;
@@ -25,8 +21,15 @@ const byte STATUS = A3;
 
 //TODO 0 is actually ' '!
 //each bit is one segment in order: abcdefg.
-const byte SEGMENT_DICT[] = { //TODO
-    0b00000000, //0
+const byte SEGMENT_DICT[] = {
+    0b00000000, // //empty
+
+    0b00000010, //-
+
+    0b00000000, //placeholder
+    0b00000000, //placeholder
+
+    0b11111100, //0
     0b01100000, //1
     0b11011010, //2
     0b11110010, //3
@@ -65,14 +68,12 @@ const byte SEGMENT_DICT[] = { //TODO
     0b01101110, //x //same as h, ugly!
     0b01110110, //y
     0b11011010, //z //same as 2!
-
-    0b00000010, //- //only for GRID9
 };
 
 //TODO: these initial values are debug - will be set by command
 //+1 because the string must contain the /0 ending
-char currentString[FRAMES_IN_CYCLE+1] = "0asscock8";
-bool currentCommas[FRAMES_IN_CYCLE] = {false, true, true, true, false, false, true, true, true};
+char currentString[FRAMES_IN_CYCLE+1] = "  asscock8"; //first must be empty! (empty frame after dot/minus)
+bool currentCommas[FRAMES_IN_CYCLE] = {false, false, false, false, false, false, false, false, false, false}; //first must be empty! (empty frame after dot/minus)
 
 int frame = 0;
 unsigned long frameStartUs = 0;
@@ -81,11 +82,12 @@ unsigned long frameStartMs = 0;
 
 void setChar(char val) {
     int idx = 0; //default index - TODO: there should probably be a special "character" for it
-    if (val >= '0' && val <= '9') {
-        idx = val - '0';
+
+    if (val >= '-' && val <= '9') {
+        idx = val - '-' + 1;
     }
-    if (val >= '_' && val <= 'z') {
-        idx = val - '_' + 10;
+    else if (val >= '_' && val <= 'z') {
+        idx = val - '_' + 14;
     }
     //theoretically not necessary (if there's no error anywhere)
 //    int arrSize = sizeof(SEGMENT_DICT)/sizeof(SEGMENT_DICT[0]);
@@ -119,12 +121,6 @@ void stepMultiplexingPulse() {
 }
 
 void multiplexViaShiftRegister(int frameNumber) {
-//    //stop displaying points for player when all are displayed (clear the shift register)
-//    if (frameNumber % (SEGMENT_CNT) >= playerScore) {
-//        resetScoreTrackWalkingPulse(playerIdx);
-//    }
-
-
     //send a single "1" to the shift register in the beginning of each cycle
     if ((frameNumber % (FRAMES_IN_CYCLE) == 0)) {
         digitalWrite(MUX_DA, HIGH);
@@ -137,10 +133,7 @@ void multiplexViaShiftRegister(int frameNumber) {
     //set GRID9 if we reached the last frames (they are cycled right to left)
     if ((frameNumber % (FRAMES_IN_CYCLE) == 8)) {
         digitalWrite(GRID9, HIGH);
-    } else {
-        digitalWrite(GRID9, LOW);
     }
-    //TODO: add some wait after last frame to allow digit9 go completely off (the optocoupler has a delay)
 }
 
 void initFrame() {
@@ -149,6 +142,8 @@ void initFrame() {
 }
 
 void frameUp() {
+    unsigned int delayLength;
+
     frame++;
 
     if (frame >= FRAMES_IN_CYCLE) {
@@ -161,11 +156,15 @@ void frameUp() {
 
     //the frame is set up, now wait for the reminder of time.
 
-    unsigned int delayLength = FRAME_DURATION_US - (frameEndUs - frameStartUs);
+    if ((frame % FRAMES_IN_CYCLE) == FRAMES_IN_CYCLE - 1) { //last empty frame for dot/minus afterglow
+        delayLength = AFTER_GLOW_DELAY_US - (frameEndUs - frameStartUs);
+    } else {
+        delayLength = FRAME_DURATION_US - (frameEndUs - frameStartUs);
+    }
     //DEBUG MS instead of US
 //    unsigned int delayLength = FRAME_DURATION_US - (frameEndMs - frameStartMs);
 
-    //debug
+    //delay debug
 //    if (delayLength < 100) {
 //        Serial.print("Delay length ");
 //        Serial.println(delayLength);
@@ -175,17 +174,8 @@ void frameUp() {
     //DEBUG MS instead of US
 //    delay(delayLength > 0 ? delayLength : 1);
 
-//    //debug
-////    if (delayLength < 100) {
-////        Serial.print("Delay length ");
-////        Serial.println(delayLength);
-////    }
-
     //here a new frame really begins - we clear the character
     clearChar();
-
-    //TODO: seems unnecessary
-//    delayMicroseconds(AFTER_GLOW_DELAY_US);
 
     multiplexViaShiftRegister(frame);
 }
@@ -222,22 +212,17 @@ void setup() {
     digitalWrite(HV_ENABLE, HIGH);
     digitalWrite(STATUS, HIGH);
 
-//    pinMode(LED_BUILTIN, OUTPUT);
+    Serial.begin(115200);
+    Serial.println("yo");
 }
 
 void loop() {
     initFrame();
 
-//    digitalWrite(LED_BUILTIN, HIGH);
-//    delay(500);
-//    digitalWrite(LED_BUILTIN, LOW);
-//    delay(500);
+    if ((frame % (FRAMES_IN_CYCLE) == 9)) {
+        digitalWrite(GRID9, LOW);
+    }
 
-//    clearChar();
-//    delayMicroseconds(AFTER_GLOW_DELAY_US);
-
-    //TODO: this is debug
-//    setChar('8');
     setChar(currentString[FRAMES_IN_CYCLE - (frame + 1)]);//intToChar(frame + 1));
     setComma(currentCommas[FRAMES_IN_CYCLE - (frame + 1)]);
 
