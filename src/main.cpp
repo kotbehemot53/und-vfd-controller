@@ -3,6 +3,9 @@
 //TODO: PWM brightness
 //TODO: I2C (?) + COMMANDS
 //TODO: ability to send custom array of bytes representing raw segments, not ASCII characters
+//TODO: support small dots (set last bit to 1 based on a separate array & the output of of regular SEGMENT_DICT?)
+//TODO: support big dot/minus (frames + 1 in frameUp, multiplexViaShiftRegister, ...?)
+//TODO: fix SEGMENT_CNT (number of SMALL segments) != FRAMES_IN_CYCLE (number of grids)!!
 
 const int SEGMENT_CNT = 8;
 const unsigned int FRAME_DURATION_US = 1000;
@@ -14,6 +17,8 @@ const int MUX_DA = 2;
 const int MUX_CL = 3;
 const int MUX_MR = 4;
 const int SEGMENTS[SEGMENT_CNT] = {5, 6, 7, 8, 9, 10, 11, 12};
+const byte HV_ENABLE = A0;
+const byte STATUS = A3;
 
 //each bit is one segment in order: abcdefg.
 const byte SEGMENT_DICT[] = { //TODO
@@ -58,8 +63,10 @@ const byte SEGMENT_DICT[] = { //TODO
     0b11011010, //z //same as 2!
 };
 
-//TODO: this initial value is debug - will be set by command
-char currentString[SEGMENT_CNT+1] = "foo_bar`";
+//TODO: these initial values are debug - will be set by command
+char currentString[SEGMENT_CNT+1] = "asscock8";
+bool currentCommas[SEGMENT_CNT+1] = {true, true, true, false, false, true, true, true};
+
 int frame = 0;
 unsigned long frameStartUs = 0;
 unsigned long frameStartMs = 0;
@@ -80,6 +87,10 @@ void setChar(char val) {
             digitalWrite(SEGMENTS[i], SEGMENT_DICT[idx] & (0b10000000 >> i));
         }
 //    }
+}
+
+void setComma(bool val) {
+    digitalWrite(SEGMENTS[7], val & (0b00000001));
 }
 
 void clearChar() {
@@ -162,8 +173,6 @@ char intToChar (int val) {
     return '0' + val;
 }
 
-
-
 void setup() {
 
     pinMode(MUX_DA, OUTPUT);
@@ -172,6 +181,10 @@ void setup() {
     digitalWrite(MUX_CL, LOW);
     pinMode(MUX_MR, OUTPUT);
     digitalWrite(MUX_MR, LOW);
+    pinMode(HV_ENABLE, OUTPUT);
+    digitalWrite(HV_ENABLE, LOW);
+    pinMode(STATUS, OUTPUT);
+    digitalWrite(STATUS, LOW);
 
     for (int i = 0; i < SEGMENT_CNT; i++) {
         pinMode(SEGMENTS[i], OUTPUT);
@@ -179,6 +192,10 @@ void setup() {
     }
 
     resetMultiplexingPulse();
+
+    delay(100);
+    digitalWrite(HV_ENABLE, HIGH);
+    digitalWrite(STATUS, HIGH);
 
 //    pinMode(LED_BUILTIN, OUTPUT);
 }
@@ -196,6 +213,7 @@ void loop() {
     //TODO: this is debug
 //    setChar('8');
     setChar(currentString[FRAMES_IN_CYCLE - (frame + 1)]);//intToChar(frame + 1));
+    setComma(currentCommas[FRAMES_IN_CYCLE - (frame + 1)]);
 
     frameUp();
 }
