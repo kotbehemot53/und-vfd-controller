@@ -3,23 +3,27 @@
 //TODO: PWM brightness
 //TODO: I2C (?) + COMMANDS
 //TODO: ability to send custom array of bytes representing raw segments, not ASCII characters
-//TODO: support small dots (set last bit to 1 based on a separate array & the output of of regular SEGMENT_DICT?)
-//TODO: support big dot/minus (frames + 1 in frameUp, multiplexViaShiftRegister, ...?)
-//TODO: fix SEGMENT_CNT (number of SMALL segments) != FRAMES_IN_CYCLE (number of grids)!!
+
+//TODO: support small dots (set last bit to 1 based on a separate array & the output of of regular SEGMENT_DICT?) - WIP
+
+//TODO: support big dot/minus (frames + 1 in frameUp, multiplexViaShiftRegister, ...?) - WIP
 
 const int SEGMENT_CNT = 8;
-const unsigned int FRAME_DURATION_US = 1000;
-//const unsigned int AFTER_GLOW_DELAY_US = 10; //TODO: seems unnecessary
-const int FRAMES_IN_CYCLE = SEGMENT_CNT;
+const unsigned int FRAME_DURATION_US = 1000; //default 1000
+//const unsigned int AFTER_GLOW_DELAY_US = 300; //it's only needed because the GRID9 optocoupler goes off with a noticeable delay
+const int FRAMES_IN_CYCLE = 9; //main grids + dot/minus
 const int SERIAL_REG_CLK_PULSE_LEN_US = 100;   //clock/reset pulse length for the shift registers
 
 const int MUX_DA = 2;
 const int MUX_CL = 3;
 const int MUX_MR = 4;
 const int SEGMENTS[SEGMENT_CNT] = {5, 6, 7, 8, 9, 10, 11, 12};
+const byte GRID9 = 13;
+
 const byte HV_ENABLE = A0;
 const byte STATUS = A3;
 
+//TODO 0 is actually ' '!
 //each bit is one segment in order: abcdefg.
 const byte SEGMENT_DICT[] = { //TODO
     0b00000000, //0
@@ -61,11 +65,14 @@ const byte SEGMENT_DICT[] = { //TODO
     0b01101110, //x //same as h, ugly!
     0b01110110, //y
     0b11011010, //z //same as 2!
+
+    0b00000010, //- //only for GRID9
 };
 
 //TODO: these initial values are debug - will be set by command
-char currentString[SEGMENT_CNT+1] = "asscock8";
-bool currentCommas[SEGMENT_CNT+1] = {true, true, true, false, false, true, true, true};
+//+1 because the string must contain the /0 ending
+char currentString[FRAMES_IN_CYCLE+1] = "0asscock8";
+bool currentCommas[FRAMES_IN_CYCLE] = {false, true, true, true, false, false, true, true, true};
 
 int frame = 0;
 unsigned long frameStartUs = 0;
@@ -117,8 +124,9 @@ void multiplexViaShiftRegister(int frameNumber) {
 //        resetScoreTrackWalkingPulse(playerIdx);
 //    }
 
+
     //send a single "1" to the shift register in the beginning of each cycle
-    if ((frameNumber % (SEGMENT_CNT) == 0)) {
+    if ((frameNumber % (FRAMES_IN_CYCLE) == 0)) {
         digitalWrite(MUX_DA, HIGH);
     } else {
         digitalWrite(MUX_DA, LOW);
@@ -126,6 +134,13 @@ void multiplexViaShiftRegister(int frameNumber) {
 
     //1 clock pulse to the shift register
     stepMultiplexingPulse();
+    //set GRID9 if we reached the last frames (they are cycled right to left)
+    if ((frameNumber % (FRAMES_IN_CYCLE) == 8)) {
+        digitalWrite(GRID9, HIGH);
+    } else {
+        digitalWrite(GRID9, LOW);
+    }
+    //TODO: add some wait after last frame to allow digit9 go completely off (the optocoupler has a delay)
 }
 
 void initFrame() {
@@ -141,27 +156,34 @@ void frameUp() {
     }
 
     unsigned long frameEndUs = micros();
+    //DEBUG MS instead of US
 //    unsigned long frameEndMs = millis();
 
+    //the frame is set up, now wait for the reminder of time.
+
     unsigned int delayLength = FRAME_DURATION_US - (frameEndUs - frameStartUs);
+    //DEBUG MS instead of US
+//    unsigned int delayLength = FRAME_DURATION_US - (frameEndMs - frameStartMs);
+
     //debug
 //    if (delayLength < 100) {
 //        Serial.print("Delay length ");
 //        Serial.println(delayLength);
 //    }
-    delayMicroseconds(delayLength > 0 ? delayLength : 1);
 
+    delayMicroseconds(delayLength > 0 ? delayLength : 1);
     //DEBUG MS instead of US
-//    unsigned int delayLength = FRAME_DURATION_US - (frameEndMs - frameStartMs);
+//    delay(delayLength > 0 ? delayLength : 1);
+
 //    //debug
 ////    if (delayLength < 100) {
 ////        Serial.print("Delay length ");
 ////        Serial.println(delayLength);
 ////    }
-//    delay(delayLength > 0 ? delayLength : 1);
 
-
+    //here a new frame really begins - we clear the character
     clearChar();
+
     //TODO: seems unnecessary
 //    delayMicroseconds(AFTER_GLOW_DELAY_US);
 
@@ -191,6 +213,9 @@ void setup() {
         digitalWrite(SEGMENTS[i], HIGH);
     }
 
+    pinMode(GRID9, OUTPUT);
+    digitalWrite(GRID9, LOW);
+
     resetMultiplexingPulse();
 
     delay(100);
@@ -202,6 +227,7 @@ void setup() {
 
 void loop() {
     initFrame();
+
 //    digitalWrite(LED_BUILTIN, HIGH);
 //    delay(500);
 //    digitalWrite(LED_BUILTIN, LOW);
