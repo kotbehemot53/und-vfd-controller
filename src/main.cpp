@@ -1,8 +1,11 @@
 #include <Arduino.h>
 
+// DEBUG:
+//#include "avr8-stub.h"
+//#include "app_api.h" // only needed with flash breakpoints
+
 //TODO: PWM brightness
 //TODO: I2C (?) + COMMANDS
-//TODO: ability to send custom array of bytes representing raw segments, not ASCII characters
 
 const int SEGMENT_CNT = 8;
 const unsigned int FRAME_DURATION_US = 1000; //default 1000
@@ -18,6 +21,9 @@ const byte GRID9 = 13;
 
 const byte HV_ENABLE = A0;
 const byte STATUS = A3;
+
+const byte MODE_CHARS = 0;
+const byte MODE_BYTES = 1;
 
 //TODO 0 is actually ' '!
 //each bit is one segment in order: abcdefg.
@@ -72,13 +78,21 @@ const byte SEGMENT_DICT[] = {
 
 //TODO: these initial values are debug - will be set by command
 //+1 because the string must contain the /0 ending
-char currentString[FRAMES_IN_CYCLE+1] = "  asscock8"; //first must be empty! (empty frame after dot/minus)
-bool currentCommas[FRAMES_IN_CYCLE] = {false, false, false, false, false, false, false, false, false, false}; //first must be empty! (empty frame after dot/minus)
+//first must be empty! (empty frame after dot/minus)
+//minus works for idx 1
+char currentString[FRAMES_IN_CYCLE+1] = "  asscock6";
+//first must be empty! (empty frame after dot/minus)
+//dot at idx 1 is the "big one"
+bool currentCommas[FRAMES_IN_CYCLE] = {false, true, false, false, false, false, false, false, false, true};
+//bytes for custom mode
+//first must be empty! (empty frame after dot/minus)
+byte currentBytes[FRAMES_IN_CYCLE+1] = {0b00000000, 0b00000000, 0b00010000, 0b00010000, 0b00010000, 0b00010000, 0b00010000, 0b00010000, 0b00010000, 0b00010000};
 
 int frame = 0;
 unsigned long frameStartUs = 0;
 unsigned long frameStartMs = 0;
 
+byte currentMode = MODE_BYTES;
 
 void setChar(char val) {
     int idx = 0; //default index - TODO: there should probably be a special "character" for it
@@ -96,6 +110,12 @@ void setChar(char val) {
             digitalWrite(SEGMENTS[i], SEGMENT_DICT[idx] & (0b10000000 >> i));
         }
 //    }
+}
+
+void setByte(byte val) {
+    for (int i = 0; i < SEGMENT_CNT; i++) {
+        digitalWrite(SEGMENTS[i], val & (0b10000000 >> i));
+    }
 }
 
 void setComma(bool val) {
@@ -212,8 +232,8 @@ void setup() {
     digitalWrite(HV_ENABLE, HIGH);
     digitalWrite(STATUS, HIGH);
 
-    Serial.begin(115200);
-    Serial.println("yo");
+//    Serial.begin(115200);
+//    Serial.println("yo");
 }
 
 void loop() {
@@ -223,7 +243,11 @@ void loop() {
         digitalWrite(GRID9, LOW);
     }
 
-    setChar(currentString[FRAMES_IN_CYCLE - (frame + 1)]);//intToChar(frame + 1));
+    if (currentMode == MODE_CHARS) {
+        setChar(currentString[FRAMES_IN_CYCLE - (frame + 1)]);//intToChar(frame + 1));
+    } else {
+        setByte(currentBytes[FRAMES_IN_CYCLE - (frame + 1)]);
+    }
     setComma(currentCommas[FRAMES_IN_CYCLE - (frame + 1)]);
 
     frameUp();
