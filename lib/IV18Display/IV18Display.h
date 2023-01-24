@@ -3,7 +3,8 @@
 
 #include <Arduino.h>
 
-class IV18Display {
+class IV18Display
+{
 private:
     // grids/subframes count
     static const int SEGMENT_CNT = 8;
@@ -26,52 +27,52 @@ private:
     //TODO 0 is actually ' '!
     //each bit is one segment in order: abcdefg.
     static constexpr byte SEGMENT_DICT[] = {
-    0b00000000, // //empty
+            0b00000000, // //empty
 
-    0b00000010, //-
+            0b00000010, //-
 
-    0b00000000, //placeholder
-    0b00000000, //placeholder
+            0b00000000, //placeholder
+            0b00000000, //placeholder
 
-    0b11111100, //0
-    0b01100000, //1
-    0b11011010, //2
-    0b11110010, //3
-    0b01100110, //4
-    0b10110110, //5
-    0b10111110, //6
-    0b11100000, //7
-    0b11111110, //8
-    0b11110110, //9
+            0b11111100, //0
+            0b01100000, //1
+            0b11011010, //2
+            0b11110010, //3
+            0b01100110, //4
+            0b10110110, //5
+            0b10111110, //6
+            0b11100000, //7
+            0b11111110, //8
+            0b11110110, //9
 
-    0b00010000, //_
-    0b10000000, //` sort of
-    0b11101110, //a
-    0b00111110, //b
-    0b00011010, //c
-    0b01111010, //d
-    0b10011110, //e
-    0b10001110, //f
-    0b10111100, //g
-    0b01101110, //h
-    0b00100000, //i
-    0b01111000, //j
-    0b00001110, //k //ugly
-    0b00011100, //l
-    0b00101010, //m //ugly & same as n!
-    0b00101010, //n
-    0b00111010, //o
-    0b11001110, //p
-    0b11100110, //q
-    0b00001010, //r
-    0b10110110, //s //same as 5!
-    0b11100000, //t //ugly
-    0b01111100, //u
-    0b01111100, //v //same as u, w ugly!
-    0b01111100, //w //same as u, v ugly!
-    0b01101110, //x //same as h, ugly!
-    0b01110110, //y
-    0b11011010, //z //same as 2!
+            0b00010000, //_
+            0b10000000, //` sort of
+            0b11101110, //a
+            0b00111110, //b
+            0b00011010, //c
+            0b01111010, //d
+            0b10011110, //e
+            0b10001110, //f
+            0b10111100, //g
+            0b01101110, //h
+            0b00100000, //i
+            0b01111000, //j
+            0b00001110, //k //ugly
+            0b00011100, //l
+            0b00101010, //m //ugly & same as n!
+            0b00101010, //n
+            0b00111010, //o
+            0b11001110, //p
+            0b11100110, //q
+            0b00001010, //r
+            0b10110110, //s //same as 5!
+            0b11100000, //t //ugly
+            0b01111100, //u
+            0b01111100, //v //same as u, w ugly!
+            0b01111100, //w //same as u, v ugly!
+            0b01101110, //x //same as h, ugly!
+            0b01110110, //y
+            0b11011010, //z //same as 2!
     };
 
 //    unsigned long frameDurationUs;
@@ -82,9 +83,10 @@ private:
     //+1 because the string must contain the /0 ending
     char currentString[SUBFRAMES_IN_CYCLE] = " asscock6";
     //dot at idx 0 is the "big one"
-    bool currentCommas[SUBFRAMES_IN_CYCLE-1] = {true, false, false, false, false, false, false, false, false};
+    bool currentCommas[SUBFRAMES_IN_CYCLE - 1] = {true, false, false, false, false, false, false, false, false};
     //bytes for custom mode
-    byte currentBytes[SUBFRAMES_IN_CYCLE-1] = {0b00000000, 0b00010000, 0b00010000, 0b00010000, 0b00010000, 0b00010000, 0b00010000, 0b00010000, 0b00010000};
+    byte currentBytes[SUBFRAMES_IN_CYCLE - 1] = {0b00000000, 0b00010000, 0b00010000, 0b00010000, 0b00010000, 0b00010000,
+                                                 0b00010000, 0b00010000, 0b00010000};
 
     int currentSubframeNumber = 0;
 //    unsigned long frameStartUs = 0;
@@ -99,7 +101,8 @@ private:
 
     // TODO: extract these to a separate DisplayMultiplexer class
     void resetMultiplexingPulse(); //reset multiplexer - TODO will be public in mux class?
-    void initMultiplexingPulse(byte subframeNumber); //send a 1 to the multiplexer data input if necessary (beginning of frame)
+    void initMultiplexingPulse(
+            byte subframeNumber); //send a 1 to the multiplexer data input if necessary (beginning of frame)
     void stepMultiplexingPulse(byte subframeNumber); //send a pulse to the multiplexer clock
     void multiplexViaShiftRegister(byte subframeNumber); // TODO will be public in mux class?
 
@@ -117,10 +120,11 @@ public:
 
     void init(unsigned long frameDurationUs);
 
+    void on();
+
+    void off();
+
     // TODO:
-//    void on();
-//    void off();
-//
 //    // TODO: remember to append first empty value to those passed or introduce the empty frame otherwise
 //    void setBytes(byte* bytes); // TODO: how to ensure length of 8? enable exceptions?
 //    void setChars(char* chars); // TODO: how to ensure length of 8? enable exceptions?

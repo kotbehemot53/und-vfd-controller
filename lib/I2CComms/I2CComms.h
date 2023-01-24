@@ -5,10 +5,12 @@
 
 #include "../IV18Display/IV18Display.h"
 
-class I2CComms {
+class I2CComms
+{
 
 public:
     void init(byte addr, IV18Display display);
+
     void handleBufferedInput();
 };
 
