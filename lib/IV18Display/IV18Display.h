@@ -81,7 +81,7 @@ private:
 //TODO: these initial values are debug - will be set by command
     //minus works for idx 0
     //+1 because the string must contain the /0 ending
-    char currentString[SUBFRAMES_IN_CYCLE] = " asscock6";
+    char currentString[SUBFRAMES_IN_CYCLE] = " asscock7";
     //dot at idx 0 is the "big one"
     bool currentCommas[SUBFRAMES_IN_CYCLE - 1] = {true, false, false, false, false, false, false, false, false};
     //bytes for custom mode
