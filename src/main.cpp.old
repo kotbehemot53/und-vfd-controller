@@ -201,9 +201,9 @@ void frameUp() {
 }
 
 
-char intToChar (int val) {
-    return '0' + val;
-}
+//char intToChar (int val) {
+//    return '0' + val;
+//}
 
 void setup() {
 
