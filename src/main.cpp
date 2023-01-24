@@ -6,6 +6,7 @@
 
 //TODO: PWM brightness
 //TODO: I2C (?) + COMMANDS
+//TODO: intro mode?
 
 const int SEGMENT_CNT = 8;
 const unsigned int FRAME_DURATION_US = 1000; //default 1000
@@ -83,7 +84,7 @@ const byte SEGMENT_DICT[] = {
 char currentString[FRAMES_IN_CYCLE+1] = "  asscock6";
 //first must be empty! (empty frame after dot/minus)
 //dot at idx 1 is the "big one"
-bool currentCommas[FRAMES_IN_CYCLE] = {false, true, false, false, false, false, false, false, false, true};
+bool currentCommas[FRAMES_IN_CYCLE] = {false, true, false, false, false, false, false, false, false, false};
 //bytes for custom mode
 //first must be empty! (empty frame after dot/minus)
 byte currentBytes[FRAMES_IN_CYCLE+1] = {0b00000000, 0b00000000, 0b00010000, 0b00010000, 0b00010000, 0b00010000, 0b00010000, 0b00010000, 0b00010000, 0b00010000};
@@ -94,6 +95,16 @@ unsigned long frameStartMs = 0;
 
 byte currentMode = MODE_BYTES;
 
+void setByte(byte val) {
+    //theoretically not necessary (if there's no error anywhere)
+//    int arrSize = sizeof(SEGMENT_DICT)/sizeof(SEGMENT_DICT[0]);
+//    if (idx >= 0 && idx < arrSize) {
+    for (int i = 0; i < SEGMENT_CNT; i++) {
+        digitalWrite(SEGMENTS[i], val & (0b10000000 >> i));
+    }
+//    }
+}
+
 void setChar(char val) {
     int idx = 0; //default index - TODO: there should probably be a special "character" for it
 
@@ -103,19 +114,8 @@ void setChar(char val) {
     else if (val >= '_' && val <= 'z') {
         idx = val - '_' + 14;
     }
-    //theoretically not necessary (if there's no error anywhere)
-//    int arrSize = sizeof(SEGMENT_DICT)/sizeof(SEGMENT_DICT[0]);
-//    if (idx >= 0 && idx < arrSize) {
-        for (int i = 0; i < SEGMENT_CNT; i++) {
-            digitalWrite(SEGMENTS[i], SEGMENT_DICT[idx] & (0b10000000 >> i));
-        }
-//    }
-}
 
-void setByte(byte val) {
-    for (int i = 0; i < SEGMENT_CNT; i++) {
-        digitalWrite(SEGMENTS[i], val & (0b10000000 >> i));
-    }
+    setByte(SEGMENT_DICT[idx]);
 }
 
 void setComma(bool val) {
