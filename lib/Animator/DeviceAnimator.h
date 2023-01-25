@@ -6,8 +6,10 @@
 class DeviceAnimator
 {
 private:
-    DeviceAnimatorThread* threads;
-    int numberOfThreads;
+    DeviceAnimatorStep** stepsMerged;
+    int totalSteps;
+
+    static int sortMergedSteps(const void *cmp1, const void *cmp2);
 
 public:
     void setThreads(DeviceAnimatorThread threadsToSet[], int numberOfThreadsToSet);

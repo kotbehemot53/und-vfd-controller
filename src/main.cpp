@@ -28,6 +28,8 @@ void setup()
     delay(100);
     Display.on();
 
+    // TODO: remove it when we have a nice heartbeat animated
+//    Display.statusOn(&Display);
 }
 
 void loop()
@@ -40,6 +42,9 @@ void loop()
 
 //    Animator.doFrame();
     animator->doFrame();
+
+    // TODO: debug, remove
+//    delay(100);
 
     Comms.handleBufferedInput(); //if new_frame handleNewFrame...
 
