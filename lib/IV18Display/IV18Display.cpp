@@ -2,7 +2,7 @@
 
 IV18Display Display;
 
-void IV18Display::init()
+IV18Display::IV18Display()
 {
     pinMode(MUX_DA, OUTPUT);
     digitalWrite(MUX_DA, LOW);
@@ -89,6 +89,7 @@ void IV18Display::prepareGridSegments(int sequenceNumber)
 {
     byte idx = GRID_STEPS_COUNT - (sequenceNumber + 2);
 
+    // TODO: do we actually need the empty frame?
     // account for 1 "empty frame"
     if (idx >= 0) {
         if (currentMode == MODE_CHARS) {
