@@ -18,7 +18,7 @@ void setup()
     Serial.begin(115200);
     Serial.println("yo");
 
-    Display.init();//FRAME_DURATION_US); //outputs, status diode (no hv_enable yet?, do on command only?)
+    Display.init(); //outputs, status diode (no hv_enable yet?, do on command only?)
     Comms.init(I2C_ADDR, Display); //wire begin, wire.onReceive TODO: make it minimal, just buffer data!
 
 //    Animator.init(Display);

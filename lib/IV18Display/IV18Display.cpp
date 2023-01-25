@@ -48,7 +48,7 @@ void IV18Display::resetMultiplexingPulse()
 void IV18Display::initMultiplexingPulse(byte subframeNumber)
 {
     //send a single "1" to the shift register in the beginning of each cycle
-    if ((subframeNumber % (SUBFRAMES_IN_CYCLE) == 0)) {
+    if ((subframeNumber % (GRID_STEPS_COUNT) == 0)) {
         digitalWrite(MUX_DA, HIGH);
     } else {
         digitalWrite(MUX_DA, LOW);
@@ -70,15 +70,84 @@ void IV18Display::multiplexViaShiftRegister(byte subframeNumber)
     stepMultiplexingPulse(subframeNumber);
 }
 
-void IV18Display::initSubframe()
+
+
+//void IV18Display::initSubframe()
+//{
+//    currentSubframeStartUs = micros();
+//    grid9Begin(currentSubframeNumber);
+//}
+//
+//void IV18Display::doSubframe(byte subframeNumber)
+//{
+//    byte idx = GRID_STEPS_COUNT - (subframeNumber + 2);
+//
+//    // account for 1 "empty frame"
+//    if (idx >= 0) {
+//        if (currentMode == MODE_CHARS) {
+//            setChar(currentString[idx]);
+//        } else {
+//            setByte(currentBytes[idx]);
+//        }
+//        setComma(currentCommas[idx]);
+//    }
+//
+//    // TODO: status led heartbeat?
+//}
+//
+//void IV18Display::finishSubframe()
+//{
+//    unsigned int delayLength;
+//
+//    currentSubframeNumber++;
+//
+//    if (currentSubframeNumber >= GRID_STEPS_COUNT) {
+//        currentSubframeNumber = 0;
+//    }
+//
+//    unsigned long currentSubframeEndUs = micros();
+//    //DEBUG MS instead of US
+////    unsigned long frameEndMs = millis();
+//
+//    //the frame is set up, now wait for the reminder of time.
+//
+//    if ((currentSubframeNumber % GRID_STEPS_COUNT) ==
+//        GRID_STEPS_COUNT - 1) { //last empty frame for dot/minus afterglow
+//        delayLength = AFTER_GLOW_DELAY_US - (currentSubframeEndUs - currentSubframeStartUs);
+//    } else {
+//        delayLength = subframeDurationUs - (currentSubframeEndUs - currentSubframeStartUs);
+//    }
+//    //DEBUG MS instead of US
+////    unsigned int delayLength = FRAME_DURATION_US - (frameEndMs - frameStartMs);
+//
+//    //delay debug
+////    if (delayLength < 100) {
+////        Serial.print("Delay length ");
+////        Serial.println(delayLength);
+////    }
+//
+//    delayMicroseconds(delayLength > 0 ? delayLength : 1);
+//    //DEBUG MS instead of US
+////    delay(delayLength > 0 ? delayLength : 1);
+//
+//    //here a new frame really begins - we clear the character
+//    clearChar();
+//
+//    multiplexViaShiftRegister(currentSubframeNumber);
+//
+//    grid9End(currentSubframeNumber);
+//}
+
+void IV18Display::initGridStep()
 {
+    // TODO: set from animator?
     currentSubframeStartUs = micros();
-    grid9Begin(currentSubframeNumber);
+    grid9Begin();
 }
 
-void IV18Display::doSubframe(byte subframeNumber)
+void IV18Display::setGridSegments()
 {
-    byte idx = SUBFRAMES_IN_CYCLE - (subframeNumber + 2);
+    byte idx = GRID_STEPS_COUNT - (currentSubframeNumber + 2);
 
     // account for 1 "empty frame"
     if (idx >= 0) {
@@ -89,17 +158,15 @@ void IV18Display::doSubframe(byte subframeNumber)
         }
         setComma(currentCommas[idx]);
     }
-
-    // TODO: status led heartbeat?
 }
 
-void IV18Display::finishSubframe()
+void IV18Display::finishGridStep()
 {
     unsigned int delayLength;
 
     currentSubframeNumber++;
 
-    if (currentSubframeNumber >= SUBFRAMES_IN_CYCLE) {
+    if (currentSubframeNumber >= GRID_STEPS_COUNT) {
         currentSubframeNumber = 0;
     }
 
@@ -109,8 +176,9 @@ void IV18Display::finishSubframe()
 
     //the frame is set up, now wait for the reminder of time.
 
-    if ((currentSubframeNumber % SUBFRAMES_IN_CYCLE) ==
-        SUBFRAMES_IN_CYCLE - 1) { //last empty frame for dot/minus afterglow
+    // TODO: move these to animator?
+    if ((currentSubframeNumber % GRID_STEPS_COUNT) ==
+        GRID_STEPS_COUNT - 1) { //last empty frame for dot/minus afterglow
         delayLength = AFTER_GLOW_DELAY_US - (currentSubframeEndUs - currentSubframeStartUs);
     } else {
         delayLength = subframeDurationUs - (currentSubframeEndUs - currentSubframeStartUs);
@@ -133,23 +201,25 @@ void IV18Display::finishSubframe()
 
     multiplexViaShiftRegister(currentSubframeNumber);
 
-    grid9End(currentSubframeNumber);
+    grid9End();
 }
 
-void IV18Display::grid9Begin(byte subframeNumber)
+void IV18Display::grid9Begin()
 {
-    if ((subframeNumber % (SUBFRAMES_IN_CYCLE) == 9)) {
+    if ((currentSubframeNumber % (GRID_STEPS_COUNT) == 9)) {
         digitalWrite(GRID9, LOW);
     }
 }
 
-void IV18Display::grid9End(byte subframeNumber)
+void IV18Display::grid9End()
 {
     //set GRID9 if we reached the last frames (they are cycled right to left)
-    if ((subframeNumber % (SUBFRAMES_IN_CYCLE) == 8)) {
+    if ((currentSubframeNumber % (GRID_STEPS_COUNT) == 8)) {
         digitalWrite(GRID9, HIGH);
     }
 }
+
+
 
 void IV18Display::init()
 {
@@ -183,7 +253,7 @@ void IV18Display::init()
 
 //void IV18Display::doFrame()
 //{
-//    for (byte i = 0; i < SUBFRAMES_IN_CYCLE; i++) {
+//    for (byte i = 0; i < GRID_STEPS_COUNT; i++) {
 //        initSubframe();
 //
 //        doSubframe(currentSubframeNumber);
@@ -191,6 +261,13 @@ void IV18Display::init()
 //        finishSubframe();
 //    }
 //}
+
+void IV18Display::doGridStep(IV18Display* that)
+{
+    that->initGridStep();
+    that->setGridSegments();
+    that->finishGridStep();
+}
 
 void IV18Display::on()
 {

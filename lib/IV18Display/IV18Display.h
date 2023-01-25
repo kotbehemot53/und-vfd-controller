@@ -5,10 +5,12 @@
 
 class IV18Display
 {
+public:
+    static const int GRID_STEPS_COUNT = 10; //main grids + dot/minus
+
 private:
     // grids/subframes count
     static const int SEGMENT_CNT = 8;
-    static const int SUBFRAMES_IN_CYCLE = 10; //main grids + dot/minus
 
     // output/input pins
     static const int MUX_DA = 2;
@@ -81,12 +83,12 @@ private:
 //TODO: these initial values are debug - will be set by command
     //minus works for idx 0
     //+1 because the string must contain the /0 ending
-    char currentString[SUBFRAMES_IN_CYCLE] = " asscock7";
+    char currentString[GRID_STEPS_COUNT] = " asscock7";
     //dot at idx 0 is the "big one"
-    bool currentCommas[SUBFRAMES_IN_CYCLE - 1] = {true, false, false, false, false, false, false, false, false};
+    bool currentCommas[GRID_STEPS_COUNT - 1] = {true, false, false, false, false, false, false, false, false};
     //bytes for custom mode
-    byte currentBytes[SUBFRAMES_IN_CYCLE - 1] = {0b00000000, 0b00010000, 0b00010000, 0b00010000, 0b00010000, 0b00010000,
-                                                 0b00010000, 0b00010000, 0b00010000};
+    byte currentBytes[GRID_STEPS_COUNT - 1] = {0b00000000, 0b00010000, 0b00010000, 0b00010000, 0b00010000, 0b00010000,
+                                               0b00010000, 0b00010000, 0b00010000};
 
     int currentSubframeNumber = 0;
 //    unsigned long frameStartUs = 0;
@@ -107,12 +109,15 @@ private:
     void multiplexViaShiftRegister(byte subframeNumber); // TODO will be public in mux class?
 
     // TODO: rethink all these!
-//    void initSub
-    void initSubframe();
-    void doSubframe(byte subframeNumber); // TODO: passing subframeNumber around does not make sense!
-    void finishSubframe();
-    void grid9Begin(byte subframeNumber);
-    void grid9End(byte subframeNumber);
+//    void initSubframe();
+//    void doSubframe(byte subframeNumber); // TODO: passing subframeNumber around does not make sense!
+//    void finishSubframe();
+
+    void initGridStep();
+    void setGridSegments();
+    void finishGridStep();
+    void grid9Begin();
+    void grid9End();
 
 public:
     static const byte MODE_CHARS = 0;
@@ -125,6 +130,7 @@ public:
     static void statusOn(IV18Display* that);
     static void statusOff(IV18Display* that);
     static void noOp(IV18Display* that);
+    static void doGridStep(IV18Display* that);
 
     // TODO:
 //    // TODO: remember to append first empty value to those passed or introduce the empty frame otherwise
