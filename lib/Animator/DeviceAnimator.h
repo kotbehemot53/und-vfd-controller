@@ -7,7 +7,7 @@ class DeviceAnimator
 {
 private:
     DeviceAnimatorThread* threads;
-    int numberOfThreads;
+    int numberOfThreads = 0;
     DeviceAnimatorStep** stepsMerged;
     int totalSteps = 0;
     unsigned long frameEndTimeUs = 0;
