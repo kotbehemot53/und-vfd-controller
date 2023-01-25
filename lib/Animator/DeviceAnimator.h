@@ -6,12 +6,17 @@
 class DeviceAnimator
 {
 private:
+    DeviceAnimatorThread* threads;
+    int numberOfThreads;
     DeviceAnimatorStep** stepsMerged;
-    int totalSteps;
+    int totalSteps = 0;
+    unsigned long frameEndTimeUs = 0;
 
-    static int sortMergedSteps(const void *cmp1, const void *cmp2);
+    static int compareMergedSteps(const void *cmp1, const void *cmp2);
+    void initFrame();
 
 public:
+    // TODO: turn it into constructor?
     void setThreads(DeviceAnimatorThread threadsToSet[], int numberOfThreadsToSet);
 
     void doFrame();

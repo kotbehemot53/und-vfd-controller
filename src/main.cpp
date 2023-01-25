@@ -40,6 +40,8 @@ void loop()
 
     // TODO: disable interrupts here? would omit packets?
 
+    // TODO: remove all animation code from device, move it to proper animator and animate it
+
 //    Animator.doFrame();
     animator->doFrame();
 

@@ -9,6 +9,10 @@ class IV18Animator
 private:
     DeviceAnimator animator;
     IV18Display currentDisplay;
+    int currentFrame = 0;
+
+    DeviceAnimatorThread* threads;
+    DeviceAnimatorStep* heartbeatSteps;
 
 public:
     IV18Animator(IV18Display display);

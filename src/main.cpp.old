@@ -156,10 +156,10 @@ void multiplexViaShiftRegister(int frameNumber) {
     }
 }
 
-void initFrame() {
-    frameStartUs = micros();
-    frameStartMs = millis();
-}
+//void initFrame() {
+//    frameStartUs = micros();
+//    frameStartMs = millis();
+//}
 
 void frameUp() {
     unsigned int delayLength;
@@ -237,7 +237,7 @@ void setup() {
 }
 
 void loop() {
-    initFrame();
+//    initFrame();
 
     if ((frame % (FRAMES_IN_CYCLE) == 9)) {
         digitalWrite(GRID9, LOW);
