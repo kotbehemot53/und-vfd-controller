@@ -124,6 +124,7 @@ public:
 
     static void statusOn(IV18Display* that);
     static void statusOff(IV18Display* that);
+    static void noOp(IV18Display* that);
 
     // TODO:
 //    // TODO: remember to append first empty value to those passed or introduce the empty frame otherwise

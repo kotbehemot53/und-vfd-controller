@@ -20,6 +20,7 @@ int DeviceAnimator::sortMergedSteps(const void *cmp1, const void *cmp2)
 void DeviceAnimator::setThreads(DeviceAnimatorThread threadsToSet[], int numberOfThreadsToSet)
 {
     int maxStepsInThread = 0;
+    unsigned long frameEndTimeUs = 0;
     totalSteps = 0;
 
     // determine number of steps to preallocate merged steps pointers array
@@ -40,6 +41,10 @@ void DeviceAnimator::setThreads(DeviceAnimatorThread threadsToSet[], int numberO
             currentPointInTimeInThreadUs += threadsToSet[i].steps[j].waitUs;
             stepsMerged[k] = &threadsToSet[i].steps[j];
 
+            if (currentPointInTimeInThreadUs > frameEndTimeUs) {
+                frameEndTimeUs = currentPointInTimeInThreadUs;
+            }
+
             ++k;
         }
     }
@@ -49,10 +54,12 @@ void DeviceAnimator::setThreads(DeviceAnimatorThread threadsToSet[], int numberO
 
     // assign times to next merged step
     unsigned long previousStepTimeWithinFrameUs = 0;
-    for (int i = 0; i < totalSteps; ++i) {
-        stepsMerged[i]->timeToNextMergedStepUs = stepsMerged[i]->timeWithinFrameUs - previousStepTimeWithinFrameUs;
+    for (int i = 1; i < totalSteps; ++i) {
+        stepsMerged[i-1]->timeToNextMergedStepUs = stepsMerged[i]->timeWithinFrameUs - previousStepTimeWithinFrameUs;
         previousStepTimeWithinFrameUs = stepsMerged[i]->timeWithinFrameUs;
     }
+    // for the last step, set time to next step, which actually is the end of frame
+    stepsMerged[totalSteps - 1]->timeToNextMergedStepUs = frameEndTimeUs - stepsMerged[totalSteps - 1]->timeWithinFrameUs;
 }
 
 void DeviceAnimator::doFrame()

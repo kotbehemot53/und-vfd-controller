@@ -211,3 +211,8 @@ void IV18Display::statusOff(IV18Display* that)
 {
     digitalWrite(STATUS, LOW);
 }
+
+void IV18Display::noOp(IV18Display *that)
+{
+    // does nothing
+}

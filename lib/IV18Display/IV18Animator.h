@@ -1,8 +1,8 @@
 #ifndef PIUCNTVFD1_IV18ANIMATOR_H
 #define PIUCNTVFD1_IV18ANIMATOR_H
 
-#include "DeviceAnimator.h"
-#include "../IV18Display/IV18Display.h"
+#include "../Animator/DeviceAnimator.h"
+#include "IV18Display.h"
 
 class IV18Animator
 {

@@ -9,21 +9,12 @@ IV18Animator::IV18Animator(IV18Display display)
     // TODO: turn it into a proper heartbeat thread and change the waitUs proportions in every frame accordingly
     auto steps = new DeviceAnimatorStep[2]{
         DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*)>(&IV18Display::statusOn), 500000),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*)>(&IV18Display::statusOff), 500000)
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*)>(&IV18Display::statusOff), 1000000)
     };
 
     // TODO: remove this debug thread
-    auto steps2 = new DeviceAnimatorStep[12]{
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*)>(&IV18Display::statusOn), 100000),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*)>(&IV18Display::statusOff), 100000),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*)>(&IV18Display::statusOn), 100000),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*)>(&IV18Display::statusOff), 100000),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*)>(&IV18Display::statusOn), 100000),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*)>(&IV18Display::statusOff), 100000),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*)>(&IV18Display::statusOn), 100000),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*)>(&IV18Display::statusOff), 100000),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*)>(&IV18Display::statusOn), 100000),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*)>(&IV18Display::statusOff), 100000),
+    auto steps2 = new DeviceAnimatorStep[3]{
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*)>(&IV18Display::noOp), 700000),
         DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*)>(&IV18Display::statusOn), 100000),
         DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*)>(&IV18Display::statusOff), 100000)
     };
@@ -32,7 +23,7 @@ IV18Animator::IV18Animator(IV18Display display)
 
     auto threads = new DeviceAnimatorThread[2]{
         DeviceAnimatorThread(steps, 2),
-        DeviceAnimatorThread(steps2, 12)
+        DeviceAnimatorThread(steps2, 3)
     };
 
     animator.setThreads(threads, 2);
