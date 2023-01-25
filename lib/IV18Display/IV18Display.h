@@ -91,30 +91,23 @@ private:
     static void setByte(byte val);
     static void setChar(char val);
     static void setComma(bool val);
-    static void clearChar();
 
-    void prepareGridSegments(int sequenceNumber);
-
-    // TODO: extract these to a separate DisplayMultiplexer class?
     static void resetMultiplexingPulse(); //reset multiplexer
-    static void multiplexViaShiftRegister(bool isFirst = false);
-    static void multiplexGrid9(bool isGrid9 = false);
 
 public:
     static const byte MODE_CHARS = 0;
     static const byte MODE_BYTES = 1;
 
-    void init();
-    void on();
-    void off();
+    static void init();
+    static void on();
+    static void off();
+    static void statusOn();
+    static void statusOff();
 
-    // TODO move these to iv18animator?
-    static void statusOn(IV18Display* that, int sequenceNumber);
-    static void statusOff(IV18Display* that, int sequenceNumber);
-    static void noOp(IV18Display* that, int sequenceNumber);
-    static void doGridStep(IV18Display* that, int sequenceNumber);
-    static void prepareNextGridStep(IV18Display* that, int sequenceNumber);
-//    static void prepareFirstGridStep(IV18Display* that, int sequenceNumber);
+    void prepareGridSegments(int sequenceNumber);
+    static void clearChar();
+    static void multiplexViaShiftRegister(bool isFirst = false);
+    static void multiplexGrid9(bool isGrid9 = false);
 
     // TODO:
 //    // TODO: remember to append first empty value to those passed or introduce the empty frame otherwise

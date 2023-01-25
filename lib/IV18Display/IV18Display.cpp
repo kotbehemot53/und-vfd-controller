@@ -2,6 +2,37 @@
 
 IV18Display Display;
 
+void IV18Display::init()
+{
+    pinMode(MUX_DA, OUTPUT);
+    digitalWrite(MUX_DA, LOW);
+    pinMode(MUX_CL, OUTPUT);
+    digitalWrite(MUX_CL, LOW);
+    pinMode(MUX_MR, OUTPUT);
+    digitalWrite(MUX_MR, LOW);
+    pinMode(HV_ENABLE, OUTPUT);
+    digitalWrite(HV_ENABLE, LOW);
+    pinMode(STATUS, OUTPUT);
+    digitalWrite(STATUS, LOW);
+
+    for (int i = 0; i < SEGMENT_CNT; i++) {
+        pinMode(SEGMENTS[i], OUTPUT);
+        digitalWrite(SEGMENTS[i], HIGH);
+    }
+
+    pinMode(GRID9, OUTPUT);
+    digitalWrite(GRID9, LOW);
+
+    resetMultiplexingPulse();
+}
+
+void IV18Display::resetMultiplexingPulse()
+{
+    digitalWrite(MUX_MR, LOW);
+    delayMicroseconds(SERIAL_REG_CLK_PULSE_LEN_US);
+    digitalWrite(MUX_MR, HIGH);
+}
+
 void IV18Display::setByte(byte val)
 {
     //theoretically not necessary (if there's no error anywhere)
@@ -38,13 +69,6 @@ void IV18Display::clearChar()
     }
 }
 
-void IV18Display::resetMultiplexingPulse()
-{
-    digitalWrite(MUX_MR, LOW);
-    delayMicroseconds(SERIAL_REG_CLK_PULSE_LEN_US);
-    digitalWrite(MUX_MR, HIGH);
-}
-
 void IV18Display::multiplexViaShiftRegister(bool isFirst)
 {
     //send a single "1" to the shift register in the beginning of each cycle
@@ -76,30 +100,6 @@ void IV18Display::prepareGridSegments(int sequenceNumber)
     }
 }
 
-void IV18Display::init()
-{
-    pinMode(MUX_DA, OUTPUT);
-    digitalWrite(MUX_DA, LOW);
-    pinMode(MUX_CL, OUTPUT);
-    digitalWrite(MUX_CL, LOW);
-    pinMode(MUX_MR, OUTPUT);
-    digitalWrite(MUX_MR, LOW);
-    pinMode(HV_ENABLE, OUTPUT);
-    digitalWrite(HV_ENABLE, LOW);
-    pinMode(STATUS, OUTPUT);
-    digitalWrite(STATUS, LOW);
-
-    for (int i = 0; i < SEGMENT_CNT; i++) {
-        pinMode(SEGMENTS[i], OUTPUT);
-        digitalWrite(SEGMENTS[i], HIGH);
-    }
-
-    pinMode(GRID9, OUTPUT);
-    digitalWrite(GRID9, LOW);
-
-    resetMultiplexingPulse();
-}
-
 void IV18Display::on()
 {
     digitalWrite(HV_ENABLE, HIGH);
@@ -110,30 +110,12 @@ void IV18Display::off()
     digitalWrite(HV_ENABLE, LOW);
 }
 
-
-void IV18Display::doGridStep(IV18Display* that, int sequenceNumber)
-{
-    that->prepareGridSegments(sequenceNumber);
-}
-
-void IV18Display::prepareNextGridStep(IV18Display* that, int sequenceNumber)
-{
-    that->clearChar();
-    that->multiplexViaShiftRegister(sequenceNumber == 0);
-    that->multiplexGrid9(sequenceNumber == 8);
-}
-
-void IV18Display::statusOn(IV18Display* that, int sequenceNumber)
+void IV18Display::statusOn()
 {
     digitalWrite(STATUS, HIGH);
 }
 
-void IV18Display::statusOff(IV18Display* that, int sequenceNumber)
+void IV18Display::statusOff()
 {
     digitalWrite(STATUS, LOW);
-}
-
-void IV18Display::noOp(IV18Display *that, int sequenceNumber)
-{
-    // does nothing
 }

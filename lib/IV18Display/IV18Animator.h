@@ -2,6 +2,7 @@
 #define PIUCNTVFD1_IV18ANIMATOR_H
 
 #include "../DeviceAnimator/DeviceAnimator.h"
+#include "IV18AnimationSteps.h"
 #include "IV18Display.h"
 
 class IV18Animator
@@ -12,7 +13,6 @@ private:
     static const unsigned long DIMMEST_LENGTH_US = 500;
 
     DeviceAnimator animator;
-    IV18Display currentDisplay;
     int currentFrame = 0;
     DeviceAnimatorThread* threads;
 
