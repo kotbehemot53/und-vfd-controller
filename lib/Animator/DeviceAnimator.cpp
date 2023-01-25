@@ -33,7 +33,8 @@ void DeviceAnimator::setThreads(DeviceAnimatorThread threadsToSet[], int numberO
     for (int i = 0; i < numberOfThreads; ++i) {
         for (int j = 0; j < threads[i].numberOfSteps; ++j) {
             stepsMerged[k] = &threads[i].steps[j];
-            stepsMerged[k]->stepInThread = j;
+            // now they are set arbitrarily by user
+//            stepsMerged[k]->sequenceNumber = j;
             ++k;
         }
     }
@@ -79,7 +80,7 @@ void DeviceAnimator::doFrame()
 
     for (int i = 0; i < totalSteps; ++i) {
         preExecTimeUs = micros();
-        stepsMerged[i]->callback(stepsMerged[i]->devicePtr, stepsMerged[i]->stepInThread);
+        stepsMerged[i]->callback(stepsMerged[i]->devicePtr, stepsMerged[i]->sequenceNumber);
         postExecTimeUs = micros();
         execTimeDiffUs = postExecTimeUs >= preExecTimeUs ? postExecTimeUs - preExecTimeUs : 0;
 

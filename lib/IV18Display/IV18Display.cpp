@@ -70,6 +70,11 @@ void IV18Display::multiplexViaShiftRegister(bool isFirst)
     stepMultiplexingPulse();
 }
 
+void IV18Display::multiplexGrid9(int sequenceNumber)
+{
+    digitalWrite(GRID9, sequenceNumber == 8 ? HIGH : LOW);
+}
+
 
 
 //void IV18Display::initSubframe()
@@ -145,9 +150,9 @@ void IV18Display::multiplexViaShiftRegister(bool isFirst)
 //    grid9Begin();
 //}
 
-void IV18Display::setGridSegments(int stepInThread)
+void IV18Display::setGridSegments(int sequenceNumber)
 {
-    byte idx = GRID_STEPS_COUNT - (stepInThread + 2);
+    byte idx = GRID_STEPS_COUNT - (sequenceNumber + 2);
 
     // account for 1 "empty frame"
     if (idx >= 0) {
@@ -204,17 +209,17 @@ void IV18Display::setGridSegments(int stepInThread)
 //    grid9End();
 //}
 
-//void IV18Display::grid9Begin(int stepInThread)
+//void IV18Display::grid9Begin(int sequenceNumber)
 //{
-//    if ((stepInThread % (GRID_STEPS_COUNT) == 9)) {
+//    if ((sequenceNumber % (GRID_STEPS_COUNT) == 9)) {
 //        digitalWrite(GRID9, LOW);
 //    }
 //}
 //
-//void IV18Display::grid9End(int stepInThread)
+//void IV18Display::grid9End(int sequenceNumber)
 //{
 //    //set GRID9 if we reached the last frames (they are cycled right to left)
-//    if ((stepInThread % (GRID_STEPS_COUNT) == 8)) {
+//    if ((sequenceNumber % (GRID_STEPS_COUNT) == 8)) {
 //        digitalWrite(GRID9, HIGH);
 //    }
 //}
@@ -272,36 +277,32 @@ void IV18Display::off()
 //    }
 //}
 
-void IV18Display::doGridStep(IV18Display* that, int stepInThread)
+void IV18Display::doGridStep(IV18Display* that, int sequenceNumber)
 {
-    // TODO: /2 because every other step is prepareNextGridStep
-    //       think about ability to pass arbitrary sequence number instead (or additionally?)
-    that->setGridSegments(stepInThread/2);
+//    if (sequenceNumber == 9) {
+//        digitalWrite(GRID9, HIGH);
+//    }
+    that->setGridSegments(sequenceNumber);
 }
 
-void IV18Display::prepareNextGridStep(IV18Display* that, int stepInThread)
-{
-    that->clearChar();
-    that->multiplexViaShiftRegister();
-}
-
-void IV18Display::prepareFirstGridStep(IV18Display *that, int stepInThread)
+void IV18Display::prepareNextGridStep(IV18Display* that, int sequenceNumber)
 {
     that->clearChar();
-    that->multiplexViaShiftRegister(true);
+    that->multiplexViaShiftRegister(sequenceNumber == 0);
+    that->multiplexGrid9(sequenceNumber);
 }
 
-void IV18Display::statusOn(IV18Display* that, int stepInThread)
+void IV18Display::statusOn(IV18Display* that, int sequenceNumber)
 {
     digitalWrite(STATUS, HIGH);
 }
 
-void IV18Display::statusOff(IV18Display* that, int stepInThread)
+void IV18Display::statusOff(IV18Display* that, int sequenceNumber)
 {
     digitalWrite(STATUS, LOW);
 }
 
-void IV18Display::noOp(IV18Display *that, int stepInThread)
+void IV18Display::noOp(IV18Display *that, int sequenceNumber)
 {
     // does nothing
 }

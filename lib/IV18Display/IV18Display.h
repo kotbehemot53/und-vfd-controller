@@ -83,9 +83,9 @@ private:
 //TODO: these initial values are debug - will be set by command
     //minus works for idx 0
     //+1 because the string must contain the /0 ending
-    char currentString[GRID_STEPS_COUNT] = " asscock7";
+    char currentString[GRID_STEPS_COUNT] = "-asscock7";
     //dot at idx 0 is the "big one"
-    bool currentCommas[GRID_STEPS_COUNT - 1] = {true, false, false, false, false, false, false, false, false};
+    bool currentCommas[GRID_STEPS_COUNT - 1] = {false, false, false, false, false, false, false, false, false};
     //bytes for custom mode
     byte currentBytes[GRID_STEPS_COUNT - 1] = {0b00000000, 0b00010000, 0b00010000, 0b00010000, 0b00010000, 0b00010000,
                                                0b00010000, 0b00010000, 0b00010000};
@@ -106,6 +106,7 @@ private:
     void initMultiplexingPulse(bool isFirst = false); //send a 1 to the multiplexer data input if necessary (beginning of frame); 0 otherwise
     void stepMultiplexingPulse(); //send a pulse to the multiplexer clock
     void multiplexViaShiftRegister(bool isFirst = false); // TODO will be public in mux class?
+    void multiplexGrid9(int sequenceNumber); // TODO will be public in mux class?
 
     // TODO: rethink all these!
 //    void initSubframe();
@@ -113,7 +114,7 @@ private:
 //    void finishSubframe();
 
 //    void initGridStep();
-    void setGridSegments(int stepInThread);
+    void setGridSegments(int sequenceNumber);
 //    void finishGridStep();
 //    void grid9Begin();
 //    void grid9End();
@@ -126,12 +127,12 @@ public:
     void on();
     void off();
 
-    static void statusOn(IV18Display* that, int stepInThread);
-    static void statusOff(IV18Display* that, int stepInThread);
-    static void noOp(IV18Display* that, int stepInThread);
-    static void doGridStep(IV18Display* that, int stepInThread);
-    static void prepareNextGridStep(IV18Display* that, int stepInThread);
-    static void prepareFirstGridStep(IV18Display* that, int stepInThread);
+    static void statusOn(IV18Display* that, int sequenceNumber);
+    static void statusOff(IV18Display* that, int sequenceNumber);
+    static void noOp(IV18Display* that, int sequenceNumber);
+    static void doGridStep(IV18Display* that, int sequenceNumber);
+    static void prepareNextGridStep(IV18Display* that, int sequenceNumber);
+//    static void prepareFirstGridStep(IV18Display* that, int sequenceNumber);
 
     // TODO:
 //    // TODO: remember to append first empty value to those passed or introduce the empty frame otherwise
