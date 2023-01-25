@@ -118,11 +118,13 @@ public:
     static const byte MODE_CHARS = 0;
     static const byte MODE_BYTES = 1;
 
-    void init(unsigned long frameDurationUs);
-
+    void init();
     void on();
-
     void off();
+
+    static void statusOn(IV18Display* that);
+    static void statusOff(IV18Display* that);
+    static void noOp(IV18Display* that);
 
     // TODO:
 //    // TODO: remember to append first empty value to those passed or introduce the empty frame otherwise
@@ -132,7 +134,7 @@ public:
 //    void setMode(byte mode);
 
     // TODO: move this & frameDurationUs to a separate "animator" class? or iface?
-    void doFrame(); //unsigned long frameStart = micros(); do stuff
+//    void doFrame(); //unsigned long frameStart = micros(); do stuff
 //    void endFrame(); //wait till end of frame as set in frameDurationUs; TODO: warn when no time left!
 };
 

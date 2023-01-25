@@ -151,7 +151,7 @@ void IV18Display::grid9End(byte subframeNumber)
     }
 }
 
-void IV18Display::init(unsigned long frameDurationUs)
+void IV18Display::init()
 {
     //TODO: calc subframeDurationUs from frameDurationUs
     subframeDurationUs = 1000;
@@ -178,19 +178,19 @@ void IV18Display::init(unsigned long frameDurationUs)
     resetMultiplexingPulse();
 
     // TODO: make a nice heartbeat or sth
-    digitalWrite(STATUS, HIGH);
+//    digitalWrite(STATUS, HIGH);
 }
 
-void IV18Display::doFrame()
-{
-    for (byte i = 0; i < SUBFRAMES_IN_CYCLE; i++) {
-        initSubframe();
-
-        doSubframe(currentSubframeNumber);
-
-        finishSubframe();
-    }
-}
+//void IV18Display::doFrame()
+//{
+//    for (byte i = 0; i < SUBFRAMES_IN_CYCLE; i++) {
+//        initSubframe();
+//
+//        doSubframe(currentSubframeNumber);
+//
+//        finishSubframe();
+//    }
+//}
 
 void IV18Display::on()
 {
@@ -200,4 +200,19 @@ void IV18Display::on()
 void IV18Display::off()
 {
     digitalWrite(HV_ENABLE, LOW);
+}
+
+void IV18Display::statusOn(IV18Display* that)
+{
+    digitalWrite(STATUS, HIGH);
+}
+
+void IV18Display::statusOff(IV18Display* that)
+{
+    digitalWrite(STATUS, LOW);
+}
+
+void IV18Display::noOp(IV18Display *that)
+{
+    // does nothing
 }
