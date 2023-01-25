@@ -22,8 +22,7 @@ private:
     static const byte STATUS = A3;
 
     // timing
-    static const unsigned short AFTER_GLOW_DELAY_US = 200;
-    static const unsigned short SERIAL_REG_CLK_PULSE_LEN_US = 100;
+    static const unsigned short SERIAL_REG_CLK_PULSE_LEN_US = 50;
 
     // char-to-segments dict
     //TODO 0 is actually ' '!
@@ -77,10 +76,7 @@ private:
             0b11011010, //z //same as 2!
     };
 
-//    unsigned long frameDurationUs;
-    unsigned short subframeDurationUs; // TODO: calc it in init!
-
-//TODO: these initial values are debug - will be set by command
+    //TODO: these initial values are debug - will be set by command
     //minus works for idx 0
     //+1 because the string must contain the /0 ending
     char currentString[GRID_STEPS_COUNT] = "-asscock7";
@@ -90,34 +86,21 @@ private:
     byte currentBytes[GRID_STEPS_COUNT - 1] = {0b00000000, 0b00010000, 0b00010000, 0b00010000, 0b00010000, 0b00010000,
                                                0b00010000, 0b00010000, 0b00010000};
 
-    int currentSubframeNumber = 0;
-//    unsigned long frameStartUs = 0;
-//    unsigned long currentSubframeStartUs = 0;
-
     byte currentMode = MODE_CHARS;
 
-    void setByte(byte val);
-    void setChar(char val);
-    void setComma(bool val);
-    void clearChar();
+    static void setByte(byte val);
+    static void setChar(char val);
+    static void setComma(bool val);
+    static void clearChar();
+
+    void prepareGridSegments(int sequenceNumber);
 
     // TODO: extract these to a separate DisplayMultiplexer class
-    void resetMultiplexingPulse(); //reset multiplexer - TODO will be public in mux class?
-    void initMultiplexingPulse(bool isFirst = false); //send a 1 to the multiplexer data input if necessary (beginning of frame); 0 otherwise
-    void stepMultiplexingPulse(); //send a pulse to the multiplexer clock
-    void multiplexViaShiftRegister(bool isFirst = false); // TODO will be public in mux class?
-    void multiplexGrid9(int sequenceNumber); // TODO will be public in mux class?
-
-    // TODO: rethink all these!
-//    void initSubframe();
-//    void doSubframe(byte subframeNumber); // TODO: passing subframeNumber around does not make sense!
-//    void finishSubframe();
-
-//    void initGridStep();
-    void setGridSegments(int sequenceNumber);
-//    void finishGridStep();
-//    void grid9Begin();
-//    void grid9End();
+    static void resetMultiplexingPulse(); //reset multiplexer - TODO will be public in mux class?
+    static void initMultiplexingPulse(bool isFirst = false); //send a 1 to the multiplexer data input if necessary (beginning of frame); 0 otherwise
+    static void stepMultiplexingPulse(); //send a pulse to the multiplexer clock
+    static void multiplexViaShiftRegister(bool isFirst = false); // TODO will be public in mux class?
+    static void multiplexGrid9(int sequenceNumber); // TODO will be public in mux class?
 
 public:
     static const byte MODE_CHARS = 0;
@@ -127,6 +110,7 @@ public:
     void on();
     void off();
 
+    // TODO move these to iv18animator?
     static void statusOn(IV18Display* that, int sequenceNumber);
     static void statusOff(IV18Display* that, int sequenceNumber);
     static void noOp(IV18Display* that, int sequenceNumber);
@@ -140,10 +124,6 @@ public:
 //    void setChars(char* chars); // TODO: how to ensure length of 8? enable exceptions?
 //    void setCommas(bool* commas); // TODO: how to ensure length of 8? enable exceptions?
 //    void setMode(byte mode);
-
-    // TODO: move this & frameDurationUs to a separate "animator" class? or iface?
-//    void doFrame(); //unsigned long frameStart = micros(); do stuff
-//    void endFrame(); //wait till end of frame as set in frameDurationUs; TODO: warn when no time left!
 };
 
 extern IV18Display Display;

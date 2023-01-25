@@ -5,7 +5,7 @@ class DeviceAnimatorStep
 {
 public:
     void* devicePtr;
-    void (*callback)(void* devicePtr,int stepInThread); //void (*callback)(DeviceAnimatorStep &step); - self mod not there - do it here on running of step!
+    void (*callback)(void* devicePtr,int sequenceNumber);
     unsigned long waitUs;
     int sequenceNumber = 0;
 

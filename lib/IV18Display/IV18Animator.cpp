@@ -33,19 +33,9 @@ IV18Animator::IV18Animator(IV18Display display)
         DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18Display::doGridStep), 900, 9),
     };
 
-    // TODO: remove this debug thread
-//    auto steps2 = new DeviceAnimatorStep[3]{
-//        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*)>(&IV18Display::noOp), 700000),
-//        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*)>(&IV18Display::statusOn), 100000),
-//        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*)>(&IV18Display::statusOff), 100000)
-//    };
-
-    // TODO: add a proper display thread (with heartbeatSteps multiplexing digits, maybe with dimming too, later on)
-
     threads = new DeviceAnimatorThread[2]{
         DeviceAnimatorThread(heartbeatSteps, 2),
         DeviceAnimatorThread(lampGridSteps, IV18Display::GRID_STEPS_COUNT*2)
-//        DeviceAnimatorThread(steps2, 3)
     };
 
     animator.setThreads(threads, 2);
