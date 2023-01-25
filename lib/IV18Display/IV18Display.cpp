@@ -45,34 +45,20 @@ void IV18Display::resetMultiplexingPulse()
     digitalWrite(MUX_MR, HIGH);
 }
 
-void IV18Display::initMultiplexingPulse(bool isFirst)
+void IV18Display::multiplexViaShiftRegister(bool isFirst)
 {
     //send a single "1" to the shift register in the beginning of each cycle
-    if (isFirst) {
-        digitalWrite(MUX_DA, HIGH);
-    } else {
-        digitalWrite(MUX_DA, LOW);
-    }
-}
+    digitalWrite(MUX_DA, isFirst ? HIGH : LOW);
 
-void IV18Display::stepMultiplexingPulse()
-{
     //1 clock pulse to the shift register
     digitalWrite(MUX_CL, HIGH);
     delayMicroseconds(SERIAL_REG_CLK_PULSE_LEN_US);
     digitalWrite(MUX_CL, LOW);
-
 }
 
-void IV18Display::multiplexViaShiftRegister(bool isFirst)
+void IV18Display::multiplexGrid9(bool isGrid9)
 {
-    initMultiplexingPulse(isFirst);
-    stepMultiplexingPulse();
-}
-
-void IV18Display::multiplexGrid9(int sequenceNumber)
-{
-    digitalWrite(GRID9, sequenceNumber == 8 ? HIGH : LOW);
+    digitalWrite(GRID9, isGrid9 ? HIGH : LOW);
 }
 
 void IV18Display::prepareGridSegments(int sequenceNumber)
@@ -134,7 +120,7 @@ void IV18Display::prepareNextGridStep(IV18Display* that, int sequenceNumber)
 {
     that->clearChar();
     that->multiplexViaShiftRegister(sequenceNumber == 0);
-    that->multiplexGrid9(sequenceNumber);
+    that->multiplexGrid9(sequenceNumber == 8);
 }
 
 void IV18Display::statusOn(IV18Display* that, int sequenceNumber)

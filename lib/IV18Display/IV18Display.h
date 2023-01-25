@@ -95,12 +95,10 @@ private:
 
     void prepareGridSegments(int sequenceNumber);
 
-    // TODO: extract these to a separate DisplayMultiplexer class
-    static void resetMultiplexingPulse(); //reset multiplexer - TODO will be public in mux class?
-    static void initMultiplexingPulse(bool isFirst = false); //send a 1 to the multiplexer data input if necessary (beginning of frame); 0 otherwise
-    static void stepMultiplexingPulse(); //send a pulse to the multiplexer clock
-    static void multiplexViaShiftRegister(bool isFirst = false); // TODO will be public in mux class?
-    static void multiplexGrid9(int sequenceNumber); // TODO will be public in mux class?
+    // TODO: extract these to a separate DisplayMultiplexer class?
+    static void resetMultiplexingPulse(); //reset multiplexer
+    static void multiplexViaShiftRegister(bool isFirst = false);
+    static void multiplexGrid9(bool isGrid9 = false);
 
 public:
     static const byte MODE_CHARS = 0;
