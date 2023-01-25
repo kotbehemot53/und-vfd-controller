@@ -45,17 +45,17 @@ void IV18Display::resetMultiplexingPulse()
     digitalWrite(MUX_MR, HIGH);
 }
 
-void IV18Display::initMultiplexingPulse(byte subframeNumber)
+void IV18Display::initMultiplexingPulse(bool isFirst)
 {
     //send a single "1" to the shift register in the beginning of each cycle
-    if ((subframeNumber % (GRID_STEPS_COUNT) == 0)) {
+    if (isFirst) {
         digitalWrite(MUX_DA, HIGH);
     } else {
         digitalWrite(MUX_DA, LOW);
     }
 }
 
-void IV18Display::stepMultiplexingPulse(byte subframeNumber)
+void IV18Display::stepMultiplexingPulse()
 {
     //1 clock pulse to the shift register
     digitalWrite(MUX_CL, HIGH);
@@ -64,10 +64,10 @@ void IV18Display::stepMultiplexingPulse(byte subframeNumber)
 
 }
 
-void IV18Display::multiplexViaShiftRegister(byte subframeNumber)
+void IV18Display::multiplexViaShiftRegister(bool isFirst)
 {
-    initMultiplexingPulse(subframeNumber);
-    stepMultiplexingPulse(subframeNumber);
+    initMultiplexingPulse(isFirst);
+    stepMultiplexingPulse();
 }
 
 
@@ -138,16 +138,16 @@ void IV18Display::multiplexViaShiftRegister(byte subframeNumber)
 //    grid9End(currentSubframeNumber);
 //}
 
-void IV18Display::initGridStep()
-{
-    // TODO: set from animator?
-    currentSubframeStartUs = micros();
-    grid9Begin();
-}
+//void IV18Display::initGridStep()
+//{
+//    // TODO: set from animator?
+//    currentSubframeStartUs = micros();
+//    grid9Begin();
+//}
 
-void IV18Display::setGridSegments()
+void IV18Display::setGridSegments(int stepInThread)
 {
-    byte idx = GRID_STEPS_COUNT - (currentSubframeNumber + 2);
+    byte idx = GRID_STEPS_COUNT - (stepInThread + 2);
 
     // account for 1 "empty frame"
     if (idx >= 0) {
@@ -160,64 +160,64 @@ void IV18Display::setGridSegments()
     }
 }
 
-void IV18Display::finishGridStep()
-{
-    unsigned int delayLength;
-
-    currentSubframeNumber++;
-
-    if (currentSubframeNumber >= GRID_STEPS_COUNT) {
-        currentSubframeNumber = 0;
-    }
-
-    unsigned long currentSubframeEndUs = micros();
-    //DEBUG MS instead of US
-//    unsigned long frameEndMs = millis();
-
-    //the frame is set up, now wait for the reminder of time.
-
-    // TODO: move these to animator?
-    if ((currentSubframeNumber % GRID_STEPS_COUNT) ==
-        GRID_STEPS_COUNT - 1) { //last empty frame for dot/minus afterglow
-        delayLength = AFTER_GLOW_DELAY_US - (currentSubframeEndUs - currentSubframeStartUs);
-    } else {
-        delayLength = subframeDurationUs - (currentSubframeEndUs - currentSubframeStartUs);
-    }
-    //DEBUG MS instead of US
-//    unsigned int delayLength = FRAME_DURATION_US - (frameEndMs - frameStartMs);
-
-    //delay debug
-//    if (delayLength < 100) {
-//        Serial.print("Delay length ");
-//        Serial.println(delayLength);
+//void IV18Display::finishGridStep()
+//{
+//    unsigned int delayLength;
+//
+//    currentSubframeNumber++;
+//
+//    if (currentSubframeNumber >= GRID_STEPS_COUNT) {
+//        currentSubframeNumber = 0;
 //    }
+//
+//    unsigned long currentSubframeEndUs = micros();
+//    //DEBUG MS instead of US
+////    unsigned long frameEndMs = millis();
+//
+//    //the frame is set up, now wait for the reminder of time.
+//
+//    // TODO: move these to animator?
+//    if ((currentSubframeNumber % GRID_STEPS_COUNT) ==
+//        GRID_STEPS_COUNT - 1) { //last empty frame for dot/minus afterglow
+//        delayLength = AFTER_GLOW_DELAY_US - (currentSubframeEndUs - currentSubframeStartUs);
+//    } else {
+//        delayLength = subframeDurationUs - (currentSubframeEndUs - currentSubframeStartUs);
+//    }
+//    //DEBUG MS instead of US
+////    unsigned int delayLength = FRAME_DURATION_US - (frameEndMs - frameStartMs);
+//
+//    //delay debug
+////    if (delayLength < 100) {
+////        Serial.print("Delay length ");
+////        Serial.println(delayLength);
+////    }
+//
+//    delayMicroseconds(delayLength > 0 ? delayLength : 1);
+//    //DEBUG MS instead of US
+////    delay(delayLength > 0 ? delayLength : 1);
+//
+//    //here a new frame really begins - we clear the character
+//    clearChar();
+//
+//    multiplexViaShiftRegister();
+//
+//    grid9End();
+//}
 
-    delayMicroseconds(delayLength > 0 ? delayLength : 1);
-    //DEBUG MS instead of US
-//    delay(delayLength > 0 ? delayLength : 1);
-
-    //here a new frame really begins - we clear the character
-    clearChar();
-
-    multiplexViaShiftRegister(currentSubframeNumber);
-
-    grid9End();
-}
-
-void IV18Display::grid9Begin()
-{
-    if ((currentSubframeNumber % (GRID_STEPS_COUNT) == 9)) {
-        digitalWrite(GRID9, LOW);
-    }
-}
-
-void IV18Display::grid9End()
-{
-    //set GRID9 if we reached the last frames (they are cycled right to left)
-    if ((currentSubframeNumber % (GRID_STEPS_COUNT) == 8)) {
-        digitalWrite(GRID9, HIGH);
-    }
-}
+//void IV18Display::grid9Begin(int stepInThread)
+//{
+//    if ((stepInThread % (GRID_STEPS_COUNT) == 9)) {
+//        digitalWrite(GRID9, LOW);
+//    }
+//}
+//
+//void IV18Display::grid9End(int stepInThread)
+//{
+//    //set GRID9 if we reached the last frames (they are cycled right to left)
+//    if ((stepInThread % (GRID_STEPS_COUNT) == 8)) {
+//        digitalWrite(GRID9, HIGH);
+//    }
+//}
 
 
 
@@ -251,6 +251,16 @@ void IV18Display::init()
 //    digitalWrite(STATUS, HIGH);
 }
 
+void IV18Display::on()
+{
+    digitalWrite(HV_ENABLE, HIGH);
+}
+
+void IV18Display::off()
+{
+    digitalWrite(HV_ENABLE, LOW);
+}
+
 //void IV18Display::doFrame()
 //{
 //    for (byte i = 0; i < GRID_STEPS_COUNT; i++) {
@@ -262,34 +272,36 @@ void IV18Display::init()
 //    }
 //}
 
-void IV18Display::doGridStep(IV18Display* that)
+void IV18Display::doGridStep(IV18Display* that, int stepInThread)
 {
-    that->initGridStep();
-    that->setGridSegments();
-    that->finishGridStep();
+    // TODO: /2 because every other step is prepareNextGridStep
+    //       think about ability to pass arbitrary sequence number instead (or additionally?)
+    that->setGridSegments(stepInThread/2);
 }
 
-void IV18Display::on()
+void IV18Display::prepareNextGridStep(IV18Display* that, int stepInThread)
 {
-    digitalWrite(HV_ENABLE, HIGH);
+    that->clearChar();
+    that->multiplexViaShiftRegister();
 }
 
-void IV18Display::off()
+void IV18Display::prepareFirstGridStep(IV18Display *that, int stepInThread)
 {
-    digitalWrite(HV_ENABLE, LOW);
+    that->clearChar();
+    that->multiplexViaShiftRegister(true);
 }
 
-void IV18Display::statusOn(IV18Display* that)
+void IV18Display::statusOn(IV18Display* that, int stepInThread)
 {
     digitalWrite(STATUS, HIGH);
 }
 
-void IV18Display::statusOff(IV18Display* that)
+void IV18Display::statusOff(IV18Display* that, int stepInThread)
 {
     digitalWrite(STATUS, LOW);
 }
 
-void IV18Display::noOp(IV18Display *that)
+void IV18Display::noOp(IV18Display *that, int stepInThread)
 {
     // does nothing
 }

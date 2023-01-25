@@ -6,21 +6,31 @@ IV18Animator::IV18Animator(IV18Display display)
 
     heartbeatSteps = new DeviceAnimatorStep[2]{
         // waitUs values will be overriden on every frame by animateHeartbeat
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*)>(&IV18Display::statusOn), 5000),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*)>(&IV18Display::statusOff), 5000)
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18Display::statusOn), 5000),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18Display::statusOff), 5000)
     };
 
-    lampGridSteps = new DeviceAnimatorStep[IV18Display::GRID_STEPS_COUNT]{
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*)>(&IV18Display::doGridStep), 1000),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*)>(&IV18Display::doGridStep), 1000),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*)>(&IV18Display::doGridStep), 1000),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*)>(&IV18Display::doGridStep), 1000),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*)>(&IV18Display::doGridStep), 1000),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*)>(&IV18Display::doGridStep), 1000),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*)>(&IV18Display::doGridStep), 1000),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*)>(&IV18Display::doGridStep), 1000),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*)>(&IV18Display::doGridStep), 1000),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*)>(&IV18Display::doGridStep), 1000),
+    lampGridSteps = new DeviceAnimatorStep[IV18Display::GRID_STEPS_COUNT*2]{
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18Display::doGridStep), 900),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18Display::prepareNextGridStep), 100),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18Display::doGridStep), 900),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18Display::prepareNextGridStep), 100),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18Display::doGridStep), 900),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18Display::prepareNextGridStep), 100),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18Display::doGridStep), 900),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18Display::prepareNextGridStep), 100),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18Display::doGridStep), 900),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18Display::prepareNextGridStep), 100),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18Display::doGridStep), 900),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18Display::prepareNextGridStep), 100),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18Display::doGridStep), 900),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18Display::prepareNextGridStep), 100),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18Display::doGridStep), 900),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18Display::prepareNextGridStep), 100),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18Display::doGridStep), 900),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18Display::prepareNextGridStep), 100),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18Display::doGridStep), 900),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18Display::prepareFirstGridStep), 100),
     };
 
     // TODO: remove this debug thread
@@ -34,7 +44,7 @@ IV18Animator::IV18Animator(IV18Display display)
 
     threads = new DeviceAnimatorThread[2]{
         DeviceAnimatorThread(heartbeatSteps, 2),
-        DeviceAnimatorThread(lampGridSteps, IV18Display::GRID_STEPS_COUNT)
+        DeviceAnimatorThread(lampGridSteps, IV18Display::GRID_STEPS_COUNT*2)
 //        DeviceAnimatorThread(steps2, 3)
     };
 

@@ -92,7 +92,7 @@ private:
 
     int currentSubframeNumber = 0;
 //    unsigned long frameStartUs = 0;
-    unsigned long currentSubframeStartUs = 0;
+//    unsigned long currentSubframeStartUs = 0;
 
     byte currentMode = MODE_CHARS;
 
@@ -103,21 +103,20 @@ private:
 
     // TODO: extract these to a separate DisplayMultiplexer class
     void resetMultiplexingPulse(); //reset multiplexer - TODO will be public in mux class?
-    void initMultiplexingPulse(
-            byte subframeNumber); //send a 1 to the multiplexer data input if necessary (beginning of frame)
-    void stepMultiplexingPulse(byte subframeNumber); //send a pulse to the multiplexer clock
-    void multiplexViaShiftRegister(byte subframeNumber); // TODO will be public in mux class?
+    void initMultiplexingPulse(bool isFirst = false); //send a 1 to the multiplexer data input if necessary (beginning of frame); 0 otherwise
+    void stepMultiplexingPulse(); //send a pulse to the multiplexer clock
+    void multiplexViaShiftRegister(bool isFirst = false); // TODO will be public in mux class?
 
     // TODO: rethink all these!
 //    void initSubframe();
 //    void doSubframe(byte subframeNumber); // TODO: passing subframeNumber around does not make sense!
 //    void finishSubframe();
 
-    void initGridStep();
-    void setGridSegments();
-    void finishGridStep();
-    void grid9Begin();
-    void grid9End();
+//    void initGridStep();
+    void setGridSegments(int stepInThread);
+//    void finishGridStep();
+//    void grid9Begin();
+//    void grid9End();
 
 public:
     static const byte MODE_CHARS = 0;
@@ -127,10 +126,12 @@ public:
     void on();
     void off();
 
-    static void statusOn(IV18Display* that);
-    static void statusOff(IV18Display* that);
-    static void noOp(IV18Display* that);
-    static void doGridStep(IV18Display* that);
+    static void statusOn(IV18Display* that, int stepInThread);
+    static void statusOff(IV18Display* that, int stepInThread);
+    static void noOp(IV18Display* that, int stepInThread);
+    static void doGridStep(IV18Display* that, int stepInThread);
+    static void prepareNextGridStep(IV18Display* that, int stepInThread);
+    static void prepareFirstGridStep(IV18Display* that, int stepInThread);
 
     // TODO:
 //    // TODO: remember to append first empty value to those passed or introduce the empty frame otherwise
