@@ -87,18 +87,14 @@ void IV18Display::multiplexGrid9(bool isGrid9)
 
 void IV18Display::prepareGridSegments(int sequenceNumber)
 {
-    int idx = GRID_STEPS_COUNT - (sequenceNumber + 2);
+    int idx = GRID_STEPS_COUNT - (sequenceNumber + 1);
 
-    // TODO: do we actually need the empty frame?
-    // account for 1 "empty frame"
-    if (idx >= 0) {
-        if (currentMode == MODE_CHARS) {
-            setChar(currentString[idx]);
-        } else {
-            setByte(currentBytes[idx]);
-        }
-        setComma(currentCommas[idx]);
+    if (currentMode == MODE_CHARS) {
+        setChar(currentString[idx]);
+    } else {
+        setByte(currentBytes[idx]);
     }
+    setComma(currentCommas[idx]);
 }
 
 void IV18Display::on()

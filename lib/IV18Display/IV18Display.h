@@ -6,8 +6,7 @@
 class IV18Display
 {
 public:
-    // TODO: do we need the 10th step?
-    static const int GRID_STEPS_COUNT = 10; //main grids + dot/minus
+    static const int GRID_STEPS_COUNT = 9; //main grids + dot/minus
     static const byte MODE_CHARS = 0;
     static const byte MODE_BYTES = 1;
 
@@ -82,11 +81,11 @@ private:
     //TODO: these initial values are debug - will be set by command
     //minus works for idx 0
     //+1 because the string must contain the /0 ending
-    char currentString[GRID_STEPS_COUNT] = "-steven 7";
+    char currentString[GRID_STEPS_COUNT + 1] = "-steven 7";
     //dot at idx 0 is the "big one"
-    bool currentCommas[GRID_STEPS_COUNT - 1] = {false, false, false, false, false, false, false, false, false};
+    bool currentCommas[GRID_STEPS_COUNT] = {false, false, false, false, false, false, false, false, false};
     //bytes for custom mode
-    byte currentBytes[GRID_STEPS_COUNT - 1] = {0b00000000, 0b00010000, 0b00010000, 0b00010000, 0b00010000, 0b00010000,
+    byte currentBytes[GRID_STEPS_COUNT] = {0b00000000, 0b00010000, 0b00010000, 0b00010000, 0b00010000, 0b00010000,
                                                0b00010000, 0b00010000, 0b00010000};
 
     byte currentMode = MODE_CHARS;
