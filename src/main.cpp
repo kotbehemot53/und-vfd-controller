@@ -30,7 +30,7 @@ void setup()
     Display.on();
 
     // TODO: debug, set via commands later
-//    Display.setChars(" czlonek ");
+    Display.setChars(" czlonek ");
 }
 
 void loop()

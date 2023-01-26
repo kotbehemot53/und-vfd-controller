@@ -59,7 +59,7 @@ void IV18Display::setChar(char val)
 
 void IV18Display::setComma(bool val)
 {
-    digitalWrite(SEGMENTS[7], val & (0b00000001));
+    digitalWrite(SEGMENTS[7], val ? HIGH : LOW);
 }
 
 void IV18Display::clearChar()
@@ -87,7 +87,7 @@ void IV18Display::multiplexGrid9(bool isGrid9)
 
 void IV18Display::prepareGridSegments(int sequenceNumber)
 {
-    byte idx = GRID_STEPS_COUNT - (sequenceNumber + 2);
+    int idx = GRID_STEPS_COUNT - (sequenceNumber + 2);
 
     // TODO: do we actually need the empty frame?
     // account for 1 "empty frame"

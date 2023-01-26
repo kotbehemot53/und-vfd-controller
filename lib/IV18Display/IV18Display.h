@@ -6,6 +6,7 @@
 class IV18Display
 {
 public:
+    // TODO: do we need the 10th step?
     static const int GRID_STEPS_COUNT = 10; //main grids + dot/minus
     static const byte MODE_CHARS = 0;
     static const byte MODE_BYTES = 1;
