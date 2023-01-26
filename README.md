@@ -13,3 +13,4 @@ TODO
 
 - add CMakeLists.txt to git?
 - make a fresh platformio deployment instruction
+- hmm?
