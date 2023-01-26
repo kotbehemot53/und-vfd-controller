@@ -30,7 +30,11 @@ void setup()
     Display.on();
 
     // TODO: debug, set via commands later
-    Display.setChars(" czlonek ");
+//    byte testBytes[9] = {0b00000000, 0b00010000, 0b00000000, 0b00010000, 0b00000000, 0b00010000,
+//                      0b00000000, 0b00010000, 0b00000000};
+//    Display.setChars(" czlonek ");
+//    Display.setMode(IV18Display::MODE_BYTES);
+//    Display.setBytes(testBytes);
 }
 
 void loop()
