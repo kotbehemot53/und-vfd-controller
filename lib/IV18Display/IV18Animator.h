@@ -22,7 +22,7 @@ private:
     void animateHeartbeat();
 
 public:
-    IV18Animator(IV18Display display);
+    IV18Animator(IV18Display &display);
 
     void doFrame();
 };

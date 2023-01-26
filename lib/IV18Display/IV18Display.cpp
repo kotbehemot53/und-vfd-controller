@@ -120,3 +120,23 @@ void IV18Display::statusOff()
 {
     digitalWrite(STATUS, LOW);
 }
+
+void IV18Display::setBytes(byte *bytesBuffer)
+{
+    memcpy(this->currentBytes, bytesBuffer, sizeof(this->currentBytes));
+}
+
+void IV18Display::setChars(char const *charsBuffer)
+{
+    memcpy(this->currentString, charsBuffer, sizeof(this->currentString));
+}
+
+void IV18Display::setCommas(bool *commasBuffer)
+{
+    memcpy(this->currentCommas, commasBuffer, sizeof(this->currentCommas));
+}
+
+void IV18Display::setMode(byte mode)
+{
+    this->currentMode = mode;
+}

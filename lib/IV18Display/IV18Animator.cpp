@@ -1,6 +1,6 @@
 #include "IV18Animator.h"
 
-IV18Animator::IV18Animator(IV18Display display)
+IV18Animator::IV18Animator(IV18Display &display)
 {
     heartbeatSteps = new DeviceAnimatorStep[2]{
         // waitUs values will be overriden on every frame by animateHeartbeat

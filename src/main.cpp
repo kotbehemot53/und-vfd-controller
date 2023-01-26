@@ -20,13 +20,17 @@ void setup()
     Serial.println("yo");
 
     // TODO: or constructor maybe?
-    Comms.init(I2C_ADDR, Display); //wire begin, wire.onReceive TODO: make it minimal, just buffer data!
+    // TODO: make it minimal, just buffer data!
+    Comms.init(I2C_ADDR, Display); //wire begin, wire.onReceive
 
     animator = new IV18Animator(Display);
 
     // TODO: enable it by command, not here!
     delay(100);
     Display.on();
+
+    // TODO: debug, set via commands later
+//    Display.setChars(" czlonek ");
 }
 
 void loop()

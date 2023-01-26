@@ -109,12 +109,11 @@ public:
     static void multiplexViaShiftRegister(bool isFirst = false);
     static void multiplexGrid9(bool isGrid9 = false);
 
-    // TODO:
-//    // TODO: remember to append first empty value to those passed or introduce the empty frame otherwise
-//    void setBytes(byte* bytes); // TODO: how to ensure length of 8? enable exceptions?
-//    void setChars(char* chars); // TODO: how to ensure length of 8? enable exceptions?
-//    void setCommas(bool* commas); // TODO: how to ensure length of 8? enable exceptions?
-//    void setMode(byte mode);
+    // TODO: remember to append first empty value to those passed or introduce the empty frame otherwise
+    void setBytes(byte* bytesBuffer);
+    void setChars(char const *charsBuffer);
+    void setCommas(bool* commasBuffer);
+    void setMode(byte mode);
 };
 
 extern IV18Display Display;
