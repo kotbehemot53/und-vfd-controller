@@ -36,7 +36,7 @@ IV18Animator::IV18Animator(IV18Display &display)
     };
 
     threads = new DeviceAnimatorThread[3]{
-        DeviceAnimatorThread(heartbeatSteps, 2, false),
+        DeviceAnimatorThread(heartbeatSteps, 2, true),
         DeviceAnimatorThread(blinkingSteps, 2, false),
         DeviceAnimatorThread(lampGridSteps, IV18Display::GRID_STEPS_COUNT*2)
     };

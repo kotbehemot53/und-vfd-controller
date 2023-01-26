@@ -7,6 +7,15 @@ int DeviceAnimator::compareMergedSteps(const void *cmp1, const void *cmp2)
     auto a = (DeviceAnimatorStep **) cmp1;
     auto b = (DeviceAnimatorStep **) cmp2;
 
+    // put steps from inactive threads to the end of the array, they will be ignored
+    if (!(*b)->parentThread->isEnabled && (*a)->parentThread->isEnabled) {
+        return -1;
+    }
+    if ((*b)->parentThread->isEnabled && !(*a)->parentThread->isEnabled) {
+        return 1;
+    }
+
+    // compare all other cases normally
     // no subtraction is deliberate (the operands are unsigned longs and result is int)
     if ((*b)->timeWithinFrameUs > (*a)->timeWithinFrameUs) {
         return -1;
@@ -26,19 +35,11 @@ void DeviceAnimator::setThreads(DeviceAnimatorThread threadsToSet[], int numberO
 
     // determine number of steps to preallocate merged steps pointers array
     for (int i = 0; i < numberOfThreads; ++i) {
-//        if (!threads[i].isEnabled) {
-//            continue;
-//        }
-
         totalSteps += threads[i].numberOfSteps;
     }
     stepsMerged = new DeviceAnimatorStep*[totalSteps];
     int k = 0;
     for (int i = 0; i < numberOfThreads; ++i) {
-//        if (!threads[i].isEnabled) {
-//            continue;
-//        }
-
         for (int j = 0; j < threads[i].numberOfSteps; ++j) {
             stepsMerged[k] = &threads[i].steps[j];
             // now they are set arbitrarily by user
@@ -51,12 +52,14 @@ void DeviceAnimator::setThreads(DeviceAnimatorThread threadsToSet[], int numberO
 
 void DeviceAnimator::initFrame()
 {
+    totalActiveSteps = 0;
 
     // assign objective points in time to steps, initialize merged steps pointers array (unsorted yet!)
     for (int i = 0; i < numberOfThreads; ++i) {
         if (!threads[i].isEnabled) {
             continue;
         }
+        totalActiveSteps += threads[i].numberOfSteps;
 
         unsigned long currentPointInTimeInThreadUs = 0;
         for (int j = 0; j < threads[i].numberOfSteps; ++j) {
@@ -73,13 +76,14 @@ void DeviceAnimator::initFrame()
     qsort(stepsMerged, totalSteps, sizeof(stepsMerged[0]), compareMergedSteps);
 
     // assign times to next merged step
+    // take only steps from active threads into account
     unsigned long previousStepTimeWithinFrameUs = 0;
-    for (int i = 1; i < totalSteps; ++i) {
+    for (int i = 1; i < totalActiveSteps; ++i) {
         stepsMerged[i - 1]->timeToNextMergedStepUs = stepsMerged[i]->timeWithinFrameUs - previousStepTimeWithinFrameUs;
         previousStepTimeWithinFrameUs = stepsMerged[i]->timeWithinFrameUs;
     }
     // for the last step, set time to next step, which actually is the end of frame
-    stepsMerged[totalSteps - 1]->timeToNextMergedStepUs = frameEndTimeUs - stepsMerged[totalSteps - 1]->timeWithinFrameUs;
+    stepsMerged[totalActiveSteps - 1]->timeToNextMergedStepUs = frameEndTimeUs - stepsMerged[totalActiveSteps - 1]->timeWithinFrameUs;
 }
 
 void DeviceAnimator::doFrame()
@@ -94,7 +98,9 @@ void DeviceAnimator::doFrame()
     // happens every frame because steps contents may change between frames; takes about 40 us
     initFrame();
 
-    for (int i = 0; i < totalSteps; ++i) {
+    // do every step
+    // take only steps from active threads into account
+    for (int i = 0; i < totalActiveSteps; ++i) {
         preExecTimeUs = micros();
         stepsMerged[i]->callback(stepsMerged[i]->devicePtr, stepsMerged[i]->sequenceNumber);
         postExecTimeUs = micros();

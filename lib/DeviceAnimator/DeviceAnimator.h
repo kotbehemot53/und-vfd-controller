@@ -10,6 +10,7 @@ private:
     int numberOfThreads = 0;
     DeviceAnimatorStep** stepsMerged;
     int totalSteps = 0;
+    int totalActiveSteps = 0;
     unsigned long frameEndTimeUs = 0;
 
     static int compareMergedSteps(const void *cmp1, const void *cmp2);
