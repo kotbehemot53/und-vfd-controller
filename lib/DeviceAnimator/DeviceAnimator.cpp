@@ -26,11 +26,19 @@ void DeviceAnimator::setThreads(DeviceAnimatorThread threadsToSet[], int numberO
 
     // determine number of steps to preallocate merged steps pointers array
     for (int i = 0; i < numberOfThreads; ++i) {
+//        if (!threads[i].isEnabled) {
+//            continue;
+//        }
+
         totalSteps += threads[i].numberOfSteps;
     }
     stepsMerged = new DeviceAnimatorStep*[totalSteps];
     int k = 0;
     for (int i = 0; i < numberOfThreads; ++i) {
+//        if (!threads[i].isEnabled) {
+//            continue;
+//        }
+
         for (int j = 0; j < threads[i].numberOfSteps; ++j) {
             stepsMerged[k] = &threads[i].steps[j];
             // now they are set arbitrarily by user
@@ -38,12 +46,18 @@ void DeviceAnimator::setThreads(DeviceAnimatorThread threadsToSet[], int numberO
             ++k;
         }
     }
+
 }
 
 void DeviceAnimator::initFrame()
 {
+
     // assign objective points in time to steps, initialize merged steps pointers array (unsorted yet!)
     for (int i = 0; i < numberOfThreads; ++i) {
+        if (!threads[i].isEnabled) {
+            continue;
+        }
+
         unsigned long currentPointInTimeInThreadUs = 0;
         for (int j = 0; j < threads[i].numberOfSteps; ++j) {
             threads[i].steps[j].timeWithinFrameUs = currentPointInTimeInThreadUs;
@@ -70,6 +84,8 @@ void DeviceAnimator::initFrame()
 
 void DeviceAnimator::doFrame()
 {
+    // TODO: how to omit inactive threads? do it earlier? move setup
+
     unsigned long preExecTimeUs;
     unsigned long postExecTimeUs;
     unsigned long execTimeDiffUs;

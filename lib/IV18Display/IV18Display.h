@@ -83,7 +83,7 @@ private:
     //+1 because the string must contain the /0 ending
     char currentString[GRID_STEPS_COUNT + 1] = "-steven 7";
     //dot at idx 0 is the "big one"
-    bool currentCommas[GRID_STEPS_COUNT] = {false, false, false, false, false, false, false, false, false};
+    bool currentCommas[GRID_STEPS_COUNT] = {true, false, false, false, false, false, false, false, true};
     //bytes for custom mode
     byte currentBytes[GRID_STEPS_COUNT] = {0b00000000, 0b00010000, 0b00010000, 0b00010000, 0b00010000, 0b00010000,
                                                0b00010000, 0b00010000, 0b00010000};

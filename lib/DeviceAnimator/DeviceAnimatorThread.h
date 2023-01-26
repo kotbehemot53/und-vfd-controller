@@ -6,9 +6,12 @@
 class DeviceAnimatorThread
 {
 public:
-    DeviceAnimatorStep* steps;
+    DeviceAnimatorStep *steps;
     int numberOfSteps;
-    DeviceAnimatorThread(DeviceAnimatorStep stepsToSet[], int numberOfStepsToSet) : steps(stepsToSet), numberOfSteps(numberOfStepsToSet) {};
+    bool isEnabled;
+
+    DeviceAnimatorThread(DeviceAnimatorStep stepsToSet[], int numberOfStepsToSet, bool isEnabledToSet = true) : steps(
+            stepsToSet), numberOfSteps(numberOfStepsToSet), isEnabled(isEnabledToSet) {};
 };
 
 #endif //PIUCNTVFD1_DEVICEANIMATORTHREAD_H
