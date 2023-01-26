@@ -14,10 +14,10 @@ private:
 
     DeviceAnimator animator;
     int currentFrame = 0;
-    DeviceAnimatorThread* threads;
 
-    DeviceAnimatorStep* heartbeatSteps;
-    DeviceAnimatorStep* lampGridSteps;
+    DeviceAnimatorThread* threads;
+    DeviceAnimatorThread* heartbeatThread;
+    DeviceAnimatorThread* lampGridThread;
 
     void animateHeartbeat();
 

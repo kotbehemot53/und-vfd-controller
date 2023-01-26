@@ -2,13 +2,13 @@
 
 IV18Animator::IV18Animator(IV18Display &display)
 {
-    heartbeatSteps = new DeviceAnimatorStep[2]{
+    auto heartbeatSteps = new DeviceAnimatorStep[2]{
         // waitUs values will be overriden on every frame by animateHeartbeat
         DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::statusOn), 4500),
         DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::statusOff), 4500)
     };
 
-    lampGridSteps = new DeviceAnimatorStep[IV18Display::GRID_STEPS_COUNT*2]{
+    auto lampGridSteps = new DeviceAnimatorStep[IV18Display::GRID_STEPS_COUNT*2]{
         DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep), 100, 0),
         DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep), 900, 0),
         DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep), 100, 1),
@@ -33,6 +33,8 @@ IV18Animator::IV18Animator(IV18Display &display)
         DeviceAnimatorThread(heartbeatSteps, 2),
         DeviceAnimatorThread(lampGridSteps, IV18Display::GRID_STEPS_COUNT*2)
     };
+    heartbeatThread = &(threads[0]);
+    lampGridThread = &(threads[1]);
 
     animator.setThreads(threads, 2);
 }
@@ -50,8 +52,8 @@ void IV18Animator::animateHeartbeat()
     offTime = (long) FRAME_LENGTH_US < onTime ? 0 : FRAME_LENGTH_US - onTime;
 
     // TODO: maybe make a waitUs setter, only getters for the rest and make them private?
-    heartbeatSteps[0].waitUs = onTime;
-    heartbeatSteps[1].waitUs = offTime;
+    heartbeatThread->steps[0].waitUs = onTime;
+    heartbeatThread->steps[1].waitUs = offTime;
 }
 
 void IV18Animator::doFrame()
