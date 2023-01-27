@@ -8,22 +8,36 @@
 class IV18Animator
 {
 private:
-    static const short FRAMES_PER_CYCLE = 150;
-    static const unsigned long FRAME_LENGTH_US = 9000; // 1/100 s
-    static const unsigned long DIMMEST_LENGTH_US = 500;
+    static const short LED_HEARTBEAT = 0;
+    static const short LED_WARNING = 1;
+    static const short LED_MODES_COUNT = 2;
+
+    static const unsigned long FRAME_LENGTH_US = 9000; // us -> just below 1/100 s
+
+    static constexpr unsigned short FRAMES_PER_CYCLE[LED_MODES_COUNT] = {150, 30};
+    static constexpr unsigned long MIN_DUTY_US[LED_MODES_COUNT] = {1000, 0};
+    static constexpr unsigned long MAX_DUTY_US[LED_MODES_COUNT] = {5000, 9000};
 
     DeviceAnimator animator;
-    int currentFrame = 0;
+    unsigned short currentFrame = 0;
+
+    // TODO: how to make it static and initialize it? preprocessor?
+    unsigned short framesPerLongestCycle;
 
     DeviceAnimatorThread* threads;
-    DeviceAnimatorThread* heartbeatThread;
+    DeviceAnimatorThread* statusLedThread;
     DeviceAnimatorThread* lampGridThread;
 
-    void animateHeartbeat();
+    unsigned short ledAction = 0;
+    unsigned short warningBleepsLeft = 0;
+
+    void animateStatusLED();
+    void decreaseWarningBleeps();
 
 public:
     IV18Animator(IV18Display &display);
 
+    void doWarning(short bleepsCount = 10);
     void doFrame();
 };
 
