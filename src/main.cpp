@@ -35,6 +35,7 @@ void setup()
 //    Display.setChars(" czlonek ");
 //    Display.setMode(IV18Display::MODE_BYTES);
 //    Display.setBytes(testBytes);
+    animator->doWarning(10);
 }
 
 void loop()
