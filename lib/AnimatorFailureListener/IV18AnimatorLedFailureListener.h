@@ -4,6 +4,9 @@
 #include "AnimatorFailureListenerInterface.h"
 #include "../IV18Display/IV18Animator.h"
 
+// TODO: probably doesn't make sense and should be removed due to it causing undertimes itself
+//       unless it somehow bypasses the animator
+
 class IV18AnimatorLedFailureListener : public AnimatorFailureListenerInterface
 {
 private:

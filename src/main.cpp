@@ -27,8 +27,10 @@ void setup()
     Comms.init(I2C_ADDR, Display); //wire begin, wire.onReceive
 
     animator = new IV18Animator(Display);
+
+    // TODO: use these for animation timing debug
 //    animatorFailureListener = new IV18AnimatorLedFailureListener(animator);
-    animatorFailureListener = new IV18AnimatorSerialFailureListener(animator);
+//    animatorFailureListener = new IV18AnimatorSerialFailureListener(animator);
 
     // TODO: enable it by command, not here!
     delay(100);

@@ -13,31 +13,33 @@ IV18Animator::IV18Animator(IV18Display &display)
         }
     }
 
+    // TODO: these cause undertime - due to collision with lampGridSteps?
     auto heartbeatSteps = new DeviceAnimatorStep[2]{
         // waitUs values will be overriden on every frame by animateStatusLED
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::statusOn), 4500),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::statusOff), 4500)
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::statusOn), 5000),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::statusOff), 5000)
     };
 
+    // prepare must be at least 150 us - otherwise undertime happens constantly
     auto lampGridSteps = new DeviceAnimatorStep[IV18Display::GRID_STEPS_COUNT*2]{
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep), 100, 0),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep), 900, 0),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep), 100, 1),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep), 900, 1),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep), 100, 2),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep), 900, 2),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep), 100, 3),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep), 900, 3),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep), 100, 4),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep), 900, 4),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep), 100, 5),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep), 900, 5),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep), 100, 6),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep), 900, 6),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep), 100, 7),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep), 900, 7),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep), 100, 8),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep), 900, 8)
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep), 150, 0),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep), 961, 0),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep), 150, 1),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep), 961, 1),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep), 150, 2),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep), 961, 2),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep), 150, 3),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep), 961, 3),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep), 150, 4),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep), 961, 4),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep), 150, 5),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep), 961, 5),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep), 150, 6),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep), 961, 6),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep), 150, 7),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep), 961, 7),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep), 151, 8),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep), 961, 8)
     };
 
     threads = new DeviceAnimatorThread[2]{
@@ -58,14 +60,23 @@ void IV18Animator::setFailureListener(AnimatorFailureListenerInterface *failureL
 void IV18Animator::animateStatusLED()
 {
     // TODO: maybe make a waitUs setter, only getters for the rest and make them private?
-    statusLedThread->steps[0].waitUs = SinusoidalDutyCycleGenerator::animateSinusoidalDutyCycle(
-        MIN_DUTY_US[ledAction],
-        MAX_DUTY_US[ledAction],
-        FRAME_LENGTH_US,
-        currentFrame,
-        FRAMES_PER_CYCLE[ledAction]
-    );
-    statusLedThread->steps[1].waitUs = FRAME_LENGTH_US - statusLedThread->steps[0].waitUs;
+    if (ledAction < LED_SINUS_MODES_COUNT) {
+        statusLedThread->steps[0].waitUs = SinusoidalDutyCycleGenerator::animateSinusoidalDutyCycle(
+            MIN_DUTY_US[ledAction],
+            MAX_DUTY_US[ledAction],
+            FRAME_LENGTH_US,
+            currentFrame,
+            FRAMES_PER_CYCLE[ledAction]
+        );
+        statusLedThread->steps[1].waitUs = FRAME_LENGTH_US - statusLedThread->steps[0].waitUs;
+    } else {
+        if (ledAction == LED_KILL) {
+            // TODO: implement actual total kills somehow? omittable threads?
+            // can't set it to 0 now, because of potential undertime
+            statusLedThread->steps[0].waitUs = 200;
+            statusLedThread->steps[1].waitUs = 8800;
+        }
+    }
 }
 
 void IV18Animator::doWarning(short bleepsCount)
@@ -103,6 +114,7 @@ void IV18Animator::doFrame()
         currentFrame = 0;
     }
 
+    // TODO: separate cycle & bleeps for LED_KILL?
     if (currentFrame % FRAMES_PER_CYCLE[LED_WARNING] == 0) {
         decreaseWarningBleeps();
     }

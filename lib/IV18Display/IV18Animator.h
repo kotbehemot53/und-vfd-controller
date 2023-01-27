@@ -14,11 +14,11 @@ private:
 
     static const short LED_KILL = 100;
 
-    static const unsigned long FRAME_LENGTH_US = 9000; // us -> just below 1/100 s
+    static const unsigned long FRAME_LENGTH_US = 10000; // us -> just below 1/100 s
 
     static constexpr unsigned short FRAMES_PER_CYCLE[LED_SINUS_MODES_COUNT] = {150, 30};
     static constexpr unsigned long MIN_DUTY_US[LED_SINUS_MODES_COUNT] = {1000, 0};
-    static constexpr unsigned long MAX_DUTY_US[LED_SINUS_MODES_COUNT] = {5000, 9000};
+    static constexpr unsigned long MAX_DUTY_US[LED_SINUS_MODES_COUNT] = {7000, 10000};
 
     DeviceAnimator animator;
     unsigned short currentFrame = 0;
