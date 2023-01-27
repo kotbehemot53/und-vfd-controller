@@ -35,7 +35,7 @@ private:
     void decreaseWarningBleeps();
 
 public:
-    IV18Animator(IV18Display &display);
+    IV18Animator(IV18Display &display, AnimatorFailureListenerInterface &failureListener);
 
     void doWarning(short bleepsCount = 10);
     void doFrame();

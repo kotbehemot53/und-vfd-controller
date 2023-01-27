@@ -2,7 +2,7 @@
 
 #include "../DutyCycleGenerator/SinusoidalDutyCycleGenerator.h"
 
-IV18Animator::IV18Animator(IV18Display &display)
+IV18Animator::IV18Animator(IV18Display &display, AnimatorFailureListenerInterface &failureListener)
 {
     // TODO: preprocessor could do it
     // determine longest multiframe animation cycle
@@ -48,6 +48,7 @@ IV18Animator::IV18Animator(IV18Display &display)
     lampGridThread = &(threads[1]);
 
     animator.setThreads(threads, 2);
+    animator.setFailureListener(&failureListener);
 }
 
 void IV18Animator::animateStatusLED()
