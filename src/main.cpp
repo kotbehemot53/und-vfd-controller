@@ -5,6 +5,7 @@
 #include "../lib/I2CComms/I2CComms.h"
 #include "../lib/IV18Display/IV18Animator.h"
 #include "../lib/AnimatorFailureListener/IV18AnimatorSerialFailureListener.h"
+#include "../lib/AnimatorFailureListener/IV18AnimatorLedFailureListener.h"
 
 // TODO: intro mode? as special IV18Display subclass? just a different animation routine and a switch?
 // TODO: PWM brightness - special command + functions in IV18Display?
@@ -14,6 +15,7 @@ const byte I2C_ADDR = 0x5;
 const unsigned long FRAME_DURATION_US = 10000;
 
 IV18Animator* animator;
+AnimatorFailureListenerInterface* animatorFailureListener;
 
 void setup()
 {
@@ -24,7 +26,9 @@ void setup()
     // TODO: make it minimal, just buffer data!
     Comms.init(I2C_ADDR, Display); //wire begin, wire.onReceive
 
-    animator = new IV18Animator(Display, AnimatorFailureListener);
+    animator = new IV18Animator(Display);
+//    animatorFailureListener = new IV18AnimatorLedFailureListener(animator);
+    animatorFailureListener = new IV18AnimatorSerialFailureListener(animator);
 
     // TODO: enable it by command, not here!
     delay(100);

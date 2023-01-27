@@ -90,16 +90,22 @@ void DeviceAnimator::doFrame()
         postExecTimeUs = micros();
         execTimeDiffUs = postExecTimeUs >= preExecTimeUs ? postExecTimeUs - preExecTimeUs : 0;
 
-        // wait the appropriate amount of time for the next step (taking into account how much time it took to execute the step)
-        // TODO: warn on timeToNextMergedStepUs < execTimeDiffUs (means too little intervals specified)
+        // detect timeToNextMergedStepUs < execTimeDiffUs (means too small intervals specified)
         bool undertimeDetected = false;
+
+        // for debug purposes report undertime
         if (stepsMerged[i]->timeToNextMergedStepUs < execTimeDiffUs) {
             undertimeDetected = true;
             if (hasFailureListener) {
-                this->failureListener->failureWarning(AnimatorFailureListenerInterface::WARNING_UNDERTIME);
+                this->failureListener->failureWarning(
+                    AnimatorFailureListenerInterface::WARNING_UNDERTIME,
+                    stepsMerged[i]->timeToNextMergedStepUs,
+                    execTimeDiffUs
+                );
             }
         }
 
+        // wait the appropriate amount of time for the next step (taking into account how much time it took to execute the step)
         delayUs = undertimeDetected ? 0 : stepsMerged[i]->timeToNextMergedStepUs - execTimeDiffUs;
         if (delayUs > 16000) {
             delay(delayUs / 1000);
