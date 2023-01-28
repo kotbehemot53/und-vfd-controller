@@ -8,6 +8,9 @@
 class IV18Animator
 {
 private:
+    static const short PREPARE_MIN_DUTY_US = 150;
+    static const short GRID_MAX_DUTY_US = 961;
+
     static const short LED_HEARTBEAT = 0;
     static const short LED_WARNING = 1;
     static const short LED_SINUS_MODES_COUNT = 2;
@@ -19,6 +22,8 @@ private:
     static constexpr unsigned short FRAMES_PER_CYCLE[LED_SINUS_MODES_COUNT] = {150, 30};
     static constexpr unsigned long MIN_DUTY_US[LED_SINUS_MODES_COUNT] = {1000, 0};
     static constexpr unsigned long MAX_DUTY_US[LED_SINUS_MODES_COUNT] = {7000, 9000};
+
+    static const unsigned short LAMP_GRID_FRAMES_PER_CYCLE = 75;
 
     DeviceAnimator animator;
     unsigned short currentFrame = 0;
@@ -33,8 +38,15 @@ private:
     unsigned short ledAction = 0;
     unsigned short warningBleepsLeft = 0;
 
+    unsigned short randomLampGridOrder[IV18Display::GRID_STEPS_COUNT] = {1, 3, 5, 7, 9, 11, 13, 15, 17};
+//    unsigned short lampCycleNumber = 0;
+
     void animateStatusLED();
+    void animateGridsBrightness();
     void decreaseWarningBleeps();
+
+//    static int randomCompare(const void *cmp1, const void *cmp2);
+    static void shuffleArray(unsigned short * array, int size);
 
 public:
     explicit IV18Animator(IV18Display &display);

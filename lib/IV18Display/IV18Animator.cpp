@@ -2,6 +2,19 @@
 
 #include "../DutyCycleGenerator/SinusoidalDutyCycleGenerator.h"
 
+void IV18Animator::shuffleArray(unsigned short * array, int size)
+{
+    int last = 0;
+    int temp = array[last];
+    for (int i=0; i<size; i++)
+    {
+        int index = random(size);
+        array[last] = array[index];
+        last = index;
+    }
+    array[last] = temp;
+}
+
 IV18Animator::IV18Animator(IV18Display &display)
 {
     // TODO: preprocessor could do it
@@ -22,24 +35,42 @@ IV18Animator::IV18Animator(IV18Display &display)
 
     // prepare must be at least 150 us - otherwise undertime happens constantly
     auto lampGridSteps = new DeviceAnimatorStep[IV18Display::GRID_STEPS_COUNT*2]{
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep), 150, 0),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep), 961, 0),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep), 150, 1),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep), 961, 1),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep), 150, 2),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep), 961, 2),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep), 150, 3),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep), 961, 3),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep), 150, 4),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep), 961, 4),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep), 150, 5),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep), 961, 5),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep), 150, 6),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep), 961, 6),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep), 150, 7),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep), 961, 7),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep), 151, 8),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep), 961, 8)
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep),
+                           PREPARE_MIN_DUTY_US, 0),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep),
+                           GRID_MAX_DUTY_US, 0),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep),
+                           PREPARE_MIN_DUTY_US, 1),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep),
+                           GRID_MAX_DUTY_US, 1),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep),
+                           PREPARE_MIN_DUTY_US, 2),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep),
+                           GRID_MAX_DUTY_US, 2),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep),
+                           PREPARE_MIN_DUTY_US, 3),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep),
+                           GRID_MAX_DUTY_US, 3),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep),
+                           PREPARE_MIN_DUTY_US, 4),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep),
+                           GRID_MAX_DUTY_US, 4),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep),
+                           PREPARE_MIN_DUTY_US, 5),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep),
+                           GRID_MAX_DUTY_US, 5),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep),
+                           PREPARE_MIN_DUTY_US, 6),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep),
+                           GRID_MAX_DUTY_US, 6),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep),
+                           PREPARE_MIN_DUTY_US, 7),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep),
+                           GRID_MAX_DUTY_US, 7),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep),
+                           PREPARE_MIN_DUTY_US + 1, 8),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep),
+                           GRID_MAX_DUTY_US, 8)
     };
 
     threads = new DeviceAnimatorThread[2]{
@@ -50,11 +81,37 @@ IV18Animator::IV18Animator(IV18Display &display)
     lampGridThread = &(threads[1]);
 
     animator.setThreads(threads, 2);
+
+    randomSeed(analogRead(A2));
+    shuffleArray(randomLampGridOrder, IV18Display::GRID_STEPS_COUNT);
 }
 
 void IV18Animator::setFailureListener(AnimatorFailureListenerInterface *failureListener)
 {
     animator.setFailureListener(failureListener);
+}
+
+/**
+ * This is just a silly animation of the grids
+ */
+void IV18Animator::animateGridsBrightness()
+{
+    // TODO: add more animations/effects based on a state property
+
+    unsigned short j;
+
+    // 4 just because
+    for (short i = 0; i < 4; ++i) {
+        j = randomLampGridOrder[i];
+        lampGridThread->steps[j].waitUs = SinusoidalDutyCycleGenerator::animateSinusoidalDutyCycle(
+            10,
+            GRID_MAX_DUTY_US,
+            GRID_MAX_DUTY_US + PREPARE_MIN_DUTY_US,
+            currentFrame + 30 * i, // just because TODO: add some randomness?
+            LAMP_GRID_FRAMES_PER_CYCLE // just because
+        );
+        lampGridThread->steps[j-1].waitUs = GRID_MAX_DUTY_US + PREPARE_MIN_DUTY_US - lampGridThread->steps[i].waitUs;
+    }
 }
 
 void IV18Animator::animateStatusLED()
@@ -78,6 +135,8 @@ void IV18Animator::animateStatusLED()
         }
     }
 }
+
+//void IV18Animator::animate
 
 void IV18Animator::doWarning(short bleepsCount)
 {
@@ -104,6 +163,9 @@ void IV18Animator::doFrame()
 {
     // multiframe animation of the heartbeat
     animateStatusLED();
+
+    // TODO: enable it by command?
+    animateGridsBrightness();
 
     animator.doFrame();
 
