@@ -2,6 +2,7 @@
 #define PIUCNTVFD1_DEVICEANIMATOR_H
 
 #include "DeviceAnimatorThread.h"
+#include "../AnimatorFailureListener/AnimatorFailureListenerInterface.h"
 
 class DeviceAnimator
 {
@@ -12,12 +13,16 @@ private:
     int totalSteps = 0;
     unsigned long frameEndTimeUs = 0;
 
+    AnimatorFailureListenerInterface* failureListener;
+    bool hasFailureListener = false;
+
     static int compareMergedSteps(const void *cmp1, const void *cmp2);
     void initFrame();
 
 public:
-    // TODO: turn it into constructor?
+    // TODO: turn these into constructor?
     void setThreads(DeviceAnimatorThread threadsToSet[], int numberOfThreadsToSet);
+    void setFailureListener(AnimatorFailureListenerInterface* failureListener);
 
     void doFrame();
 };
