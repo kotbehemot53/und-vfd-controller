@@ -2,18 +2,19 @@
 
 #include "../DutyCycleGenerator/SinusoidalDutyCycleGenerator.h"
 
-void IV18Animator::shuffleArray(unsigned short * array, int size)
-{
-    int last = 0;
-    int temp = array[last];
-    for (int i=0; i<size; i++)
-    {
-        int index = random(size);
-        array[last] = array[index];
-        last = index;
-    }
-    array[last] = temp;
-}
+// TODO: do we need this silliness?
+//void IV18Animator::shuffleArray(unsigned short * array, int size)
+//{
+//    int last = 0;
+//    unsigned short temp = array[last];
+//    for (int i = 0; i < size; ++i)
+//    {
+//        int index = random(size);
+//        array[last] = array[index];
+//        last = index;
+//    }
+//    array[last] = temp;
+//}
 
 IV18Animator::IV18Animator(IV18Display &display)
 {
@@ -82,8 +83,9 @@ IV18Animator::IV18Animator(IV18Display &display)
 
     animator.setThreads(threads, 2);
 
-    randomSeed(analogRead(A2));
-    shuffleArray(randomLampGridOrder, IV18Display::GRID_STEPS_COUNT);
+    // TODO: do we need this silliness?
+//    randomSeed(analogRead(A2));
+//    shuffleArray(randomLampGridOrder, IV18Display::GRID_STEPS_COUNT);
 }
 
 void IV18Animator::setFailureListener(AnimatorFailureListenerInterface *failureListener)
@@ -164,8 +166,9 @@ void IV18Animator::doFrame()
     // multiframe animation of the heartbeat
     animateStatusLED();
 
-    // TODO: enable it by command?
-    animateGridsBrightness();
+//    // TODO: do we need this silliness?
+//    // TODO: enable it by command?
+//    animateGridsBrightness();
 
     animator.doFrame();
 
