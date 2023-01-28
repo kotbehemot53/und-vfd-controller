@@ -40,6 +40,12 @@ void DeviceAnimator::setThreads(DeviceAnimatorThread threadsToSet[], int numberO
     }
 }
 
+void DeviceAnimator::setFailureListener(AnimatorFailureListenerInterface* failureListenerToSet)
+{
+    this->failureListener = failureListenerToSet;
+    hasFailureListener = true;
+}
+
 void DeviceAnimator::initFrame()
 {
     // assign objective points in time to steps, initialize merged steps pointers array (unsorted yet!)
@@ -84,9 +90,23 @@ void DeviceAnimator::doFrame()
         postExecTimeUs = micros();
         execTimeDiffUs = postExecTimeUs >= preExecTimeUs ? postExecTimeUs - preExecTimeUs : 0;
 
+        // detect timeToNextMergedStepUs < execTimeDiffUs (means too small intervals specified)
+        bool undertimeDetected = false;
+
+        // for debug purposes report undertime
+        if (stepsMerged[i]->timeToNextMergedStepUs < execTimeDiffUs) {
+            undertimeDetected = true;
+            if (hasFailureListener) {
+                this->failureListener->failureWarning(
+                    AnimatorFailureListenerInterface::WARNING_UNDERTIME,
+                    stepsMerged[i]->timeToNextMergedStepUs,
+                    execTimeDiffUs
+                );
+            }
+        }
+
         // wait the appropriate amount of time for the next step (taking into account how much time it took to execute the step)
-        // TODO: warn on timeToNextMergedStepUs < execTimeDiffUs (means too little intervals specified)
-        delayUs = stepsMerged[i]->timeToNextMergedStepUs >= execTimeDiffUs ? stepsMerged[i]->timeToNextMergedStepUs - execTimeDiffUs : 0;
+        delayUs = undertimeDetected ? 0 : stepsMerged[i]->timeToNextMergedStepUs - execTimeDiffUs;
         if (delayUs > 16000) {
             delay(delayUs / 1000);
         } else {
