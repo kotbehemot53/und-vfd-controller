@@ -21,11 +21,13 @@ unsigned long SinusoidalDutyCycleGenerator::animateSinusoidalDutyCycle(
         horizontalMultiplier = 2;
     }
     if (!isUp) {
-        horizontalOffset = -framesPerCycle;
+        horizontalOffset = framesPerCycle;
     }
 
+    short preCock = currentFrame + horizontalOffset;
+
     unsigned long onTime;
-    double multiplier = 1 - cos((currentFrame + horizontalOffset) / (0.0506599 * framesPerCycle * horizontalMultiplier * PI));
+    double multiplier = 1 - cos(preCock / (0.0506599 * framesPerCycle * horizontalMultiplier * PI));
     onTime = multiplier <= 0 ? minDuty : (unsigned long)(((maxDuty - minDuty) / 2) * multiplier) + minDuty;
 
     if (onTime > frameLength) {
