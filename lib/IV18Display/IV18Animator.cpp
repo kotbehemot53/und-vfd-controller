@@ -146,8 +146,11 @@ void IV18Animator::animateLampGridBrightnesses()
                 );
                 lampGridThread->steps[j-1].waitUs = frameLength - lampGridThread->steps[i].waitUs;
 
-                // switch to static on last frame
+                // digit frame counting
+                ++lampGridCurrentFrameInCycle[i];
                 if (lampGridCurrentFrameInCycle[i] >= lampGridFramesPerCycle[i]) {
+                    // switch to static on last frame
+                    lampGridCurrentFrameInCycle[i] = 0;
                     lampGridActions[i] = LAMP_GRID_STATIC;
                 }
                 break;
@@ -163,8 +166,10 @@ void IV18Animator::animateLampGridBrightnesses()
                 );
                 lampGridThread->steps[j-1].waitUs = frameLength - lampGridThread->steps[i].waitUs;
 
-                // switch to static on last frame
+                ++lampGridCurrentFrameInCycle[i];
                 if (lampGridCurrentFrameInCycle[i] >= lampGridFramesPerCycle[i]) {
+                    // switch to static on last frame
+                    lampGridCurrentFrameInCycle[i] = 0;
                     lampGridActions[i] = LAMP_GRID_STATIC;
                 }
                 break;
@@ -251,13 +256,7 @@ void IV18Animator::doFrame()
         ledCurrentFrame = 0;
     }
 
-    // digit frame counting
-    for (short i = 0; i < IV18Display::GRID_STEPS_COUNT; ++i) {
-        ++lampGridCurrentFrameInCycle[i];
-        if (lampGridCurrentFrameInCycle[i] >= lampGridFramesPerCycle[i]) {
-            lampGridCurrentFrameInCycle[i] = 0;
-        }
-    }
+
 
     // TODO: separate cycle & bleeps for LED_KILL?
     if (ledCurrentFrame % LED_FRAMES_PER_CYCLE[LED_WARNING] == 0) {

@@ -44,9 +44,9 @@ void setup()
 //    Display.setMode(IV18Display::MODE_BYTES);
 //    Display.setBytes(testBytes);
     animator->doWarning(10);
-    for (int i = 0; i < IV18Display::GRID_STEPS_COUNT; ++i) {
-        animator->setCurrentLampGridDutyValue(i, 0);
-    }
+//    for (int i = 0; i < IV18Display::GRID_STEPS_COUNT; ++i) {
+//        animator->setCurrentLampGridDutyValue(i, 0);
+//    }
 }
 
 void loop()
@@ -56,12 +56,20 @@ void loop()
     animator->doFrame();
     Comms.handleBufferedInput(); //if new_frame handleNewFrame...
 
-    if (currentFrame % 1000 == 0 && currentFrame < 9000) {
-        short digitNumber = currentFrame / 1000;
+    if (currentFrame % 100 == 0 && currentFrame < 900) {
+        short digitNumber = currentFrame / 100;
         // TODO: fade in does not work like it should!
-        animator->setLampGridAction(digitNumber, IV18Animator::LAMP_GRID_IN);
+        animator->setLampGridAction(digitNumber, IV18Animator::LAMP_GRID_OUT);
     }
 
-    ++currentFrame;
+//    if (currentFrame % 100 == 0 && currentFrame >= 1800 && currentFrame < 2700) {
+//        short digitNumber = 26 - (currentFrame / 100);
+//        // TODO: fade in does not work like it should!
+//        animator->setLampGridAction(digitNumber, IV18Animator::LAMP_GRID_OUT);
+//    }
+
+    if (currentFrame < 2700) {
+        ++currentFrame;
+    }
 }
 

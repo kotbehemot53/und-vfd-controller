@@ -44,6 +44,7 @@ private:
 
     // TODO: add setter for this to use via command
     // sets max duty cycle per lamp grid (permanent dimming)
+    // TODO: minus/dot duty cycle doesn't seem to work properly
     unsigned short lampGridMaxOnDutyUs[IV18Display::GRID_STEPS_COUNT] = {
         LAMP_GRID_MAX_DUTY_US,
         LAMP_GRID_MAX_DUTY_US,
