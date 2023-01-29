@@ -27,14 +27,19 @@ private:
     // available lamp grid animation modes
     static const short LAMP_GRID_OFF = 0;   // constant off
     static const short LAMP_GRID_ON = 1;    // constant on
-    static const short LAMP_GRID_IN = 2;    // phase in
-    static const short LAMP_GRID_OUT = 3;   // phase out
+    static const short LAMP_GRID_IN = 2;    // fade-in
+    static const short LAMP_GRID_OUT = 3;   // fade-out
 
 //    static const unsigned short LAMP_GRID_FRAMES_PER_CYCLE = 75;
+    // TODO: add setter for this to use via command
     unsigned short lampGridFramesPerCycle[IV18Display::GRID_STEPS_COUNT] =
         {150, 150, 150, 150, 150, 150, 150, 150, 150};
+
     unsigned short lampGridCurrentFrameInCycle[IV18Display::GRID_STEPS_COUNT] =
         {0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+    // TODO: add setter for this to use via command
+    // sets max duty cycle per lamp grid (permanent dimming)
     unsigned short lampGridOnDutyUs[IV18Display::GRID_STEPS_COUNT] = {
         LAMP_GRID_MAX_DUTY_US,
         LAMP_GRID_MAX_DUTY_US,
@@ -45,6 +50,19 @@ private:
         LAMP_GRID_MAX_DUTY_US,
         LAMP_GRID_MAX_DUTY_US,
         LAMP_GRID_MAX_DUTY_US
+    };
+
+    // TODO: add setter for this to use via command
+    unsigned short lampGridActions[IV18Display::GRID_STEPS_COUNT] = {
+        LAMP_GRID_ON,
+        LAMP_GRID_ON,
+        LAMP_GRID_ON,
+        LAMP_GRID_ON,
+        LAMP_GRID_ON,
+        LAMP_GRID_ON,
+        LAMP_GRID_ON,
+        LAMP_GRID_ON,
+        LAMP_GRID_ON,
     };
 
     // TODO: methods to init lamp grid modes/animations, animate them properly, set on duty values (regular/permanent dimming)
@@ -70,7 +88,8 @@ private:
 //    unsigned short lampCycleNumber = 0;
 //    static int randomCompare(const void *cmp1, const void *cmp2);
 //    static void shuffleArray(unsigned short * array, int size);
-//    void animateGridsBrightness();
+
+    void animateGridsBrightness();
 
 public:
     explicit IV18Animator(IV18Display &display);

@@ -93,7 +93,7 @@ void IV18Animator::setFailureListener(AnimatorFailureListenerInterface *failureL
     animator.setFailureListener(failureListener);
 }
 
-// TODO: do we need this silliness
+// TODO: do we need this silliness?
 /**
  * This is just a silly animation of the grids
  */
@@ -116,6 +116,29 @@ void IV18Animator::setFailureListener(AnimatorFailureListenerInterface *failureL
 //        lampGridThread->steps[j-1].waitUs = LAMP_GRID_MAX_DUTY_US + LAMP_GRID_PREPARE_MIN_DUTY_US - lampGridThread->steps[i].waitUs;
 //    }
 //}
+
+void IV18Animator::animateGridsBrightness()
+{
+    for (short i = 0; i < IV18Display::GRID_STEPS_COUNT; ++i) {
+        switch (lampGridActions[i]) {
+            // TODO: are these needed? 1 "static" mode that does nothing instead?
+//            case LAMP_GRID_ON:
+//
+//                break;
+//            case LAMP_GRID_OFF:
+//
+//                break;
+            case LAMP_GRID_IN:
+                // TODO
+                // TODO: remember to switch mode at the end
+                break;
+            case LAMP_GRID_OUT:
+                // TODO
+                // TODO: remember to switch mode at the end
+                break;
+        }
+    }
+}
 
 void IV18Animator::animateStatusLED()
 {
@@ -166,10 +189,7 @@ void IV18Animator::doFrame()
 {
     // multiframe animation of the heartbeat
     animateStatusLED();
-
-//    // TODO: do we need this silliness?
-//    // TODO: enable it by command?
-//    animateGridsBrightness();
+    animateGridsBrightness();
 
     animator.doFrame();
 

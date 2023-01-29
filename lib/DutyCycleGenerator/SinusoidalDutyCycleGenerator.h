@@ -9,7 +9,9 @@ public:
         unsigned long maxDuty,
         unsigned long frameLength,
         unsigned short currentFrame,
-        unsigned short framesPerCycle
+        unsigned short framesPerCycle,
+        bool isHalfCycle = false,
+        bool isUp = true
     );
 };
 
