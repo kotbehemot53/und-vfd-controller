@@ -20,12 +20,19 @@ IV18Animator::IV18Animator(IV18Display &display)
 {
     // TODO: preprocessor could do it
     // determine longest multiframe animation cycle
-    framesPerLongestCycle = 0;
+    ledFramesPerLongestCycle = 0;
     for (unsigned short i : LED_FRAMES_PER_CYCLE) {
-        if (i > framesPerLongestCycle) {
-            framesPerLongestCycle = i;
+        if (i > ledFramesPerLongestCycle) {
+            ledFramesPerLongestCycle = i;
         }
     }
+    // TODO: not needed, right?
+//    lampGridFramesPerLongestCycle = 0;
+//    for (unsigned short i : lampGridFramesPerCycle) {
+//        if (i > lampGridFramesPerLongestCycle) {
+//            lampGridFramesPerLongestCycle = i;
+//        }
+//    }
 
     // TODO: these cause undertime - due to collision with lampGridSteps?
     auto heartbeatSteps = new DeviceAnimatorStep[2]{
@@ -97,7 +104,7 @@ void IV18Animator::setFailureListener(AnimatorFailureListenerInterface *failureL
 /**
  * This is just a silly animation of the grids
  */
-//void IV18Animator::animateGridsBrightness()
+//void IV18Animator::animateLampGridBrightnesses()
 //{
 //    // TODO: add more animations/effects based on a state property
 //
@@ -110,31 +117,56 @@ void IV18Animator::setFailureListener(AnimatorFailureListenerInterface *failureL
 //            10,
 //            LAMP_GRID_MAX_DUTY_US,
 //            LAMP_GRID_MAX_DUTY_US + LAMP_GRID_PREPARE_MIN_DUTY_US,
-//            currentFrame + 30 * i, // just because TODO: add some randomness?
+//            ledCurrentFrame + 30 * i, // just because TODO: add some randomness?
 //            LAMP_GRID_FRAMES_PER_CYCLE // just because
 //        );
 //        lampGridThread->steps[j-1].waitUs = LAMP_GRID_MAX_DUTY_US + LAMP_GRID_PREPARE_MIN_DUTY_US - lampGridThread->steps[i].waitUs;
 //    }
 //}
 
-void IV18Animator::animateGridsBrightness()
+void IV18Animator::animateLampGridBrightnesses()
 {
+    short j;
+    unsigned long frameLength = LAMP_GRID_MAX_DUTY_US + LAMP_GRID_PREPARE_MIN_DUTY_US;
     for (short i = 0; i < IV18Display::GRID_STEPS_COUNT; ++i) {
+        j = 2*i + 1; //step number
         switch (lampGridActions[i]) {
-            // TODO: are these needed? 1 "static" mode that does nothing instead?
-//            case LAMP_GRID_ON:
-//
-//                break;
-//            case LAMP_GRID_OFF:
-//
-//                break;
+            case LAMP_GRID_STATIC:
+//                lampGridThread->steps[j].waitUs =
+                break;
             case LAMP_GRID_IN:
-                // TODO
-                // TODO: remember to switch mode at the end
+                lampGridThread->steps[j].waitUs = SinusoidalDutyCycleGenerator::animateSinusoidalDutyCycle(
+                    0,
+                    lampGridMaxOnDutyUs[i],
+                    frameLength,
+                    lampGridCurrentFrameInCycle[i],
+                    lampGridFramesPerCycle[i],
+                    true,
+                    true
+                );
+                lampGridThread->steps[j-1].waitUs = frameLength - lampGridThread->steps[i].waitUs;
+
+                // switch to static on last frame
+                if (lampGridCurrentFrameInCycle[i] >= lampGridFramesPerCycle[i]) {
+                    lampGridActions[i] = LAMP_GRID_STATIC;
+                }
                 break;
             case LAMP_GRID_OUT:
-                // TODO
-                // TODO: remember to switch mode at the end
+                lampGridThread->steps[j].waitUs = SinusoidalDutyCycleGenerator::animateSinusoidalDutyCycle(
+                    0,
+                    lampGridMaxOnDutyUs[i],
+                    frameLength,
+                    lampGridCurrentFrameInCycle[i],
+                    lampGridFramesPerCycle[i],
+                    true,
+                    false
+                );
+                lampGridThread->steps[j-1].waitUs = frameLength - lampGridThread->steps[i].waitUs;
+
+                // switch to static on last frame
+                if (lampGridCurrentFrameInCycle[i] >= lampGridFramesPerCycle[i]) {
+                    lampGridActions[i] = LAMP_GRID_STATIC;
+                }
                 break;
         }
     }
@@ -148,7 +180,7 @@ void IV18Animator::animateStatusLED()
             LED_MIN_DUTY_US[ledAction],
             LED_MAX_DUTY_US[ledAction],
             FRAME_LENGTH_US,
-            currentFrame,
+            ledCurrentFrame,
             LED_FRAMES_PER_CYCLE[ledAction]
         );
         statusLedThread->steps[1].waitUs = FRAME_LENGTH_US - statusLedThread->steps[0].waitUs;
@@ -185,23 +217,50 @@ void IV18Animator::decreaseWarningBleeps()
     }
 }
 
+void IV18Animator::setLampGridOnDutyValues(const unsigned short *values)
+{
+    for (short i = 0; i < IV18Display::GRID_STEPS_COUNT; ++i) {
+        this->lampGridMaxOnDutyUs[i] = values[i];
+    }
+}
+
+void IV18Animator::setCurrentLampGridDutyValue(short lampGridNumber, unsigned short dutyValue)
+{
+    // TODO: calculate it in constructor?
+    unsigned long frameLength = LAMP_GRID_MAX_DUTY_US + LAMP_GRID_PREPARE_MIN_DUTY_US;
+    this->lampGridThread->steps[2 * lampGridNumber + 1].waitUs = dutyValue;
+    this->lampGridThread->steps[2 * lampGridNumber].waitUs = frameLength - dutyValue;
+}
+
+void IV18Animator::setLampGridAction(short lampGridNumber, short action)
+{
+    this->lampGridActions[lampGridNumber] = action;
+}
+
 void IV18Animator::doFrame()
 {
     // multiframe animation of the heartbeat
     animateStatusLED();
-    animateGridsBrightness();
+    animateLampGridBrightnesses();
 
     animator.doFrame();
 
-    ++currentFrame;
-
+    ++ledCurrentFrame;
     // for now, we're doing uniform cycles per all threads (applies only to heartbeat atm)
-    if (currentFrame >= framesPerLongestCycle) {
-        currentFrame = 0;
+    if (ledCurrentFrame >= ledFramesPerLongestCycle) {
+        ledCurrentFrame = 0;
+    }
+
+    // digit frame counting
+    for (short i = 0; i < IV18Display::GRID_STEPS_COUNT; ++i) {
+        ++lampGridCurrentFrameInCycle[i];
+        if (lampGridCurrentFrameInCycle[i] >= lampGridFramesPerCycle[i]) {
+            lampGridCurrentFrameInCycle[i] = 0;
+        }
     }
 
     // TODO: separate cycle & bleeps for LED_KILL?
-    if (currentFrame % LED_FRAMES_PER_CYCLE[LED_WARNING] == 0) {
+    if (ledCurrentFrame % LED_FRAMES_PER_CYCLE[LED_WARNING] == 0) {
         decreaseWarningBleeps();
     }
 }

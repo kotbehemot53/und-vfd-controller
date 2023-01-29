@@ -7,11 +7,19 @@
 
 class IV18Animator
 {
+public:
+    // available status led animation modes
+    static const short LED_HEARTBEAT = 0;
+    static const short LED_WARNING = 1;
+
+    // available lamp grid animation modes
+    static const short LAMP_GRID_STATIC = 0;    // constant state
+    static const short LAMP_GRID_IN = 1;        // fade-in
+    static const short LAMP_GRID_OUT = 2;       // fade-out
+
 private:
     static const unsigned long FRAME_LENGTH_US = 10000; // us -> just below 1/100 s
 
-    static const short LED_HEARTBEAT = 0;
-    static const short LED_WARNING = 1;
     static const short LED_SINUS_MODES_COUNT = 2;
 
     static const short LED_KILL = 100;
@@ -24,14 +32,10 @@ private:
     static const short LAMP_GRID_PREPARE_MIN_DUTY_US = 150;
     static const short LAMP_GRID_MAX_DUTY_US = 961;
 
-    // available lamp grid animation modes
-    static const short LAMP_GRID_OFF = 0;   // constant off
-    static const short LAMP_GRID_ON = 1;    // constant on
-    static const short LAMP_GRID_IN = 2;    // fade-in
-    static const short LAMP_GRID_OUT = 3;   // fade-out
 
 //    static const unsigned short LAMP_GRID_FRAMES_PER_CYCLE = 75;
     // TODO: add setter for this to use via command
+    //       recalculate lampGridFramesPerLongestCycle on set
     unsigned short lampGridFramesPerCycle[IV18Display::GRID_STEPS_COUNT] =
         {150, 150, 150, 150, 150, 150, 150, 150, 150};
 
@@ -40,7 +44,7 @@ private:
 
     // TODO: add setter for this to use via command
     // sets max duty cycle per lamp grid (permanent dimming)
-    unsigned short lampGridOnDutyUs[IV18Display::GRID_STEPS_COUNT] = {
+    unsigned short lampGridMaxOnDutyUs[IV18Display::GRID_STEPS_COUNT] = {
         LAMP_GRID_MAX_DUTY_US,
         LAMP_GRID_MAX_DUTY_US,
         LAMP_GRID_MAX_DUTY_US,
@@ -54,28 +58,27 @@ private:
 
     // TODO: add setter for this to use via command
     unsigned short lampGridActions[IV18Display::GRID_STEPS_COUNT] = {
-        LAMP_GRID_ON,
-        LAMP_GRID_ON,
-        LAMP_GRID_ON,
-        LAMP_GRID_ON,
-        LAMP_GRID_ON,
-        LAMP_GRID_ON,
-        LAMP_GRID_ON,
-        LAMP_GRID_ON,
-        LAMP_GRID_ON,
+        LAMP_GRID_STATIC,
+        LAMP_GRID_STATIC,
+        LAMP_GRID_STATIC,
+        LAMP_GRID_STATIC,
+        LAMP_GRID_STATIC,
+        LAMP_GRID_STATIC,
+        LAMP_GRID_STATIC,
+        LAMP_GRID_STATIC,
+        LAMP_GRID_STATIC,
     };
 
     // TODO: methods to init lamp grid modes/animations, animate them properly, set on duty values (regular/permanent dimming)
 
     DeviceAnimator animator;
-    unsigned short currentFrame = 0; // TODO: rename to ledCurrentFrame?
+    unsigned short ledCurrentFrame = 0;
 
     // TODO: how to make it static and initialize it? preprocessor?
-    unsigned short framesPerLongestCycle;
+    unsigned short ledFramesPerLongestCycle;
+//    unsigned short lampGridFramesPerLongestCycle;
 
     DeviceAnimatorThread* threads;
-    DeviceAnimatorThread* statusLedThread;
-    DeviceAnimatorThread* lampGridThread;
 
     unsigned short ledAction = 0;
     unsigned short warningBleepsLeft = 0;
@@ -89,15 +92,23 @@ private:
 //    static int randomCompare(const void *cmp1, const void *cmp2);
 //    static void shuffleArray(unsigned short * array, int size);
 
-    void animateGridsBrightness();
+    void animateLampGridBrightnesses();
 
 public:
+    // TODO: make appropriate getters/setters instead?
+    DeviceAnimatorThread* statusLedThread;
+    DeviceAnimatorThread* lampGridThread;
+
     explicit IV18Animator(IV18Display &display);
     void setFailureListener(AnimatorFailureListenerInterface* failureListener);
 
     void doWarning(short bleepsCount = 10);
     void doKillLED();
     void doFrame();
+
+    void setLampGridOnDutyValues(const unsigned short * values);
+    void setCurrentLampGridDutyValue(short lampGridNumber, unsigned short dutyValue);
+    void setLampGridAction(short lampGridNumber, short action);
 };
 
 #endif //PIUCNTVFD1_IV18ANIMATOR_H
