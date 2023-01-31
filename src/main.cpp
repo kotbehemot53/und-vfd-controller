@@ -44,6 +44,7 @@ void setup()
 //    Display.setMode(IV18Display::MODE_BYTES);
 //    Display.setBytes(testBytes);
     animator->doWarning(10);
+    // TODO: why isn't minus dimming?
 //    for (int i = 0; i < IV18Display::GRID_STEPS_COUNT; ++i) {
 //        animator->setCurrentLampGridDutyValue(i, 0);
 //    }
