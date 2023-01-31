@@ -132,7 +132,6 @@ void IV18Animator::animateLampGridBrightnesses()
         j = 2*i + 1; //step number
         switch (lampGridActions[i]) {
             case LAMP_GRID_STATIC:
-//                lampGridThread->steps[j].waitUs =
                 break;
             case LAMP_GRID_IN:
                 lampGridThread->steps[j].waitUs = SinusoidalDutyCycleGenerator::animateSinusoidalDutyCycle(
@@ -144,7 +143,7 @@ void IV18Animator::animateLampGridBrightnesses()
                     true,
                     true
                 );
-                lampGridThread->steps[j-1].waitUs = frameLength - lampGridThread->steps[i].waitUs;
+                lampGridThread->steps[j-1].waitUs = frameLength - lampGridThread->steps[j].waitUs;
 
                 // digit frame counting
                 ++lampGridCurrentFrameInCycle[i];
@@ -164,7 +163,7 @@ void IV18Animator::animateLampGridBrightnesses()
                     true,
                     false
                 );
-                lampGridThread->steps[j-1].waitUs = frameLength - lampGridThread->steps[i].waitUs;
+                lampGridThread->steps[j-1].waitUs = frameLength - lampGridThread->steps[j].waitUs;
 
                 ++lampGridCurrentFrameInCycle[i];
                 if (lampGridCurrentFrameInCycle[i] >= lampGridFramesPerCycle[i]) {

@@ -86,7 +86,7 @@ void DeviceAnimator::doFrame()
 
     for (int i = 0; i < totalSteps; ++i) {
         // omit steps that should take 0 time
-        if (stepsMerged[i]->waitUs == 0) {
+        if (stepsMerged[i]->waitUs <= 0) {
             continue;
         }
 
