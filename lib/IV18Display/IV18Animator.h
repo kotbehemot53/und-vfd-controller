@@ -17,6 +17,10 @@ public:
     static const short LAMP_GRID_IN = 1;        // fade-in
     static const short LAMP_GRID_OUT = 2;       // fade-out
 
+    // lamp grid duty cycle bounds
+    static const short LAMP_GRID_PREPARE_MIN_DUTY_US = 150;
+    static const short LAMP_GRID_MAX_DUTY_US = 961;
+    static const short LAMP_GRID_CUTOUT_DUTY_US = 100;
 private:
     static const unsigned long FRAME_LENGTH_US = 10000; // us -> just below 1/100 s
 
@@ -27,11 +31,6 @@ private:
     static constexpr unsigned short LED_FRAMES_PER_CYCLE[LED_SINUS_MODES_COUNT] = {150, 30};
     static constexpr unsigned long LED_MIN_DUTY_US[LED_SINUS_MODES_COUNT] = {500, 0};
     static constexpr unsigned long LED_MAX_DUTY_US[LED_SINUS_MODES_COUNT] = {7000, 9000};
-
-    // lamp grid duty cycle bounds
-    static const short LAMP_GRID_PREPARE_MIN_DUTY_US = 150;
-    static const short LAMP_GRID_MAX_DUTY_US = 961;
-
 
 //    static const unsigned short LAMP_GRID_FRAMES_PER_CYCLE = 75;
     // TODO: add setter for this to use via command
@@ -55,6 +54,18 @@ private:
         LAMP_GRID_MAX_DUTY_US,
         LAMP_GRID_MAX_DUTY_US,
         LAMP_GRID_MAX_DUTY_US
+    };
+
+    unsigned short lampGridMinOffDutyUs[IV18Display::GRID_STEPS_COUNT] = {
+        LAMP_GRID_CUTOUT_DUTY_US,
+        LAMP_GRID_CUTOUT_DUTY_US,
+        LAMP_GRID_CUTOUT_DUTY_US,
+        LAMP_GRID_CUTOUT_DUTY_US,
+        LAMP_GRID_CUTOUT_DUTY_US,
+        LAMP_GRID_CUTOUT_DUTY_US,
+        LAMP_GRID_CUTOUT_DUTY_US,
+        LAMP_GRID_CUTOUT_DUTY_US,
+        LAMP_GRID_CUTOUT_DUTY_US
     };
 
     // TODO: add setter for this to use via command
@@ -107,9 +118,11 @@ public:
     void doKillLED();
     void doFrame();
 
-    void setLampGridOnDutyValues(const unsigned short * values);
+//    void setLampGridOnDutyValues(const unsigned short * values);
+
     void setCurrentLampGridDutyValue(short lampGridNumber, unsigned short dutyValue);
-    void setLampGridAction(short lampGridNumber, short action);
+
+    void setLampGridAction(short lampGridNumber, short action, unsigned short maxDutyValue = LAMP_GRID_MAX_DUTY_US, unsigned short minDutyValue = LAMP_GRID_CUTOUT_DUTY_US);
 };
 
 #endif //PIUCNTVFD1_IV18ANIMATOR_H

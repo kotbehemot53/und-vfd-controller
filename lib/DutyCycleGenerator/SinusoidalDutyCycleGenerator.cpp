@@ -9,7 +9,8 @@ unsigned long SinusoidalDutyCycleGenerator::animateSinusoidalDutyCycle(
     unsigned short currentFrame,
     unsigned short framesPerCycle,
     bool isHalfCycle,
-    bool isUp
+    bool isUp,
+    unsigned long cutoutOnAndBelow
 )
 {
     // formula for a nice sinusoidal bajinga
@@ -32,6 +33,9 @@ unsigned long SinusoidalDutyCycleGenerator::animateSinusoidalDutyCycle(
 
     if (onTime > frameLength) {
         onTime = frameLength;
+    }
+    if (onTime <= cutoutOnAndBelow) {
+        onTime = 0;
     }
 
     return onTime;

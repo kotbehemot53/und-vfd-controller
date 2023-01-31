@@ -135,13 +135,14 @@ void IV18Animator::animateLampGridBrightnesses()
                 break;
             case LAMP_GRID_IN:
                 lampGridThread->steps[j].waitUs = SinusoidalDutyCycleGenerator::animateSinusoidalDutyCycle(
-                    0,
+                    lampGridMinOffDutyUs[i],
                     lampGridMaxOnDutyUs[i],
                     frameLength,
                     lampGridCurrentFrameInCycle[i],
                     lampGridFramesPerCycle[i],
                     true,
-                    true
+                    true,
+                    LAMP_GRID_CUTOUT_DUTY_US
                 );
                 lampGridThread->steps[j-1].waitUs = frameLength - lampGridThread->steps[j].waitUs;
 
@@ -155,13 +156,14 @@ void IV18Animator::animateLampGridBrightnesses()
                 break;
             case LAMP_GRID_OUT:
                 lampGridThread->steps[j].waitUs = SinusoidalDutyCycleGenerator::animateSinusoidalDutyCycle(
-                    0,
+                    lampGridMinOffDutyUs[i],
                     lampGridMaxOnDutyUs[i],
                     frameLength,
                     lampGridCurrentFrameInCycle[i],
                     lampGridFramesPerCycle[i],
                     true,
-                    false
+                    false,
+                    LAMP_GRID_CUTOUT_DUTY_US
                 );
                 lampGridThread->steps[j-1].waitUs = frameLength - lampGridThread->steps[j].waitUs;
 
@@ -221,12 +223,12 @@ void IV18Animator::decreaseWarningBleeps()
     }
 }
 
-void IV18Animator::setLampGridOnDutyValues(const unsigned short *values)
-{
-    for (short i = 0; i < IV18Display::GRID_STEPS_COUNT; ++i) {
-        this->lampGridMaxOnDutyUs[i] = values[i];
-    }
-}
+//void IV18Animator::setLampGridOnDutyValues(const unsigned short *values)
+//{
+//    for (short i = 0; i < IV18Display::GRID_STEPS_COUNT; ++i) {
+//        this->lampGridMaxOnDutyUs[i] = values[i];
+//    }
+//}
 
 void IV18Animator::setCurrentLampGridDutyValue(short lampGridNumber, unsigned short dutyValue)
 {
@@ -236,8 +238,16 @@ void IV18Animator::setCurrentLampGridDutyValue(short lampGridNumber, unsigned sh
     this->lampGridThread->steps[2 * lampGridNumber].waitUs = frameLength - dutyValue;
 }
 
-void IV18Animator::setLampGridAction(short lampGridNumber, short action)
+void IV18Animator::setLampGridAction(
+    short lampGridNumber,
+    short action,
+    unsigned short maxDutyValue,
+    unsigned short minDutyValue
+)
 {
+    this->lampGridMaxOnDutyUs[lampGridNumber] = maxDutyValue;
+    this->lampGridMinOffDutyUs[lampGridNumber] = minDutyValue;
+
     this->lampGridActions[lampGridNumber] = action;
 }
 

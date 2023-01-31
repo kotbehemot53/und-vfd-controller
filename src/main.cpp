@@ -17,6 +17,7 @@ IV18Animator* animator;
 AnimatorFailureListenerInterface* animatorFailureListener;
 
 unsigned long currentFrame = 0;
+bool on = true;
 
 void setup()
 {
@@ -57,18 +58,29 @@ void loop()
     animator->doFrame();
     Comms.handleBufferedInput(); //if new_frame handleNewFrame...
 
-    if (currentFrame % 100 == 0 && currentFrame < 900) {
-        short digitNumber = currentFrame / 100;
-        animator->setLampGridAction(digitNumber, IV18Animator::LAMP_GRID_OUT);
+//    if (currentFrame % 100 == 0 && currentFrame < 900) {
+//        short digitNumber = currentFrame / 100;
+//        animator->setLampGridAction(digitNumber, IV18Animator::LAMP_GRID_OUT);
+//    }
+//
+//    if (currentFrame % 100 == 0 && currentFrame >= 1800 && currentFrame < 2700) {
+//        short digitNumber = 26 - (currentFrame / 100);
+//        animator->setLampGridAction(digitNumber, IV18Animator::LAMP_GRID_IN);
+//    }
+
+    if (currentFrame % 200 == 0) {
+        if (on) {
+            animator->setLampGridAction(8, IV18Animator::LAMP_GRID_OUT, IV18Animator::LAMP_GRID_MAX_DUTY_US);
+            animator->setLampGridAction(6, IV18Animator::LAMP_GRID_OUT, IV18Animator::LAMP_GRID_MAX_DUTY_US);
+        } else {
+            animator->setLampGridAction(8, IV18Animator::LAMP_GRID_IN, IV18Animator::LAMP_GRID_MAX_DUTY_US);
+            animator->setLampGridAction(6, IV18Animator::LAMP_GRID_IN, IV18Animator::LAMP_GRID_MAX_DUTY_US);
+        }
+        on = !on;
     }
 
-    if (currentFrame % 100 == 0 && currentFrame >= 1800 && currentFrame < 2700) {
-        short digitNumber = 26 - (currentFrame / 100);
-        animator->setLampGridAction(digitNumber, IV18Animator::LAMP_GRID_IN);
-    }
-
-    if (currentFrame < 2700) {
+//    if (currentFrame < 2700) {
         ++currentFrame;
-    }
+//    }
 }
 

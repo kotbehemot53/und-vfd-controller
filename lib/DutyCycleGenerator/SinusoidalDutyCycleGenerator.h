@@ -11,7 +11,8 @@ public:
         unsigned short currentFrame,
         unsigned short framesPerCycle,
         bool isHalfCycle = false,
-        bool isUp = true
+        bool isUp = true,
+        unsigned long cutoutOnAndBelow = 100
     );
 };
 
