@@ -59,15 +59,13 @@ void loop()
 
     if (currentFrame % 100 == 0 && currentFrame < 900) {
         short digitNumber = currentFrame / 100;
-        // TODO: fade in does not work like it should!
         animator->setLampGridAction(digitNumber, IV18Animator::LAMP_GRID_OUT);
     }
 
-//    if (currentFrame % 100 == 0 && currentFrame >= 1800 && currentFrame < 2700) {
-//        short digitNumber = 26 - (currentFrame / 100);
-//        // TODO: fade in does not work like it should!
-//        animator->setLampGridAction(digitNumber, IV18Animator::LAMP_GRID_OUT);
-//    }
+    if (currentFrame % 100 == 0 && currentFrame >= 1800 && currentFrame < 2700) {
+        short digitNumber = 26 - (currentFrame / 100);
+        animator->setLampGridAction(digitNumber, IV18Animator::LAMP_GRID_IN);
+    }
 
     if (currentFrame < 2700) {
         ++currentFrame;
