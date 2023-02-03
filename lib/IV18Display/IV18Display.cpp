@@ -79,10 +79,17 @@ void IV18Display::multiplexViaShiftRegister(bool isFirst)
     delayMicroseconds(SERIAL_REG_CLK_PULSE_LEN_US);
     digitalWrite(MUX_CL, LOW);
 }
-
-void IV18Display::multiplexGrid9(bool isGrid9)
+void IV18Display::Grid9Off()
 {
-    digitalWrite(GRID9, isGrid9 ? HIGH : LOW);
+    digitalWrite(GRID9, LOW);
+}
+
+// TODO: maybe run it outside as an animation step, just like Grid9Off?
+void IV18Display::Grid9OnWhenNeeded(bool isGrid9)
+{
+    if (isGrid9) {
+        digitalWrite(GRID9, HIGH);
+    }
 }
 
 void IV18Display::prepareGridSegments(int sequenceNumber)

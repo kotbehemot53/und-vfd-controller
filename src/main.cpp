@@ -70,17 +70,17 @@ void loop()
 
     if (currentFrame % 200 == 0) {
         if (on) {
-            animator->setLampGridAction(8, IV18Animator::LAMP_GRID_OUT, IV18Animator::LAMP_GRID_MAX_DUTY_US, IV18Animator::LAMP_GRID_CUTOUT_DUTY_US + 1);
-            animator->setLampGridAction(6, IV18Animator::LAMP_GRID_OUT, IV18Animator::LAMP_GRID_MAX_DUTY_US);
-            animator->setLampGridAction(4, IV18Animator::LAMP_GRID_OUT, IV18Animator::LAMP_GRID_MAX_DUTY_US, IV18Animator::LAMP_GRID_CUTOUT_DUTY_US + 1);
-            animator->setLampGridAction(2, IV18Animator::LAMP_GRID_OUT, IV18Animator::LAMP_GRID_MAX_DUTY_US);
-            animator->setLampGridAction(0, IV18Animator::LAMP_GRID_OUT, IV18Animator::LAMP_GRID_MAX_DUTY_US, IV18Animator::LAMP_GRID_CUTOUT_DUTY_US + 1);
+            animator->setLampGridAction(8, IV18Animator::LAMP_GRID_OUT, IV18Animator::LAMP_GRID_MAX_DUTY_US, IV18Animator::LAMP_GRID_CUTOUT_DUTY_US); // + 1);
+//            animator->setLampGridAction(6, IV18Animator::LAMP_GRID_OUT, IV18Animator::LAMP_GRID_MAX_DUTY_US);
+            animator->setLampGridAction(4, IV18Animator::LAMP_GRID_OUT, IV18Animator::LAMP_GRID_MAX_DUTY_US, IV18Animator::LAMP_GRID_CUTOUT_DUTY_US); // + 1);
+//            animator->setLampGridAction(2, IV18Animator::LAMP_GRID_OUT, IV18Animator::LAMP_GRID_MAX_DUTY_US);
+//            animator->setLampGridAction(0, IV18Animator::LAMP_GRID_OUT, IV18Animator::LAMP_GRID_MAX_DUTY_US, IV18Animator::LAMP_GRID_CUTOUT_DUTY_US + 1);
         } else {
-            animator->setLampGridAction(8, IV18Animator::LAMP_GRID_IN, IV18Animator::LAMP_GRID_MAX_DUTY_US, IV18Animator::LAMP_GRID_CUTOUT_DUTY_US + 1);
-            animator->setLampGridAction(6, IV18Animator::LAMP_GRID_IN, IV18Animator::LAMP_GRID_MAX_DUTY_US);
-            animator->setLampGridAction(4, IV18Animator::LAMP_GRID_IN, IV18Animator::LAMP_GRID_MAX_DUTY_US, IV18Animator::LAMP_GRID_CUTOUT_DUTY_US + 1);
-            animator->setLampGridAction(2, IV18Animator::LAMP_GRID_IN, IV18Animator::LAMP_GRID_MAX_DUTY_US);
-            animator->setLampGridAction(0, IV18Animator::LAMP_GRID_IN, IV18Animator::LAMP_GRID_MAX_DUTY_US, IV18Animator::LAMP_GRID_CUTOUT_DUTY_US + 1);
+            animator->setLampGridAction(8, IV18Animator::LAMP_GRID_IN, IV18Animator::LAMP_GRID_MAX_DUTY_US, IV18Animator::LAMP_GRID_CUTOUT_DUTY_US); // + 1);
+//            animator->setLampGridAction(6, IV18Animator::LAMP_GRID_IN, IV18Animator::LAMP_GRID_MAX_DUTY_US);
+            animator->setLampGridAction(4, IV18Animator::LAMP_GRID_IN, IV18Animator::LAMP_GRID_MAX_DUTY_US, IV18Animator::LAMP_GRID_CUTOUT_DUTY_US); // + 1);
+//            animator->setLampGridAction(2, IV18Animator::LAMP_GRID_IN, IV18Animator::LAMP_GRID_MAX_DUTY_US);
+//            animator->setLampGridAction(0, IV18Animator::LAMP_GRID_IN, IV18Animator::LAMP_GRID_MAX_DUTY_US, IV18Animator::LAMP_GRID_CUTOUT_DUTY_US + 1);
         }
         on = !on;
     }

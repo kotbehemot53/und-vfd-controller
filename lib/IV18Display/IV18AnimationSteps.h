@@ -12,7 +12,7 @@ public:
     static void prepareNextGridStep(IV18Display* that, int sequenceNumber);
     static void statusOn(IV18Display* that, int sequenceNumber);
     static void statusOff(IV18Display* that, int sequenceNumber);
-    static void noOp(IV18Display *that, int sequenceNumber);
+    static void grid9OffAndCooldown(IV18Display *that, int sequenceNumber);
 };
 
 #endif //PIUCNTVFD1_IV18ANIMATIONSTEPS_H

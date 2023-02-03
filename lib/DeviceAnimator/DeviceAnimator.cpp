@@ -70,8 +70,9 @@ void DeviceAnimator::initFrame()
         stepsMerged[i - 1]->timeToNextMergedStepUs = stepsMerged[i]->timeWithinFrameUs - previousStepTimeWithinFrameUs;
         previousStepTimeWithinFrameUs = stepsMerged[i]->timeWithinFrameUs;
     }
-    // for the last step, set time to next step, which actually is the end of frame
-    stepsMerged[totalSteps - 1]->timeToNextMergedStepUs = frameEndTimeUs - stepsMerged[totalSteps - 1]->timeWithinFrameUs;
+    // for the last step, set time left to the next step, which actually is the end of frame
+    // include last cummulative undertime in frameEndTimeUs to have a real endtime and not finish the last step too early
+    stepsMerged[totalSteps - 1]->timeToNextMergedStepUs = frameEndTimeUs + lastFrameCummulativeUndertime - stepsMerged[totalSteps - 1]->timeWithinFrameUs;
 }
 
 void DeviceAnimator::doFrame()
@@ -83,6 +84,7 @@ void DeviceAnimator::doFrame()
 
     // happens every frame because steps contents may change between frames; takes about 40 us
     initFrame();
+    lastFrameCummulativeUndertime = 0;
 
     for (int i = 0; i < totalSteps; ++i) {
         // omit steps that should take 0 time
@@ -93,7 +95,7 @@ void DeviceAnimator::doFrame()
         preExecTimeUs = micros();
         stepsMerged[i]->callback(stepsMerged[i]->devicePtr, stepsMerged[i]->sequenceNumber);
         postExecTimeUs = micros();
-        execTimeDiffUs = postExecTimeUs >= preExecTimeUs ? postExecTimeUs - preExecTimeUs : 0;
+        execTimeDiffUs = postExecTimeUs >= preExecTimeUs ? postExecTimeUs - preExecTimeUs + EXEC_TIME_OVERHEAD_US : 0;
 
         // detect timeToNextMergedStepUs < execTimeDiffUs (means too small intervals specified)
         bool undertimeDetected = false;
@@ -101,6 +103,8 @@ void DeviceAnimator::doFrame()
         // for debug purposes report undertime
         if (stepsMerged[i]->timeToNextMergedStepUs < execTimeDiffUs) {
             undertimeDetected = true;
+            lastFrameCummulativeUndertime += execTimeDiffUs - stepsMerged[i]->timeToNextMergedStepUs;
+//            Serial.println(lastFrameCummulativeUndertime, DEC);
             if (hasFailureListener) {
                 this->failureListener->failureWarning(
                     AnimatorFailureListenerInterface::WARNING_UNDERTIME,

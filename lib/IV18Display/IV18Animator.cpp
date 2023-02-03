@@ -42,7 +42,7 @@ IV18Animator::IV18Animator(IV18Display &display)
     };
 
     // prepare must be at least 150 us - otherwise undertime happens constantly
-    auto lampGridSteps = new DeviceAnimatorStep[IV18Display::GRID_STEPS_COUNT*2]{
+    auto lampGridSteps = new DeviceAnimatorStep[IV18Display::GRID_STEPS_COUNT*2 + 1]{
         DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep),
                            LAMP_GRID_PREPARE_MIN_DUTY_US, 0),
         DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep),
@@ -78,12 +78,14 @@ IV18Animator::IV18Animator(IV18Display &display)
         DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep),
                            LAMP_GRID_PREPARE_MIN_DUTY_US + 1, 8),
         DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep),
-                           LAMP_GRID_MAX_DUTY_US, 8)
+                           LAMP_GRID_MAX_DUTY_US, 8),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::grid9OffAndCooldown),
+                           IV18Display::GRID9_COOLDOWN_US, 9)
     };
 
     threads = new DeviceAnimatorThread[2]{
         DeviceAnimatorThread(heartbeatSteps, 2),
-        DeviceAnimatorThread(lampGridSteps, IV18Display::GRID_STEPS_COUNT*2)
+        DeviceAnimatorThread(lampGridSteps, IV18Display::GRID_STEPS_COUNT*2 + 1)
     };
     statusLedThread = &(threads[0]);
     lampGridThread = &(threads[1]);
