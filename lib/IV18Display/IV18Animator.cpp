@@ -34,7 +34,8 @@ IV18Animator::IV18Animator(IV18Display &display)
 //        }
 //    }
 
-    // TODO: these cause undertime - due to collision with lampDigitSteps?
+    // TODO: these cause undertime - due to collision with lampDigitSteps
+    //       think about rectangular heartbeat with a non-colliding offsets instead
     auto heartbeatSteps = new DeviceAnimatorStep[2]{
         // waitUs values will be overriden on every frame by animateStatusLED
         DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::statusOn), 5000),

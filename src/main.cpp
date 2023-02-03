@@ -17,7 +17,7 @@ IV18Animator* animator;
 AnimatorFailureListenerInterface* animatorFailureListener;
 
 unsigned long currentFrame = 0;
-bool on = true;
+int animSteps[4] = {0, 0, 0, 0,};
 
 void setup()
 {
@@ -47,7 +47,7 @@ void setup()
     animator->doWarning(10);
     // TODO: why isn't minus dimming?
 //    for (int i = 0; i < IV18Display::DIGIT_STEPS_COUNT; ++i) {
-//        animator->setCurrentLampDigitDutyValue(i, 0);
+//        animator->setCurrentLampDigitDutyValue(i, IV18Animator::LAMP_DIGIT_CUTOUT_DUTY_US + 1);
 //    }
 }
 
@@ -68,29 +68,28 @@ void loop()
 //        animator->setLampDigitAction(digitNumber, IV18Animator::LAMP_DIGIT_IN);
 //    }
 
-    if (currentFrame % 200 == 0) {
-        if (on) {
-            animator->setLampDigitAction(8, IV18Animator::LAMP_DIGIT_OUT, IV18Animator::LAMP_DIGIT_MAX_DUTY_US,
-                                         IV18Animator::LAMP_DIGIT_CUTOUT_DUTY_US); // + 1);
-//            animator->setLampDigitAction(6, IV18Animator::LAMP_DIGIT_OUT, IV18Animator::LAMP_DIGIT_MAX_DUTY_US);
-            animator->setLampDigitAction(4, IV18Animator::LAMP_DIGIT_OUT, IV18Animator::LAMP_DIGIT_MAX_DUTY_US,
-                                         IV18Animator::LAMP_DIGIT_CUTOUT_DUTY_US); // + 1);
-//            animator->setLampDigitAction(2, IV18Animator::LAMP_DIGIT_OUT, IV18Animator::LAMP_DIGIT_MAX_DUTY_US);
-//            animator->setLampDigitAction(0, IV18Animator::LAMP_DIGIT_OUT, IV18Animator::LAMP_DIGIT_MAX_DUTY_US, IV18Animator::LAMP_DIGIT_CUTOUT_DUTY_US + 1);
-        } else {
-            animator->setLampDigitAction(8, IV18Animator::LAMP_DIGIT_IN, IV18Animator::LAMP_DIGIT_MAX_DUTY_US,
-                                         IV18Animator::LAMP_DIGIT_CUTOUT_DUTY_US); // + 1);
-//            animator->setLampDigitAction(6, IV18Animator::LAMP_DIGIT_IN, IV18Animator::LAMP_DIGIT_MAX_DUTY_US);
-            animator->setLampDigitAction(4, IV18Animator::LAMP_DIGIT_IN, IV18Animator::LAMP_DIGIT_MAX_DUTY_US,
-                                         IV18Animator::LAMP_DIGIT_CUTOUT_DUTY_US); // + 1);
-//            animator->setLampDigitAction(2, IV18Animator::LAMP_DIGIT_IN, IV18Animator::LAMP_DIGIT_MAX_DUTY_US);
-//            animator->setLampDigitAction(0, IV18Animator::LAMP_DIGIT_IN, IV18Animator::LAMP_DIGIT_MAX_DUTY_US, IV18Animator::LAMP_DIGIT_CUTOUT_DUTY_US + 1);
+    if (currentFrame % 50 == 0) {
+        for (int i = 1; i < 4; ++i) {
+            animSteps[i] = animSteps[i - 1] - 2;
+            if (animSteps[i] < 0) {
+                animSteps[i] = animSteps[i] + 9;
+            }
         }
-        on = !on;
+
+        animator->setLampDigitAction(animSteps[0], IV18Animator::LAMP_DIGIT_OUT, IV18Animator::LAMP_DIGIT_MAX_DUTY_US,
+                                     IV18Animator::LAMP_DIGIT_CUTOUT_DUTY_US + 1);
+        animator->setLampDigitAction(animSteps[1], IV18Animator::LAMP_DIGIT_IN, IV18Animator::LAMP_DIGIT_MAX_DUTY_US,
+                                     IV18Animator::LAMP_DIGIT_CUTOUT_DUTY_US + 1);
+        animator->setLampDigitAction(animSteps[2], IV18Animator::LAMP_DIGIT_OUT, IV18Animator::LAMP_DIGIT_MAX_DUTY_US,
+                                     IV18Animator::LAMP_DIGIT_CUTOUT_DUTY_US + 1);
+        animator->setLampDigitAction(animSteps[3], IV18Animator::LAMP_DIGIT_IN, IV18Animator::LAMP_DIGIT_MAX_DUTY_US,
+                                     IV18Animator::LAMP_DIGIT_CUTOUT_DUTY_US + 1);
+        ++animSteps[0];
+        if (animSteps[0] > 8) {
+            animSteps[0] = 0;
+        }
     }
 
-//    if (currentFrame < 2700) {
-        ++currentFrame;
-//    }
+    ++currentFrame;
 }
 
