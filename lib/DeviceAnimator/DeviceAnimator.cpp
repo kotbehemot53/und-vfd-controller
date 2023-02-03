@@ -21,7 +21,6 @@ void DeviceAnimator::setThreads(DeviceAnimatorThread threadsToSet[], int numberO
 {
     threads = threadsToSet;
     numberOfThreads = numberOfThreadsToSet;
-    frameEndTimeUs = 0;
     totalSteps = 0;
 
     // determine number of steps to preallocate merged steps pointers array
@@ -48,6 +47,8 @@ void DeviceAnimator::setFailureListener(AnimatorFailureListenerInterface* failur
 
 void DeviceAnimator::initFrame()
 {
+    frameEndTimeUs = 0;
+
     // assign objective points in time to steps, initialize merged steps pointers array (unsorted yet!)
     for (int i = 0; i < numberOfThreads; ++i) {
         unsigned long currentPointInTimeInThreadUs = 0;

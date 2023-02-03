@@ -36,7 +36,7 @@ private:
     // TODO: add setter for this to use via command
     //       recalculate lampGridFramesPerLongestCycle on set
     unsigned short lampDigitFramesPerCycle[IV18Display::DIGIT_STEPS_COUNT] =
-        {150, 150, 150, 150, 150, 150, 150, 150, 150};
+        {100, 100, 100, 100, 100, 100, 100, 100, 100};
 
     unsigned short lampDigitCurrentFrameInCycle[IV18Display::DIGIT_STEPS_COUNT] =
         {0, 0, 0, 0, 0, 0, 0, 0, 0};
