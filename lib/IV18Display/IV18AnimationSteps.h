@@ -8,8 +8,8 @@ class IV18AnimationSteps
 private:
     IV18AnimationSteps() {}
 public:
-    static void doGridStep(IV18Display* that, int sequenceNumber);
-    static void prepareNextGridStep(IV18Display* that, int sequenceNumber);
+    static void doDigitStep(IV18Display* that, int sequenceNumber);
+    static void prepareNextDigitStep(IV18Display* that, int sequenceNumber);
     static void statusOn(IV18Display* that, int sequenceNumber);
     static void statusOff(IV18Display* that, int sequenceNumber);
     static void grid9OffAndCooldown(IV18Display *that, int sequenceNumber);

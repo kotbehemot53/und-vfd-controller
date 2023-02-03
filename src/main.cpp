@@ -46,8 +46,8 @@ void setup()
 //    Display.setBytes(testBytes);
     animator->doWarning(10);
     // TODO: why isn't minus dimming?
-//    for (int i = 0; i < IV18Display::GRID_STEPS_COUNT; ++i) {
-//        animator->setCurrentLampGridDutyValue(i, 0);
+//    for (int i = 0; i < IV18Display::DIGIT_STEPS_COUNT; ++i) {
+//        animator->setCurrentLampDigitDutyValue(i, 0);
 //    }
 }
 
@@ -60,27 +60,31 @@ void loop()
 
 //    if (currentFrame % 100 == 0 && currentFrame < 900) {
 //        short digitNumber = currentFrame / 100;
-//        animator->setLampGridAction(digitNumber, IV18Animator::LAMP_GRID_OUT);
+//        animator->setLampDigitAction(digitNumber, IV18Animator::LAMP_DIGIT_OUT);
 //    }
 //
 //    if (currentFrame % 100 == 0 && currentFrame >= 1800 && currentFrame < 2700) {
 //        short digitNumber = 26 - (currentFrame / 100);
-//        animator->setLampGridAction(digitNumber, IV18Animator::LAMP_GRID_IN);
+//        animator->setLampDigitAction(digitNumber, IV18Animator::LAMP_DIGIT_IN);
 //    }
 
     if (currentFrame % 200 == 0) {
         if (on) {
-            animator->setLampGridAction(8, IV18Animator::LAMP_GRID_OUT, IV18Animator::LAMP_GRID_MAX_DUTY_US, IV18Animator::LAMP_GRID_CUTOUT_DUTY_US); // + 1);
-//            animator->setLampGridAction(6, IV18Animator::LAMP_GRID_OUT, IV18Animator::LAMP_GRID_MAX_DUTY_US);
-            animator->setLampGridAction(4, IV18Animator::LAMP_GRID_OUT, IV18Animator::LAMP_GRID_MAX_DUTY_US, IV18Animator::LAMP_GRID_CUTOUT_DUTY_US); // + 1);
-//            animator->setLampGridAction(2, IV18Animator::LAMP_GRID_OUT, IV18Animator::LAMP_GRID_MAX_DUTY_US);
-//            animator->setLampGridAction(0, IV18Animator::LAMP_GRID_OUT, IV18Animator::LAMP_GRID_MAX_DUTY_US, IV18Animator::LAMP_GRID_CUTOUT_DUTY_US + 1);
+            animator->setLampDigitAction(8, IV18Animator::LAMP_DIGIT_OUT, IV18Animator::LAMP_DIGIT_MAX_DUTY_US,
+                                         IV18Animator::LAMP_DIGIT_CUTOUT_DUTY_US); // + 1);
+//            animator->setLampDigitAction(6, IV18Animator::LAMP_DIGIT_OUT, IV18Animator::LAMP_DIGIT_MAX_DUTY_US);
+            animator->setLampDigitAction(4, IV18Animator::LAMP_DIGIT_OUT, IV18Animator::LAMP_DIGIT_MAX_DUTY_US,
+                                         IV18Animator::LAMP_DIGIT_CUTOUT_DUTY_US); // + 1);
+//            animator->setLampDigitAction(2, IV18Animator::LAMP_DIGIT_OUT, IV18Animator::LAMP_DIGIT_MAX_DUTY_US);
+//            animator->setLampDigitAction(0, IV18Animator::LAMP_DIGIT_OUT, IV18Animator::LAMP_DIGIT_MAX_DUTY_US, IV18Animator::LAMP_DIGIT_CUTOUT_DUTY_US + 1);
         } else {
-            animator->setLampGridAction(8, IV18Animator::LAMP_GRID_IN, IV18Animator::LAMP_GRID_MAX_DUTY_US, IV18Animator::LAMP_GRID_CUTOUT_DUTY_US); // + 1);
-//            animator->setLampGridAction(6, IV18Animator::LAMP_GRID_IN, IV18Animator::LAMP_GRID_MAX_DUTY_US);
-            animator->setLampGridAction(4, IV18Animator::LAMP_GRID_IN, IV18Animator::LAMP_GRID_MAX_DUTY_US, IV18Animator::LAMP_GRID_CUTOUT_DUTY_US); // + 1);
-//            animator->setLampGridAction(2, IV18Animator::LAMP_GRID_IN, IV18Animator::LAMP_GRID_MAX_DUTY_US);
-//            animator->setLampGridAction(0, IV18Animator::LAMP_GRID_IN, IV18Animator::LAMP_GRID_MAX_DUTY_US, IV18Animator::LAMP_GRID_CUTOUT_DUTY_US + 1);
+            animator->setLampDigitAction(8, IV18Animator::LAMP_DIGIT_IN, IV18Animator::LAMP_DIGIT_MAX_DUTY_US,
+                                         IV18Animator::LAMP_DIGIT_CUTOUT_DUTY_US); // + 1);
+//            animator->setLampDigitAction(6, IV18Animator::LAMP_DIGIT_IN, IV18Animator::LAMP_DIGIT_MAX_DUTY_US);
+            animator->setLampDigitAction(4, IV18Animator::LAMP_DIGIT_IN, IV18Animator::LAMP_DIGIT_MAX_DUTY_US,
+                                         IV18Animator::LAMP_DIGIT_CUTOUT_DUTY_US); // + 1);
+//            animator->setLampDigitAction(2, IV18Animator::LAMP_DIGIT_IN, IV18Animator::LAMP_DIGIT_MAX_DUTY_US);
+//            animator->setLampDigitAction(0, IV18Animator::LAMP_DIGIT_IN, IV18Animator::LAMP_DIGIT_MAX_DUTY_US, IV18Animator::LAMP_DIGIT_CUTOUT_DUTY_US + 1);
         }
         on = !on;
     }
