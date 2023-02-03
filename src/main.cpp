@@ -17,12 +17,7 @@ IV18Animator* animator;
 AnimatorFailureListenerInterface* animatorFailureListener;
 
 unsigned long currentFrame = 0;
-//bool on = true;
-int i = 0;
-int j = 0;
-int k = 0;
-int l = 0;
-bool ons[10] = {true, true, true,true, true, true,true, true, true, true};
+int animSteps[4] = {0, 0, 0, 0,};
 
 void setup()
 {
@@ -74,35 +69,27 @@ void loop()
 //    }
 
     if (currentFrame % 50 == 0) {
-        j = i - 2;
-        k = i - 4;
-        l = i - 6;
-        if (j < 0) {
-            j = j + 9;
+        for (int i = 1; i < 4; ++i) {
+            animSteps[i] = animSteps[i - 1] - 2;
+            if (animSteps[i] < 0) {
+                animSteps[i] = animSteps[i] + 9;
+            }
         }
-        if (k < 0) {
-            k = k + 9;
-        }
-        if (l < 0) {
-            l = l + 9;
-        }
-        animator->setLampDigitAction(i, IV18Animator::LAMP_DIGIT_OUT, IV18Animator::LAMP_DIGIT_MAX_DUTY_US,
+
+        animator->setLampDigitAction(animSteps[0], IV18Animator::LAMP_DIGIT_OUT, IV18Animator::LAMP_DIGIT_MAX_DUTY_US,
                                      IV18Animator::LAMP_DIGIT_CUTOUT_DUTY_US + 1);
-        animator->setLampDigitAction(j, IV18Animator::LAMP_DIGIT_IN, IV18Animator::LAMP_DIGIT_MAX_DUTY_US,
+        animator->setLampDigitAction(animSteps[1], IV18Animator::LAMP_DIGIT_IN, IV18Animator::LAMP_DIGIT_MAX_DUTY_US,
                                      IV18Animator::LAMP_DIGIT_CUTOUT_DUTY_US + 1);
-        animator->setLampDigitAction(k, IV18Animator::LAMP_DIGIT_OUT, IV18Animator::LAMP_DIGIT_MAX_DUTY_US,
+        animator->setLampDigitAction(animSteps[2], IV18Animator::LAMP_DIGIT_OUT, IV18Animator::LAMP_DIGIT_MAX_DUTY_US,
                                      IV18Animator::LAMP_DIGIT_CUTOUT_DUTY_US + 1);
-        animator->setLampDigitAction(l, IV18Animator::LAMP_DIGIT_IN, IV18Animator::LAMP_DIGIT_MAX_DUTY_US,
+        animator->setLampDigitAction(animSteps[3], IV18Animator::LAMP_DIGIT_IN, IV18Animator::LAMP_DIGIT_MAX_DUTY_US,
                                      IV18Animator::LAMP_DIGIT_CUTOUT_DUTY_US + 1);
-//        ons[i] = !ons[i];
-        ++i;
-        if (i > 8) {
-            i = 0;
+        ++animSteps[0];
+        if (animSteps[0] > 8) {
+            animSteps[0] = 0;
         }
     }
 
-//    if (currentFrame < 2700) {
-        ++currentFrame;
-//    }
+    ++currentFrame;
 }
 
