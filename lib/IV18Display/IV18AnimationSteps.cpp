@@ -9,7 +9,7 @@ void IV18AnimationSteps::prepareNextGridStep(IV18Display* that, int sequenceNumb
 {
     that->clearChar();
     that->multiplexViaShiftRegister(sequenceNumber == 0);
-    that->multiplexGrid9(sequenceNumber == 8);
+    that->Grid9OnWhenNeeded(sequenceNumber == 8);
 }
 
 void IV18AnimationSteps::statusOn(IV18Display* that, int sequenceNumber)
@@ -22,7 +22,7 @@ void IV18AnimationSteps::statusOff(IV18Display* that, int sequenceNumber)
     that->statusOff();
 }
 
-void IV18AnimationSteps::noOp(IV18Display *that, int sequenceNumber)
+void IV18AnimationSteps::grid9OffAndCooldown(IV18Display *that, int sequenceNumber)
 {
-    // does nothing
+    that->Grid9Off();
 }

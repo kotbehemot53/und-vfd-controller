@@ -12,10 +12,12 @@
 // TODO: comms
 
 const byte I2C_ADDR = 0x5;
-const unsigned long FRAME_DURATION_US = 10000;
 
 IV18Animator* animator;
 AnimatorFailureListenerInterface* animatorFailureListener;
+
+unsigned long currentFrame = 0;
+bool on = true;
 
 void setup()
 {
@@ -43,6 +45,10 @@ void setup()
 //    Display.setMode(IV18Display::MODE_BYTES);
 //    Display.setBytes(testBytes);
     animator->doWarning(10);
+    // TODO: why isn't minus dimming?
+//    for (int i = 0; i < IV18Display::GRID_STEPS_COUNT; ++i) {
+//        animator->setCurrentLampGridDutyValue(i, 0);
+//    }
 }
 
 void loop()
@@ -51,5 +57,36 @@ void loop()
 
     animator->doFrame();
     Comms.handleBufferedInput(); //if new_frame handleNewFrame...
+
+//    if (currentFrame % 100 == 0 && currentFrame < 900) {
+//        short digitNumber = currentFrame / 100;
+//        animator->setLampGridAction(digitNumber, IV18Animator::LAMP_GRID_OUT);
+//    }
+//
+//    if (currentFrame % 100 == 0 && currentFrame >= 1800 && currentFrame < 2700) {
+//        short digitNumber = 26 - (currentFrame / 100);
+//        animator->setLampGridAction(digitNumber, IV18Animator::LAMP_GRID_IN);
+//    }
+
+    if (currentFrame % 200 == 0) {
+        if (on) {
+            animator->setLampGridAction(8, IV18Animator::LAMP_GRID_OUT, IV18Animator::LAMP_GRID_MAX_DUTY_US, IV18Animator::LAMP_GRID_CUTOUT_DUTY_US); // + 1);
+//            animator->setLampGridAction(6, IV18Animator::LAMP_GRID_OUT, IV18Animator::LAMP_GRID_MAX_DUTY_US);
+            animator->setLampGridAction(4, IV18Animator::LAMP_GRID_OUT, IV18Animator::LAMP_GRID_MAX_DUTY_US, IV18Animator::LAMP_GRID_CUTOUT_DUTY_US); // + 1);
+//            animator->setLampGridAction(2, IV18Animator::LAMP_GRID_OUT, IV18Animator::LAMP_GRID_MAX_DUTY_US);
+//            animator->setLampGridAction(0, IV18Animator::LAMP_GRID_OUT, IV18Animator::LAMP_GRID_MAX_DUTY_US, IV18Animator::LAMP_GRID_CUTOUT_DUTY_US + 1);
+        } else {
+            animator->setLampGridAction(8, IV18Animator::LAMP_GRID_IN, IV18Animator::LAMP_GRID_MAX_DUTY_US, IV18Animator::LAMP_GRID_CUTOUT_DUTY_US); // + 1);
+//            animator->setLampGridAction(6, IV18Animator::LAMP_GRID_IN, IV18Animator::LAMP_GRID_MAX_DUTY_US);
+            animator->setLampGridAction(4, IV18Animator::LAMP_GRID_IN, IV18Animator::LAMP_GRID_MAX_DUTY_US, IV18Animator::LAMP_GRID_CUTOUT_DUTY_US); // + 1);
+//            animator->setLampGridAction(2, IV18Animator::LAMP_GRID_IN, IV18Animator::LAMP_GRID_MAX_DUTY_US);
+//            animator->setLampGridAction(0, IV18Animator::LAMP_GRID_IN, IV18Animator::LAMP_GRID_MAX_DUTY_US, IV18Animator::LAMP_GRID_CUTOUT_DUTY_US + 1);
+        }
+        on = !on;
+    }
+
+//    if (currentFrame < 2700) {
+        ++currentFrame;
+//    }
 }
 
