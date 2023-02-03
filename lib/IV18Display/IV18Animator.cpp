@@ -28,13 +28,13 @@ IV18Animator::IV18Animator(IV18Display &display)
     }
     // TODO: not needed, right?
 //    lampGridFramesPerLongestCycle = 0;
-//    for (unsigned short i : lampGridFramesPerCycle) {
+//    for (unsigned short i : lampDigitFramesPerCycle) {
 //        if (i > lampGridFramesPerLongestCycle) {
 //            lampGridFramesPerLongestCycle = i;
 //        }
 //    }
 
-    // TODO: these cause undertime - due to collision with lampGridSteps?
+    // TODO: these cause undertime - due to collision with lampDigitSteps?
     auto heartbeatSteps = new DeviceAnimatorStep[2]{
         // waitUs values will be overriden on every frame by animateStatusLED
         DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::statusOn), 5000),
@@ -42,59 +42,59 @@ IV18Animator::IV18Animator(IV18Display &display)
     };
 
     // prepare must be at least 150 us - otherwise undertime happens constantly
-    auto lampGridSteps = new DeviceAnimatorStep[IV18Display::GRID_STEPS_COUNT*2 + 1]{
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep),
-                           LAMP_GRID_PREPARE_MIN_DUTY_US, 0),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep),
-                           LAMP_GRID_MAX_DUTY_US, 0),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep),
-                           LAMP_GRID_PREPARE_MIN_DUTY_US, 1),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep),
-                           LAMP_GRID_MAX_DUTY_US, 1),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep),
-                           LAMP_GRID_PREPARE_MIN_DUTY_US, 2),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep),
-                           LAMP_GRID_MAX_DUTY_US, 2),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep),
-                           LAMP_GRID_PREPARE_MIN_DUTY_US, 3),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep),
-                           LAMP_GRID_MAX_DUTY_US, 3),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep),
-                           LAMP_GRID_PREPARE_MIN_DUTY_US, 4),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep),
-                           LAMP_GRID_MAX_DUTY_US, 4),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep),
-                           LAMP_GRID_PREPARE_MIN_DUTY_US, 5),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep),
-                           LAMP_GRID_MAX_DUTY_US, 5),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep),
-                           LAMP_GRID_PREPARE_MIN_DUTY_US, 6),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep),
-                           LAMP_GRID_MAX_DUTY_US, 6),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep),
-                           LAMP_GRID_PREPARE_MIN_DUTY_US, 7),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep),
-                           LAMP_GRID_MAX_DUTY_US, 7),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextGridStep),
-                           LAMP_GRID_PREPARE_MIN_DUTY_US + 1, 8),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doGridStep),
-                           LAMP_GRID_MAX_DUTY_US, 8),
+    auto lampDigitSteps = new DeviceAnimatorStep[IV18Display::DIGIT_STEPS_COUNT * 2 + 1]{
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextDigitStep),
+                           LAMP_DIGIT_PREPARE_MIN_DUTY_US, 0),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doDigitStep),
+                           LAMP_DIGIT_MAX_DUTY_US, 0),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextDigitStep),
+                           LAMP_DIGIT_PREPARE_MIN_DUTY_US, 1),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doDigitStep),
+                           LAMP_DIGIT_MAX_DUTY_US, 1),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextDigitStep),
+                           LAMP_DIGIT_PREPARE_MIN_DUTY_US, 2),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doDigitStep),
+                           LAMP_DIGIT_MAX_DUTY_US, 2),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextDigitStep),
+                           LAMP_DIGIT_PREPARE_MIN_DUTY_US, 3),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doDigitStep),
+                           LAMP_DIGIT_MAX_DUTY_US, 3),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextDigitStep),
+                           LAMP_DIGIT_PREPARE_MIN_DUTY_US, 4),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doDigitStep),
+                           LAMP_DIGIT_MAX_DUTY_US, 4),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextDigitStep),
+                           LAMP_DIGIT_PREPARE_MIN_DUTY_US, 5),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doDigitStep),
+                           LAMP_DIGIT_MAX_DUTY_US, 5),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextDigitStep),
+                           LAMP_DIGIT_PREPARE_MIN_DUTY_US, 6),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doDigitStep),
+                           LAMP_DIGIT_MAX_DUTY_US, 6),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextDigitStep),
+                           LAMP_DIGIT_PREPARE_MIN_DUTY_US, 7),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doDigitStep),
+                           LAMP_DIGIT_MAX_DUTY_US, 7),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextDigitStep),
+                           LAMP_DIGIT_PREPARE_MIN_DUTY_US + 1, 8),
+        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doDigitStep),
+                           LAMP_DIGIT_MAX_DUTY_US, 8),
         DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::grid9OffAndCooldown),
                            IV18Display::GRID9_COOLDOWN_US, 9)
     };
 
     threads = new DeviceAnimatorThread[2]{
         DeviceAnimatorThread(heartbeatSteps, 2),
-        DeviceAnimatorThread(lampGridSteps, IV18Display::GRID_STEPS_COUNT*2 + 1)
+        DeviceAnimatorThread(lampDigitSteps, IV18Display::DIGIT_STEPS_COUNT * 2 + 1)
     };
     statusLedThread = &(threads[0]);
-    lampGridThread = &(threads[1]);
+    lampDigitThread = &(threads[1]);
 
     animator.setThreads(threads, 2);
 
     // TODO: do we need this silliness?
 //    randomSeed(analogRead(A2));
-//    shuffleArray(randomLampGridOrder, IV18Display::GRID_STEPS_COUNT);
+//    shuffleArray(randomLampGridOrder, IV18Display::DIGIT_STEPS_COUNT);
 }
 
 void IV18Animator::setFailureListener(AnimatorFailureListenerInterface *failureListener)
@@ -106,7 +106,7 @@ void IV18Animator::setFailureListener(AnimatorFailureListenerInterface *failureL
 /**
  * This is just a silly animation of the grids
  */
-//void IV18Animator::animateLampGridBrightnesses()
+//void IV18Animator::animateLampDigitBrightnesses()
 //{
 //    // TODO: add more animations/effects based on a state property
 //
@@ -115,65 +115,65 @@ void IV18Animator::setFailureListener(AnimatorFailureListenerInterface *failureL
 //    // 4 just because
 //    for (short i = 0; i < 4; ++i) {
 //        j = randomLampGridOrder[i];
-//        lampGridThread->steps[j].waitUs = SinusoidalDutyCycleGenerator::animateSinusoidalDutyCycle(
+//        lampDigitThread->steps[j].waitUs = SinusoidalDutyCycleGenerator::animateSinusoidalDutyCycle(
 //            10,
-//            LAMP_GRID_MAX_DUTY_US,
-//            LAMP_GRID_MAX_DUTY_US + LAMP_GRID_PREPARE_MIN_DUTY_US,
+//            LAMP_DIGIT_MAX_DUTY_US,
+//            LAMP_DIGIT_MAX_DUTY_US + LAMP_DIGIT_PREPARE_MIN_DUTY_US,
 //            ledCurrentFrame + 30 * i, // just because TODO: add some randomness?
 //            LAMP_GRID_FRAMES_PER_CYCLE // just because
 //        );
-//        lampGridThread->steps[j-1].waitUs = LAMP_GRID_MAX_DUTY_US + LAMP_GRID_PREPARE_MIN_DUTY_US - lampGridThread->steps[i].waitUs;
+//        lampDigitThread->steps[j-1].waitUs = LAMP_DIGIT_MAX_DUTY_US + LAMP_DIGIT_PREPARE_MIN_DUTY_US - lampDigitThread->steps[i].waitUs;
 //    }
 //}
 
-void IV18Animator::animateLampGridBrightnesses()
+void IV18Animator::animateLampDigitBrightnesses()
 {
     short j;
-    unsigned long frameLength = LAMP_GRID_MAX_DUTY_US + LAMP_GRID_PREPARE_MIN_DUTY_US;
-    for (short i = 0; i < IV18Display::GRID_STEPS_COUNT; ++i) {
+    unsigned long frameLength = LAMP_DIGIT_MAX_DUTY_US + LAMP_DIGIT_PREPARE_MIN_DUTY_US;
+    for (short i = 0; i < IV18Display::DIGIT_STEPS_COUNT; ++i) {
         j = 2*i + 1; //step number
-        switch (lampGridActions[i]) {
-            case LAMP_GRID_STATIC:
+        switch (lampDigitActions[i]) {
+            case LAMP_DIGIT_STATIC:
                 break;
-            case LAMP_GRID_IN:
-                lampGridThread->steps[j].waitUs = SinusoidalDutyCycleGenerator::animateSinusoidalDutyCycle(
-                    lampGridMinOffDutyUs[i],
-                    lampGridMaxOnDutyUs[i],
+            case LAMP_DIGIT_IN:
+                lampDigitThread->steps[j].waitUs = SinusoidalDutyCycleGenerator::animateSinusoidalDutyCycle(
+                    lampDigitMinOffDutyUs[i],
+                    lampDigitMaxOnDutyUs[i],
                     frameLength,
-                    lampGridCurrentFrameInCycle[i],
-                    lampGridFramesPerCycle[i],
+                    lampDigitCurrentFrameInCycle[i],
+                    lampDigitFramesPerCycle[i],
                     true,
                     true,
-                    LAMP_GRID_CUTOUT_DUTY_US
+                    LAMP_DIGIT_CUTOUT_DUTY_US
                 );
-                lampGridThread->steps[j-1].waitUs = frameLength - lampGridThread->steps[j].waitUs;
+                lampDigitThread->steps[j - 1].waitUs = frameLength - lampDigitThread->steps[j].waitUs;
 
                 // digit frame counting
-                ++lampGridCurrentFrameInCycle[i];
-                if (lampGridCurrentFrameInCycle[i] >= lampGridFramesPerCycle[i]) {
+                ++lampDigitCurrentFrameInCycle[i];
+                if (lampDigitCurrentFrameInCycle[i] >= lampDigitFramesPerCycle[i]) {
                     // switch to static on last frame
-                    lampGridCurrentFrameInCycle[i] = 0;
-                    lampGridActions[i] = LAMP_GRID_STATIC;
+                    lampDigitCurrentFrameInCycle[i] = 0;
+                    lampDigitActions[i] = LAMP_DIGIT_STATIC;
                 }
                 break;
-            case LAMP_GRID_OUT:
-                lampGridThread->steps[j].waitUs = SinusoidalDutyCycleGenerator::animateSinusoidalDutyCycle(
-                    lampGridMinOffDutyUs[i],
-                    lampGridMaxOnDutyUs[i],
+            case LAMP_DIGIT_OUT:
+                lampDigitThread->steps[j].waitUs = SinusoidalDutyCycleGenerator::animateSinusoidalDutyCycle(
+                    lampDigitMinOffDutyUs[i],
+                    lampDigitMaxOnDutyUs[i],
                     frameLength,
-                    lampGridCurrentFrameInCycle[i],
-                    lampGridFramesPerCycle[i],
+                    lampDigitCurrentFrameInCycle[i],
+                    lampDigitFramesPerCycle[i],
                     true,
                     false,
-                    LAMP_GRID_CUTOUT_DUTY_US
+                    LAMP_DIGIT_CUTOUT_DUTY_US
                 );
-                lampGridThread->steps[j-1].waitUs = frameLength - lampGridThread->steps[j].waitUs;
+                lampDigitThread->steps[j - 1].waitUs = frameLength - lampDigitThread->steps[j].waitUs;
 
-                ++lampGridCurrentFrameInCycle[i];
-                if (lampGridCurrentFrameInCycle[i] >= lampGridFramesPerCycle[i]) {
+                ++lampDigitCurrentFrameInCycle[i];
+                if (lampDigitCurrentFrameInCycle[i] >= lampDigitFramesPerCycle[i]) {
                     // switch to static on last frame
-                    lampGridCurrentFrameInCycle[i] = 0;
-                    lampGridActions[i] = LAMP_GRID_STATIC;
+                    lampDigitCurrentFrameInCycle[i] = 0;
+                    lampDigitActions[i] = LAMP_DIGIT_STATIC;
                 }
                 break;
         }
@@ -227,37 +227,37 @@ void IV18Animator::decreaseWarningBleeps()
 
 //void IV18Animator::setLampGridOnDutyValues(const unsigned short *values)
 //{
-//    for (short i = 0; i < IV18Display::GRID_STEPS_COUNT; ++i) {
-//        this->lampGridMaxOnDutyUs[i] = values[i];
+//    for (short i = 0; i < IV18Display::DIGIT_STEPS_COUNT; ++i) {
+//        this->lampDigitMaxOnDutyUs[i] = values[i];
 //    }
 //}
 
-void IV18Animator::setCurrentLampGridDutyValue(short lampGridNumber, unsigned short dutyValue)
+void IV18Animator::setCurrentLampDigitDutyValue(short lampGridNumber, unsigned short dutyValue)
 {
     // TODO: calculate it in constructor?
-    unsigned long frameLength = LAMP_GRID_MAX_DUTY_US + LAMP_GRID_PREPARE_MIN_DUTY_US;
-    this->lampGridThread->steps[2 * lampGridNumber + 1].waitUs = dutyValue;
-    this->lampGridThread->steps[2 * lampGridNumber].waitUs = frameLength - dutyValue;
+    unsigned long frameLength = LAMP_DIGIT_MAX_DUTY_US + LAMP_DIGIT_PREPARE_MIN_DUTY_US;
+    this->lampDigitThread->steps[2 * lampGridNumber + 1].waitUs = dutyValue;
+    this->lampDigitThread->steps[2 * lampGridNumber].waitUs = frameLength - dutyValue;
 }
 
-void IV18Animator::setLampGridAction(
-    short lampGridNumber,
+void IV18Animator::setLampDigitAction(
+    short lampDigitNumber,
     short action,
     unsigned short maxDutyValue,
     unsigned short minDutyValue
 )
 {
-    this->lampGridMaxOnDutyUs[lampGridNumber] = maxDutyValue;
-    this->lampGridMinOffDutyUs[lampGridNumber] = minDutyValue;
+    this->lampDigitMaxOnDutyUs[lampDigitNumber] = maxDutyValue;
+    this->lampDigitMinOffDutyUs[lampDigitNumber] = minDutyValue;
 
-    this->lampGridActions[lampGridNumber] = action;
+    this->lampDigitActions[lampDigitNumber] = action;
 }
 
 void IV18Animator::doFrame()
 {
     // multiframe animation of the heartbeat
     animateStatusLED();
-    animateLampGridBrightnesses();
+    animateLampDigitBrightnesses();
 
     animator.doFrame();
 

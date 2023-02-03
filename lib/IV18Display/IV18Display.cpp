@@ -92,9 +92,9 @@ void IV18Display::Grid9OnWhenNeeded(bool isGrid9)
     }
 }
 
-void IV18Display::prepareGridSegments(int sequenceNumber)
+void IV18Display::prepareDigitSegments(int sequenceNumber)
 {
-    int idx = GRID_STEPS_COUNT - (sequenceNumber + 1);
+    int idx = DIGIT_STEPS_COUNT - (sequenceNumber + 1);
 
     if (currentMode == MODE_CHARS) {
         setChar(currentString[idx]);

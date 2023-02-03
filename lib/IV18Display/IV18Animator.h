@@ -13,14 +13,14 @@ public:
     static const short LED_WARNING = 1;
 
     // available lamp grid animation modes
-    static const short LAMP_GRID_STATIC = 0;    // constant state
-    static const short LAMP_GRID_IN = 1;        // fade-in
-    static const short LAMP_GRID_OUT = 2;       // fade-out
+    static const short LAMP_DIGIT_STATIC = 0;    // constant state
+    static const short LAMP_DIGIT_IN = 1;        // fade-in
+    static const short LAMP_DIGIT_OUT = 2;       // fade-out
 
     // lamp grid duty cycle bounds
-    static const short LAMP_GRID_PREPARE_MIN_DUTY_US = 150;
-    static const short LAMP_GRID_MAX_DUTY_US = 961;
-    static const short LAMP_GRID_CUTOUT_DUTY_US = 100;
+    static const short LAMP_DIGIT_PREPARE_MIN_DUTY_US = 150;
+    static const short LAMP_DIGIT_MAX_DUTY_US = 961;
+    static const short LAMP_DIGIT_CUTOUT_DUTY_US = 100;
 private:
     static const unsigned long FRAME_LENGTH_US = 10000; // us -> just below 1/100 s
 
@@ -35,50 +35,50 @@ private:
 //    static const unsigned short LAMP_GRID_FRAMES_PER_CYCLE = 75;
     // TODO: add setter for this to use via command
     //       recalculate lampGridFramesPerLongestCycle on set
-    unsigned short lampGridFramesPerCycle[IV18Display::GRID_STEPS_COUNT] =
+    unsigned short lampDigitFramesPerCycle[IV18Display::DIGIT_STEPS_COUNT] =
         {150, 150, 150, 150, 150, 150, 150, 150, 150};
 
-    unsigned short lampGridCurrentFrameInCycle[IV18Display::GRID_STEPS_COUNT] =
+    unsigned short lampDigitCurrentFrameInCycle[IV18Display::DIGIT_STEPS_COUNT] =
         {0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     // TODO: add setter for this to use via command
     // sets max duty cycle per lamp grid (permanent dimming)
     // TODO: minus/dot duty cycle doesn't seem to work properly
-    unsigned short lampGridMaxOnDutyUs[IV18Display::GRID_STEPS_COUNT] = {
-        LAMP_GRID_MAX_DUTY_US,
-        LAMP_GRID_MAX_DUTY_US,
-        LAMP_GRID_MAX_DUTY_US,
-        LAMP_GRID_MAX_DUTY_US,
-        LAMP_GRID_MAX_DUTY_US,
-        LAMP_GRID_MAX_DUTY_US,
-        LAMP_GRID_MAX_DUTY_US,
-        LAMP_GRID_MAX_DUTY_US,
-        LAMP_GRID_MAX_DUTY_US
+    unsigned short lampDigitMaxOnDutyUs[IV18Display::DIGIT_STEPS_COUNT] = {
+        LAMP_DIGIT_MAX_DUTY_US,
+        LAMP_DIGIT_MAX_DUTY_US,
+        LAMP_DIGIT_MAX_DUTY_US,
+        LAMP_DIGIT_MAX_DUTY_US,
+        LAMP_DIGIT_MAX_DUTY_US,
+        LAMP_DIGIT_MAX_DUTY_US,
+        LAMP_DIGIT_MAX_DUTY_US,
+        LAMP_DIGIT_MAX_DUTY_US,
+        LAMP_DIGIT_MAX_DUTY_US
     };
 
-    unsigned short lampGridMinOffDutyUs[IV18Display::GRID_STEPS_COUNT] = {
-        LAMP_GRID_CUTOUT_DUTY_US,
-        LAMP_GRID_CUTOUT_DUTY_US,
-        LAMP_GRID_CUTOUT_DUTY_US,
-        LAMP_GRID_CUTOUT_DUTY_US,
-        LAMP_GRID_CUTOUT_DUTY_US,
-        LAMP_GRID_CUTOUT_DUTY_US,
-        LAMP_GRID_CUTOUT_DUTY_US,
-        LAMP_GRID_CUTOUT_DUTY_US,
-        LAMP_GRID_CUTOUT_DUTY_US
+    unsigned short lampDigitMinOffDutyUs[IV18Display::DIGIT_STEPS_COUNT] = {
+        LAMP_DIGIT_CUTOUT_DUTY_US,
+        LAMP_DIGIT_CUTOUT_DUTY_US,
+        LAMP_DIGIT_CUTOUT_DUTY_US,
+        LAMP_DIGIT_CUTOUT_DUTY_US,
+        LAMP_DIGIT_CUTOUT_DUTY_US,
+        LAMP_DIGIT_CUTOUT_DUTY_US,
+        LAMP_DIGIT_CUTOUT_DUTY_US,
+        LAMP_DIGIT_CUTOUT_DUTY_US,
+        LAMP_DIGIT_CUTOUT_DUTY_US
     };
 
     // TODO: add setter for this to use via command
-    unsigned short lampGridActions[IV18Display::GRID_STEPS_COUNT] = {
-        LAMP_GRID_STATIC,
-        LAMP_GRID_STATIC,
-        LAMP_GRID_STATIC,
-        LAMP_GRID_STATIC,
-        LAMP_GRID_STATIC,
-        LAMP_GRID_STATIC,
-        LAMP_GRID_STATIC,
-        LAMP_GRID_STATIC,
-        LAMP_GRID_STATIC,
+    unsigned short lampDigitActions[IV18Display::DIGIT_STEPS_COUNT] = {
+        LAMP_DIGIT_STATIC,
+        LAMP_DIGIT_STATIC,
+        LAMP_DIGIT_STATIC,
+        LAMP_DIGIT_STATIC,
+        LAMP_DIGIT_STATIC,
+        LAMP_DIGIT_STATIC,
+        LAMP_DIGIT_STATIC,
+        LAMP_DIGIT_STATIC,
+        LAMP_DIGIT_STATIC,
     };
 
     // TODO: methods to init lamp grid modes/animations, animate them properly, set on duty values (regular/permanent dimming)
@@ -99,17 +99,17 @@ private:
     void decreaseWarningBleeps();
 
     // TODO: do we need this silliness?
-//    unsigned short randomLampGridOrder[IV18Display::GRID_STEPS_COUNT] = {1, 3, 5, 7, 9, 11, 13, 15, 17};
+//    unsigned short randomLampGridOrder[IV18Display::DIGIT_STEPS_COUNT] = {1, 3, 5, 7, 9, 11, 13, 15, 17};
 //    unsigned short lampCycleNumber = 0;
 //    static int randomCompare(const void *cmp1, const void *cmp2);
 //    static void shuffleArray(unsigned short * array, int size);
 
-    void animateLampGridBrightnesses();
+    void animateLampDigitBrightnesses();
 
 public:
     // TODO: make appropriate getters/setters instead?
     DeviceAnimatorThread* statusLedThread;
-    DeviceAnimatorThread* lampGridThread;
+    DeviceAnimatorThread* lampDigitThread;
 
     explicit IV18Animator(IV18Display &display);
     void setFailureListener(AnimatorFailureListenerInterface* failureListener);
@@ -118,11 +118,11 @@ public:
     void doKillLED();
     void doFrame();
 
-//    void setLampGridOnDutyValues(const unsigned short * values);
+//    void setLampDigitOnDutyValues(const unsigned short * values);
 
-    void setCurrentLampGridDutyValue(short lampGridNumber, unsigned short dutyValue);
+    void setCurrentLampDigitDutyValue(short lampGridNumber, unsigned short dutyValue);
 
-    void setLampGridAction(short lampGridNumber, short action, unsigned short maxDutyValue = LAMP_GRID_MAX_DUTY_US, unsigned short minDutyValue = LAMP_GRID_CUTOUT_DUTY_US);
+    void setLampDigitAction(short lampDigitNumber, short action, unsigned short maxDutyValue = LAMP_DIGIT_MAX_DUTY_US, unsigned short minDutyValue = LAMP_DIGIT_CUTOUT_DUTY_US);
 };
 
 #endif //PIUCNTVFD1_IV18ANIMATOR_H

@@ -1,11 +1,11 @@
 #include "IV18AnimationSteps.h"
 
-void IV18AnimationSteps::doGridStep(IV18Display* that, int sequenceNumber)
+void IV18AnimationSteps::doDigitStep(IV18Display* that, int sequenceNumber)
 {
-    that->prepareGridSegments(sequenceNumber);
+    that->prepareDigitSegments(sequenceNumber);
 }
 
-void IV18AnimationSteps::prepareNextGridStep(IV18Display* that, int sequenceNumber)
+void IV18AnimationSteps::prepareNextDigitStep(IV18Display* that, int sequenceNumber)
 {
     that->clearChar();
     that->multiplexViaShiftRegister(sequenceNumber == 0);
