@@ -9,7 +9,7 @@ public:
     static const int DIGIT_STEPS_COUNT = 9; //main grids + dot/minus
     static const byte MODE_CHARS = 0;
     static const byte MODE_BYTES = 1;
-    static const int GRID9_COOLDOWN_US = 1200;
+    static const int GRID9_COOLDOWN_US = 100;
 
 private:
     // grids/subframes count
@@ -82,7 +82,7 @@ private:
     //TODO: these initial values are debug - will be set by command
     //minus works for idx 0
     //+1 because the string must contain the /0 ending
-    char currentString[DIGIT_STEPS_COUNT + 1] = "-_-fart-_";
+    char currentString[DIGIT_STEPS_COUNT + 1] = "-_-dong-_";
     //dot at idx 0 is the "big one"
     bool currentCommas[DIGIT_STEPS_COUNT] = {true, false, false, false, false, false, false, false, false};
     //bytes for custom mode
