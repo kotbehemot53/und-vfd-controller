@@ -268,8 +268,6 @@ void IV18Animator::doFrame()
         ledCurrentFrame = 0;
     }
 
-
-
     // TODO: separate cycle & bleeps for LED_KILL?
     if (ledCurrentFrame % LED_FRAMES_PER_CYCLE[LED_WARNING] == 0) {
         decreaseWarningBleeps();
