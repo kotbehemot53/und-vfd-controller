@@ -3,8 +3,6 @@
 
 #include <Arduino.h>
 
-#include "I2CCommandExecutorInterface.h"
-
 // the whole thing must be static, because receiveEvent must be static and must use the other properties...
 class I2CComms
 {

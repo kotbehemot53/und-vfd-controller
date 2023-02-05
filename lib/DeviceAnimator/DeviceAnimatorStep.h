@@ -5,7 +5,7 @@ class DeviceAnimatorStep
 {
 public:
     void* devicePtr;
-    void (*callback)(void* devicePtr,int sequenceNumber);
+    void (*callback)(void* callerPtr, int sequenceNumber);
     unsigned long waitUs;
     int sequenceNumber = 0;
 

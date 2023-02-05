@@ -1,8 +1,10 @@
 #ifndef PIUCNTVFD1_IV18ANIMATOR_H
 #define PIUCNTVFD1_IV18ANIMATOR_H
 
+#include "../DutyCycleGenerator/SinusoidalDutyCycleGenerator.h"
 #include "../DeviceAnimator/DeviceAnimator.h"
 #include "IV18AnimationSteps.h"
+#include "IV18I2CCommandExecutor.h"
 #include "IV18Display.h"
 
 class IV18Animator
@@ -22,7 +24,7 @@ public:
     static const short LAMP_DIGIT_MAX_DUTY_US = 961;
     static const short LAMP_DIGIT_CUTOUT_DUTY_US = 100;
 private:
-    static const unsigned long FRAME_LENGTH_US = 10000; // us -> just below 1/100 s
+    static const unsigned long LED_FRAME_LENGTH_US = 10000; // 1/100 s
 
     static const short LED_SINUS_MODES_COUNT = 2;
 

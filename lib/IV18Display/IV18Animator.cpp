@@ -1,7 +1,5 @@
 #include "IV18Animator.h"
 
-#include "../DutyCycleGenerator/SinusoidalDutyCycleGenerator.h"
-
 // TODO: do we need this silliness?
 //void IV18Animator::shuffleArray(unsigned short * array, int size)
 //{
@@ -45,7 +43,7 @@ IV18Animator::IV18Animator(IV18Display* display)
     };
 
     // prepare must be at least 150 us - otherwise undertime happens constantly
-    auto lampDigitSteps = new DeviceAnimatorStep[IV18Display::DIGIT_STEPS_COUNT * 2 + 1]{
+    auto lampDigitSteps = new DeviceAnimatorStep[IV18Display::DIGIT_STEPS_COUNT * 2 + 2]{
         DeviceAnimatorStep(this, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextDigitStep),
                            LAMP_DIGIT_PREPARE_MIN_DUTY_US, 0),
         DeviceAnimatorStep(this, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doDigitStep),
@@ -82,14 +80,16 @@ IV18Animator::IV18Animator(IV18Display* display)
                            LAMP_DIGIT_PREPARE_MIN_DUTY_US + 1, 8),
         DeviceAnimatorStep(this, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doDigitStep),
                            LAMP_DIGIT_MAX_DUTY_US, 8),
+           //TODO: perhaps smaller, minimal cooldown should be set here (below 100)? especially now, that we have the command processing that takes time
         DeviceAnimatorStep(this, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::grid9OffAndCooldown),
-                           IV18Display::GRID9_COOLDOWN_US, 9)
-        //TODO: add step for executing the commands from buffer
+                           IV18Display::GRID9_COOLDOWN_US, 9),
+        DeviceAnimatorStep(this, reinterpret_cast<void (*)(void*,int)>(&IV18I2CCommandExecutor::executeBufferedCommands),
+        IV18I2CCommandExecutor::MAX_EXECUTION_TIME, 10)
     };
 
     threads = new DeviceAnimatorThread[2]{
         DeviceAnimatorThread(heartbeatSteps, 2),
-        DeviceAnimatorThread(lampDigitSteps, IV18Display::DIGIT_STEPS_COUNT * 2 + 1)
+        DeviceAnimatorThread(lampDigitSteps, IV18Display::DIGIT_STEPS_COUNT * 2 + 2)
     };
     statusLedThread = &(threads[0]);
     lampDigitThread = &(threads[1]);
@@ -196,11 +196,11 @@ void IV18Animator::animateStatusLED()
         statusLedThread->steps[0].waitUs = SinusoidalDutyCycleGenerator::animateSinusoidalDutyCycle(
             LED_MIN_DUTY_US[ledAction],
             LED_MAX_DUTY_US[ledAction],
-            FRAME_LENGTH_US,
+            LED_FRAME_LENGTH_US,
             ledCurrentFrame,
             LED_FRAMES_PER_CYCLE[ledAction]
         );
-        statusLedThread->steps[1].waitUs = FRAME_LENGTH_US - statusLedThread->steps[0].waitUs;
+        statusLedThread->steps[1].waitUs = LED_FRAME_LENGTH_US - statusLedThread->steps[0].waitUs;
     } else {
         if (ledAction == LED_KILL) {
             // TODO: implement actual total kills somehow? omittable threads?
