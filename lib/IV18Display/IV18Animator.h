@@ -32,6 +32,8 @@ private:
     static constexpr unsigned long LED_MIN_DUTY_US[LED_SINUS_MODES_COUNT] = {500, 0};
     static constexpr unsigned long LED_MAX_DUTY_US[LED_SINUS_MODES_COUNT] = {7000, 9000};
 
+    IV18Display* display;
+
 //    static const unsigned short LAMP_GRID_FRAMES_PER_CYCLE = 75;
     // TODO: add setter for this to use via command
     //       recalculate lampGridFramesPerLongestCycle on set
@@ -111,7 +113,7 @@ public:
     DeviceAnimatorThread* statusLedThread;
     DeviceAnimatorThread* lampDigitThread;
 
-    explicit IV18Animator(IV18Display &display);
+    explicit IV18Animator(IV18Display* display);
     void setFailureListener(AnimatorFailureListenerInterface* failureListener);
 
     void doWarning(short bleepsCount = 10);
@@ -123,6 +125,8 @@ public:
     void setCurrentLampDigitDutyValue(short lampGridNumber, unsigned short dutyValue);
 
     void setLampDigitAction(short lampDigitNumber, short action, unsigned short maxDutyValue = LAMP_DIGIT_MAX_DUTY_US, unsigned short minDutyValue = LAMP_DIGIT_CUTOUT_DUTY_US);
+
+    IV18Display* getDisplay();
 };
 
 #endif //PIUCNTVFD1_IV18ANIMATOR_H

@@ -24,11 +24,8 @@ void setup()
     Serial.begin(115200);
     Serial.println("yo");
 
-    // TODO: or constructor maybe?
-    // TODO: make it minimal, just buffer data!
-    Comms.init(I2C_ADDR, Display); //wire begin, wire.onReceive
-
-    animator = new IV18Animator(Display);
+    animator = new IV18Animator(&Display);
+    I2CComms::init(I2C_ADDR);
 
     // TODO: use these for animation timing debug
 //    animatorFailureListener = new IV18AnimatorLedFailureListener(animator);
@@ -56,7 +53,6 @@ void loop()
     // TODO: disable interrupts here? would omit packets?
 
     animator->doFrame();
-    Comms.handleBufferedInput(); //if new_frame handleNewFrame...
 
 //    if (currentFrame % 100 == 0 && currentFrame < 900) {
 //        short digitNumber = currentFrame / 100;
