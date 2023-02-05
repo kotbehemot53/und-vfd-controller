@@ -2,17 +2,15 @@
 
 #include <Wire.h>
 
+byte* I2CComms::commandBuffers[2] = {new byte[I2CComms::COMMAND_BUFFER_LENGTH], new byte[I2CComms::COMMAND_BUFFER_LENGTH]};
+short I2CComms::commandCountsInBuffer[2] = {0,0};
+short I2CComms::readBufferRemainingCommandCount = 0;
+short I2CComms::currentWriteBuffer = 0;
+short I2CComms::currentReadBuffer = 1;
+
 //I2CComms Comms;
 void I2CComms::init(byte addr)
 {
-    commandBuffers[0] = new byte[BUFFER_LENGTH];
-    commandBuffers[1] = new byte[BUFFER_LENGTH];
-    commandCountsInBuffer[0] = 0;
-    commandCountsInBuffer[1] = 0;
-    readBufferRemainingCommandCount = 0;
-    currentWriteBuffer = 0;
-    currentReadBuffer = 1;
-
     Wire.begin(addr);
 
     Wire.onReceive(receiveEvent); // register event
@@ -24,10 +22,7 @@ void I2CComms::receiveEvent(int howMany)
     while(Wire.available()) // loop through all
     {
         byte c = Wire.read(); // receive byte
-        commandBuffers[currentWriteBuffer][commandCountsInBuffer[currentWriteBuffer]++] = c;
-//        ++commandCountsInBuffer[currentWriteBuffer];
-
-        // TODO: throw exception or prevent overflowing the buffer?
+        addCommandToWriteBuffer(c);
     }
 }
 
@@ -48,7 +43,6 @@ void I2CComms::resetBuffers()
     short temp = currentWriteBuffer;
     currentWriteBuffer = currentReadBuffer;
     currentReadBuffer = temp;
-    commandCountsInBuffer[0] = 0;
-    commandCountsInBuffer[1] = 0;
-    readBufferRemainingCommandCount = 0;
+    commandCountsInBuffer[currentWriteBuffer] = 0;
+    readBufferRemainingCommandCount = commandCountsInBuffer[currentReadBuffer];
 }
