@@ -1,6 +1,7 @@
 #ifndef PIUCNTVFD1_IV18I2CCOMMANDEXECUTOR_H
 #define PIUCNTVFD1_IV18I2CCOMMANDEXECUTOR_H
 
+#include "Arduino.h"
 #include "IV18Animator.h"
 
 class IV18Animator;
