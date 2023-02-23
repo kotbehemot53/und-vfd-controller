@@ -47,6 +47,7 @@ private:
     };
 
     static byte bunchedCommandsBuffer[BUNCHED_COMMANDS_BUFFER_LENGTH];
+    static short bunchedCommandsCount; // TODO: make init function to initialise it? sucks... damn method pointers...
 
 public:
     // TODO: check if it's actually sufficient (no undertimes in typical scenarios, no led of course)
