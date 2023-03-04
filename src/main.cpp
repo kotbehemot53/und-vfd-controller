@@ -1,5 +1,7 @@
 // TODO: remove this include later?
 #include <Arduino.h>
+//#include "avr8-stub.h" // avr-stub
+//#include "app_api.h" // only needed with flash breakpoints
 
 #include "../lib/IV18Display/IV18Display.h"
 #include "../lib/I2CComms/I2CComms.h"
@@ -23,6 +25,8 @@ void setup()
 {
     Serial.begin(115200);
     Serial.println("yo");
+
+//    debug_init(); //avr-stub
 
     animator = new IV18Animator(&Display);
     I2CComms::init(I2C_ADDR);
