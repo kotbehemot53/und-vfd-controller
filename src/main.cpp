@@ -51,32 +51,32 @@ void setup()
 //    }
 
     // TODO: command buffering debug - remove later
-    I2CComms::addCommandToWriteBuffer(0x00);
-    I2CComms::addCommandToWriteBuffer(0x01);
-    I2CComms::addCommandToWriteBuffer(0x02);
-
-    I2CComms::resetBuffers();
-    while (I2CComms::getReadBufferRemainingCommandCount()) {
-        Serial.println(I2CComms::getCommandFromReadBuffer(), HEX);
-    }
-
-    I2CComms::addCommandToWriteBuffer(0x03);
-    I2CComms::addCommandToWriteBuffer(0x04);
-
-    Serial.println("Premature ejac");
-    while (I2CComms::getReadBufferRemainingCommandCount()) {
-        Serial.println(I2CComms::getCommandFromReadBuffer(), HEX);
-    }
-
-    I2CComms::addCommandToWriteBuffer(0x05);
-    I2CComms::addCommandToWriteBuffer(0x06);
-
-    Serial.println("Real ejac");
-
-    I2CComms::resetBuffers();
-    while (I2CComms::getReadBufferRemainingCommandCount()) {
-        Serial.println(I2CComms::getCommandFromReadBuffer(), HEX);
-    }
+//    I2CComms::addCommandToWriteBuffer(0x00);
+//    I2CComms::addCommandToWriteBuffer(0x01);
+//    I2CComms::addCommandToWriteBuffer(0x02);
+//
+//    I2CComms::resetBuffers();
+//    while (I2CComms::getReadBufferRemainingCommandCount()) {
+//        Serial.println(I2CComms::getCommandFromReadBuffer(), HEX);
+//    }
+//
+//    I2CComms::addCommandToWriteBuffer(0x03);
+//    I2CComms::addCommandToWriteBuffer(0x04);
+//
+//    Serial.println("Premature ejac");
+//    while (I2CComms::getReadBufferRemainingCommandCount()) {
+//        Serial.println(I2CComms::getCommandFromReadBuffer(), HEX);
+//    }
+//
+//    I2CComms::addCommandToWriteBuffer(0x05);
+//    I2CComms::addCommandToWriteBuffer(0x06);
+//
+//    Serial.println("Real ejac");
+//
+//    I2CComms::resetBuffers();
+//    while (I2CComms::getReadBufferRemainingCommandCount()) {
+//        Serial.println(I2CComms::getCommandFromReadBuffer(), HEX);
+//    }
 }
 
 void loop()
