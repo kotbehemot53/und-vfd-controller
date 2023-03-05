@@ -9,7 +9,6 @@
 #include "../lib/AnimatorFailureListener/IV18AnimatorSerialFailureListener.h"
 #include "../lib/AnimatorFailureListener/IV18AnimatorLedFailureListener.h"
 
-// TODO: intro mode? as special IV18Display subclass? just a different animation routine and a switch?
 // TODO: PWM brightness - special command + functions in IV18Display?
 // TODO: comms
 
@@ -17,9 +16,6 @@ const byte I2C_ADDR = 0x5;
 
 IV18Animator* animator;
 AnimatorFailureListenerInterface* animatorFailureListener;
-
-unsigned long currentFrame = 0;
-int animSteps[4] = {0, 0, 0, 0,};
 
 void setup()
 {
@@ -81,13 +77,20 @@ void setup()
 // debug
 //    Display.off();
 //    I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_OFF);
+
+    // run intro in the beginning
+    I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_INTRO_ON);
 }
 
 void loop()
 {
     // TODO: disable interrupts here? would omit packets?
 
+    // run a frame of the basic animation
     animator->doFrame();
+
+    // run high-level animation sequencing if applicable (e.g. if intro is on)
+    animator->doCurrentSequencing();
 
 //    if (currentFrame % 100 == 0 && currentFrame < 900) {
 //        short digitNumber = currentFrame / 100;
@@ -107,29 +110,5 @@ void loop()
 //            I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_ON);
 //        }
 //    }
-
-    if (currentFrame % 50 == 0) {
-        for (int i = 1; i < 4; ++i) {
-            animSteps[i] = animSteps[i - 1] - 2;
-            if (animSteps[i] < 0) {
-                animSteps[i] = animSteps[i] + 9;
-            }
-        }
-
-        animator->setLampDigitAction(animSteps[0], IV18Animator::LAMP_DIGIT_OUT, IV18Animator::LAMP_DIGIT_MAX_DUTY_US,
-                                     IV18Animator::LAMP_DIGIT_CUTOUT_DUTY_US + 1);
-        animator->setLampDigitAction(animSteps[1], IV18Animator::LAMP_DIGIT_IN, IV18Animator::LAMP_DIGIT_MAX_DUTY_US,
-                                     IV18Animator::LAMP_DIGIT_CUTOUT_DUTY_US + 1);
-        animator->setLampDigitAction(animSteps[2], IV18Animator::LAMP_DIGIT_OUT, IV18Animator::LAMP_DIGIT_MAX_DUTY_US,
-                                     IV18Animator::LAMP_DIGIT_CUTOUT_DUTY_US + 1);
-        animator->setLampDigitAction(animSteps[3], IV18Animator::LAMP_DIGIT_IN, IV18Animator::LAMP_DIGIT_MAX_DUTY_US,
-                                     IV18Animator::LAMP_DIGIT_CUTOUT_DUTY_US + 1);
-        ++animSteps[0];
-        if (animSteps[0] > 8) {
-            animSteps[0] = 0;
-        }
-    }
-
-    ++currentFrame;
 }
 

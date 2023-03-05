@@ -14,11 +14,12 @@ public:
     static const byte CMD_OFF = 0x10; //turn the lamps off
     static const byte CMD_ON = 0x11; //turn the lamps on
 
-    // TODO: define the current default animation from main.cpp as intro?
     static const byte CMD_INTRO_ON = 0x12; //turn the intro on
+    static const byte CMD_INTRO_OFF = 0x13; //turn the intro off
+
+    static const byte CMD_MULTI_FINISH = 0x20; // sets up the next frame with all commands gathered in the bunched buffer
 
     // bunchable commands
-    static const byte CMD_MULTI_FINISH = 0x20; // sets up the next frame with all commands gathered in the bunched buffer
     // TODO: maybe set duty cycle by separate byte for more precision?
     //       DECISION: yes
     static const byte CMD_MULTI_DIGIT_DIMMER = 0x60; // the FOLLOWING byte sets the duty cycle; last 4 bits determine which digit

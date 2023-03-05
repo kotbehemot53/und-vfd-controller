@@ -262,6 +262,24 @@ void IV18Animator::setLampDigitAction(
     this->lampDigitActions[lampDigitNumber] = action;
 }
 
+void IV18Animator::doCurrentSequencing()
+{
+    if (sequencingEnabled) {
+        sequencingCallback(this);
+    }
+}
+
+void IV18Animator::setSequencingCallback(void (*sequencingCallbackToSet)(IV18Animator *))
+{
+    sequencingCallback = sequencingCallbackToSet;
+    sequencingEnabled = true;
+}
+
+void IV18Animator::disableSequencing()
+{
+    sequencingEnabled = false;
+}
+
 void IV18Animator::doFrame()
 {
     // multiframe animation of the heartbeat

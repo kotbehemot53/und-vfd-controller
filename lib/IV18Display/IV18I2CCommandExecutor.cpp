@@ -1,6 +1,7 @@
 #include "IV18I2CCommandExecutor.h"
 
 #include "../I2CComms/I2CComms.h"
+#include "IV18IntroSequencer.h"
 
 short IV18I2CCommandExecutor::bunchedCommandsCount = 0;
 byte IV18I2CCommandExecutor::bunchedCommandsBuffer[IV18I2CCommandExecutor::BUNCHED_COMMANDS_BUFFER_LENGTH];
@@ -49,7 +50,12 @@ void IV18I2CCommandExecutor::executeCommand(IV18Animator* animator, byte command
         case CMD_ON:
             display->on();
             break;
-
+        case CMD_INTRO_ON:
+            animator->setSequencingCallback(IV18IntroSequencer::doIntroSequencing);
+            break;
+        case CMD_INTRO_OFF:
+            animator->disableSequencing();
+            break;
         // TODO...
     }
 }

@@ -99,6 +99,9 @@ private:
     unsigned short ledAction = 0;
     unsigned short warningBleepsLeft = 0;
 
+    void (*sequencingCallback)(IV18Animator* animator);
+    bool sequencingEnabled = false;
+
     void animateStatusLED();
     void decreaseWarningBleeps();
 
@@ -121,6 +124,7 @@ public:
     void doWarning(short bleepsCount = 10);
     void doKillLED();
     void doFrame();
+    void doCurrentSequencing();
 
 //    void setLampDigitOnDutyValues(const unsigned short * values);
 
@@ -129,6 +133,9 @@ public:
     void setLampDigitAction(short lampDigitNumber, short action, unsigned short maxDutyValue = LAMP_DIGIT_MAX_DUTY_US, unsigned short minDutyValue = LAMP_DIGIT_CUTOUT_DUTY_US);
 
     IV18Display* getDisplay();
+
+    void setSequencingCallback(void (*sequencingCallbackToSet)(IV18Animator*));
+    void disableSequencing();
 };
 
 #endif //PIUCNTVFD1_IV18ANIMATOR_H
