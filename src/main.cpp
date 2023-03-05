@@ -77,6 +77,10 @@ void setup()
 //    while (I2CComms::getReadBufferRemainingCommandCount()) {
 //        Serial.println(I2CComms::getCommandFromReadBuffer(), HEX);
 //    }
+
+// debug
+//    Display.off();
+//    I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_OFF);
 }
 
 void loop()
@@ -93,6 +97,15 @@ void loop()
 //    if (currentFrame % 100 == 0 && currentFrame >= 1800 && currentFrame < 2700) {
 //        short digitNumber = 26 - (currentFrame / 100);
 //        animator->setLampDigitAction(digitNumber, IV18Animator::LAMP_DIGIT_IN);
+//    }
+
+// debug
+//    if (currentFrame % 500 == 499) {
+//        if (Display.isOn()) {
+//            I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_OFF);
+//        } else {
+//            I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_ON);
+//        }
 //    }
 
     if (currentFrame % 50 == 0) {

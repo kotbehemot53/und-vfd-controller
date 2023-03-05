@@ -102,6 +102,7 @@ public:
 
     static void on();
     static void off();
+    static bool isOn();
     static void statusOn();
     static void statusOff();
 
