@@ -35,9 +35,10 @@ public:
 
 private:
     static const short BUNCHED_COMMANDS_BUFFER_LENGTH = 128;
+    static const short BUNCHABLE_COMMANDS_COUNT = 6;
 
     // CMD_MULTI_FINISH not included - it acts immediately by dispatching all the bunched commands
-    static constexpr byte BUNCHABLE_COMMANDS[6] = {
+    static constexpr byte BUNCHABLE_COMMANDS[BUNCHABLE_COMMANDS_COUNT] = {
         CMD_MULTI_DIGIT_DIMMER,
         CMD_MULTI_DIGIT_CHAR,
         CMD_MULTI_DIGIT_BYTE,
@@ -47,7 +48,29 @@ private:
     };
 
     static byte bunchedCommandsBuffer[BUNCHED_COMMANDS_BUFFER_LENGTH];
-    static short bunchedCommandsCount; // TODO: make init function to initialise it? sucks... damn method pointers...
+    static short bunchedCommandsCount;
+
+    inline static void addCommandToBunchedBuffer(byte command)
+    {
+        // add command to write buffer and increase the command count appropriately
+        bunchedCommandsBuffer[bunchedCommandsCount++] = command;
+
+        // TODO: throw exception or prevent overflowing the buffer?
+    };
+
+    inline static bool isCommandBunchable(byte command)
+    {
+        byte shiftedCommand = command >> 4;
+        for (short i = 0; i < BUNCHABLE_COMMANDS_COUNT; ++i) {
+            if (IV18I2CCommandExecutor::BUNCHABLE_COMMANDS[i] >> 4 == shiftedCommand) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    static void executeCommand(IV18Animator* animator, byte command);
 
 public:
     // TODO: check if it's actually sufficient (no undertimes in typical scenarios, no led of course)
