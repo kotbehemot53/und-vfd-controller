@@ -6,8 +6,12 @@ VFD microcontroller
 
 Hardware: Atmega328p
 
+*This is a work in progress*
+
 Controls the Board B of the Universal Nixie Display (the VFD module).
 Receives commands via I²C.
+
+The current device address is `0x5`.
 
 Available commands
 ------------------
