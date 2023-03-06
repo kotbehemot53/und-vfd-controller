@@ -27,8 +27,9 @@ private:
     // timing
     static const unsigned short SERIAL_REG_CLK_PULSE_LEN_US = 50;
 
+    // TODO: add capital letters?
     // char-to-segments dict
-    //TODO 0 is actually ' '!
+    // TODO 0 is actually ' '!
     //each bit is one segment in order: abcdefg.
     static constexpr byte SEGMENT_DICT[] = {
             0b00000000, // //empty

@@ -34,8 +34,10 @@ public:
     static const byte CMD_MULTI_DIGIT_FADE_TIME = 0xC0; // the FOLLOWING byte sets target duration in frames; last 4 bits determine which digit
 
 private:
-    static const short BUNCHED_COMMANDS_BUFFER_LENGTH = 1024;
+    // TODO: why do strange things happen when buffer is above 511? even though there's still plenty of RAM?
+    static const short BUNCHED_COMMANDS_BUFFER_LENGTH = 255;
     static const short BUNCHABLE_COMMANDS_COUNT = 7;
+    static const short FOLLOWED_COMMANDS_COUNT = 6;
 
     // CMD_MULTI_FINISH not included - it acts immediately by dispatching all the bunched commands
     static constexpr byte BUNCHABLE_COMMANDS[BUNCHABLE_COMMANDS_COUNT] = {
@@ -48,6 +50,15 @@ private:
         CMD_MULTI_DIGIT_FADE_TIME
     };
 
+    static constexpr byte FOLLOWED_COMMANDS[FOLLOWED_COMMANDS_COUNT] = {
+        CMD_MULTI_DIGIT_DIMMER,
+        CMD_MULTI_DIGIT_CHAR,
+        CMD_MULTI_DIGIT_BYTE,
+        CMD_MULTI_DIGIT_FADE_IN,
+        CMD_MULTI_DIGIT_FADE_OUT,
+        CMD_MULTI_DIGIT_FADE_TIME
+    };
+
     static byte bunchedCommandsBuffer[BUNCHED_COMMANDS_BUFFER_LENGTH];
     static short bunchedCommandsCount;
 
@@ -55,15 +66,23 @@ private:
     {
         // add command to write buffer and increase the command count appropriately
         bunchedCommandsBuffer[bunchedCommandsCount++] = command;
-
         // TODO: throw exception or prevent overflowing the buffer?
     };
 
     inline static bool isCommandBunchable(byte command)
     {
-        byte shiftedCommand = command >> 4;
         for (short i = 0; i < BUNCHABLE_COMMANDS_COUNT; ++i) {
-            if (IV18I2CCommandExecutor::BUNCHABLE_COMMANDS[i] >> 4 == shiftedCommand) {
+            if (IV18I2CCommandExecutor::BUNCHABLE_COMMANDS[i] == (command & 0xF0)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    inline static bool isCommandFollowed(byte command)
+    {
+        for (short i = 0; i < FOLLOWED_COMMANDS_COUNT; ++i) {
+            if (IV18I2CCommandExecutor::FOLLOWED_COMMANDS[i] == (command & 0xF0)) {
                 return true;
             }
         }

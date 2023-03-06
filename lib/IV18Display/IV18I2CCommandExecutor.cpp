@@ -9,14 +9,25 @@ byte IV18I2CCommandExecutor::bunchedCommandsBuffer[IV18I2CCommandExecutor::BUNCH
 
 void IV18I2CCommandExecutor::executeBufferedCommands(IV18Animator *animator, int sequenceNumber)
 {
+    bool bufferFollowerCommand = false;
+
     I2CComms::resetBuffers();
 
     byte currentCommand;
     while (I2CComms::getReadBufferRemainingCommandCount()) {
         currentCommand = I2CComms::getCommandFromReadBuffer();
 
+        if (bufferFollowerCommand) {
+            addCommandToBunchedBuffer(currentCommand);
+            bufferFollowerCommand = false;
+            continue;
+        }
+
         if (isCommandBunchable(currentCommand)) {
             addCommandToBunchedBuffer(currentCommand);
+            if (isCommandFollowed(currentCommand)) {
+                bufferFollowerCommand = true;
+            }
         } else {
             executeCommand(animator, currentCommand);
         }
@@ -88,13 +99,17 @@ void IV18I2CCommandExecutor::executeBunchedCommands(IV18Animator *animator)
     IV18Display* display = animator->getDisplay();
     if (setBytes) {
         display->setBytes(bytesBuffer);
+        display->setMode(IV18Display::MODE_BYTES);
     }
     if (setChars) {
         display->setChars(charsBuffer);
+        display->setMode(IV18Display::MODE_CHARS);
     }
     if (setCommas) {
         display->setCommas(commasBuffer);
     }
+
+    bunchedCommandsCount = 0;
 }
 
 void IV18I2CCommandExecutor::executeCommand(IV18Animator* animator, byte command)
