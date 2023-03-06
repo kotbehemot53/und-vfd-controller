@@ -17,6 +17,8 @@ const byte I2C_ADDR = 0x5;
 IV18Animator* animator;
 AnimatorFailureListenerInterface* animatorFailureListener;
 
+long currentFrame = 0;
+
 void setup()
 {
     Serial.begin(115200);
@@ -86,6 +88,11 @@ void setup()
 //    Serial.println(IV18Animator::convertDutyCycle(100));
 //    Serial.println(IV18Animator::convertDutyCycle(128));
 //    Serial.println(IV18Animator::convertDutyCycle(255));
+
+    I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_CHAR | 2);
+    I2CComms::addCommandToWriteBuffer('a');
+    I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_CHAR | 4);
+    I2CComms::addCommandToWriteBuffer('c');
 }
 
 void loop()
@@ -109,12 +116,18 @@ void loop()
 //    }
 
 // debug
-//    if (currentFrame % 500 == 499) {
+    if (currentFrame % 500 == 499) {
+        I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_INTRO_OFF);
+        I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_CLEAR);
+        I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_FINISH);
+
 //        if (Display.isOn()) {
 //            I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_OFF);
 //        } else {
 //            I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_ON);
 //        }
-//    }
+    }
+
+    ++currentFrame;
 }
 
