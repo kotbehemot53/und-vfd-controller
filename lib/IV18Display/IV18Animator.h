@@ -37,10 +37,9 @@ private:
     static constexpr unsigned long LED_MAX_DUTY_US[LED_SINUS_MODES_COUNT] = {7000, 9000};
 
     IV18Display* display;
+    DeviceAnimatorThread* statusLedThread;
+    DeviceAnimatorThread* lampDigitThread;
 
-//    static const unsigned short LAMP_GRID_FRAMES_PER_CYCLE = 75;
-    // TODO: add setter for this to use via command
-    //       recalculate lampGridFramesPerLongestCycle on set
     unsigned short lampDigitFramesPerCycle[IV18Display::DIGIT_STEPS_COUNT] = {
         DEFAULT_LAMP_DIGIT_FRAMES_PER_CYCLE,
         DEFAULT_LAMP_DIGIT_FRAMES_PER_CYCLE,
@@ -82,7 +81,6 @@ private:
         LAMP_DIGIT_CUTOUT_DUTY_US
     };
 
-    // TODO: add setter for this to use via command
     unsigned short lampDigitActions[IV18Display::DIGIT_STEPS_COUNT] = {
         LAMP_DIGIT_STATIC,
         LAMP_DIGIT_STATIC,
@@ -94,8 +92,6 @@ private:
         LAMP_DIGIT_STATIC,
         LAMP_DIGIT_STATIC,
     };
-
-    // TODO: methods to init lamp grid modes/animations, animate them properly, set on duty values (regular/permanent dimming)
 
     DeviceAnimator animator;
     unsigned short ledCurrentFrame = 0;
@@ -124,11 +120,9 @@ private:
     void animateLampDigitBrightnesses();
 
 public:
-    // TODO: make appropriate getters/setters instead?
-    DeviceAnimatorThread* statusLedThread;
-    DeviceAnimatorThread* lampDigitThread;
 
     explicit IV18Animator(IV18Display* display);
+
     void setFailureListener(AnimatorFailureListenerInterface* failureListener);
 
     void doWarning(short bleepsCount = 10);
