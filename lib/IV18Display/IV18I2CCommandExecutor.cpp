@@ -36,8 +36,8 @@ void IV18I2CCommandExecutor::executeBufferedCommands(IV18Animator *animator, int
 
 void IV18I2CCommandExecutor::executeBunchedCommands(IV18Animator *animator)
 {
-    short lampDigitNumber;
-    byte commandByte;
+    byte commandHalfByte;
+    byte indexHalfByte;
 
     bool setBytes = false;
     bool setChars = false;
@@ -49,46 +49,97 @@ void IV18I2CCommandExecutor::executeBunchedCommands(IV18Animator *animator)
 
     // TODO: throw exception/handle improper commands count (above buffer or not including supplementary commands with values?)
     for (short i = 0; i < bunchedCommandsCount; ++i) {
-        commandByte = bunchedCommandsBuffer[i];
-        switch (commandByte & 0xF0) { //mask out the last 4 bits
+        commandHalfByte = bunchedCommandsBuffer[i] & 0xF0;
+        indexHalfByte = bunchedCommandsBuffer[i] & 0x0F;
+        switch (commandHalfByte) { //mask out the last 4 bits
+            case CMD_MULTI_DIGIT_CLEAR:
+                setBytes = true;
+                setChars = true;
+                setCommas = true;
+                break;
             case CMD_MULTI_DIGIT_CHAR:
                 setChars = true;
-                charsBuffer[commandByte & 0x0F] = (char) bunchedCommandsBuffer[++i];
+                charsBuffer[indexHalfByte] = (char) bunchedCommandsBuffer[++i];
                 break;
             case CMD_MULTI_DIGIT_BYTE:
                 setBytes = true;
-                bytesBuffer[commandByte & 0x0F] = bunchedCommandsBuffer[++i];
+                bytesBuffer[indexHalfByte] = bunchedCommandsBuffer[++i];
                 break;
             case CMD_MULTI_DIGIT_POINT_R:
                 setCommas = true;
-                commasBuffer[commandByte & 0x0F] = true;
+                commasBuffer[indexHalfByte] = true;
                 break;
             case CMD_MULTI_DIGIT_DIMMER:
-                animator->setCurrentLampDigitDutyValue(
-                    commandByte & 0x0F,
-                    IV18Animator::convertDutyCycle(bunchedCommandsBuffer[++i])
-                );
+                if (indexHalfByte >= IV18Display::DIGIT_STEPS_COUNT) {
+                    ++i;
+                    for (short j = 0; j < IV18Display::DIGIT_STEPS_COUNT; ++j) {
+                        animator->setCurrentLampDigitDutyValue(
+                            j,
+                            IV18Animator::convertDutyCycle(bunchedCommandsBuffer[i])
+                        );
+                    }
+                } else {
+                    animator->setCurrentLampDigitDutyValue(
+                        indexHalfByte,
+                        IV18Animator::convertDutyCycle(bunchedCommandsBuffer[++i])
+                    );
+                }
                 break;
             case CMD_MULTI_DIGIT_FADE_IN:
-                lampDigitNumber = commandByte & 0x0F;
-                animator->setLampDigitAction(
-                    lampDigitNumber,
-                    IV18Animator::LAMP_DIGIT_IN,
-                    IV18Animator::convertDutyCycle(bunchedCommandsBuffer[++i]),
-                    animator->getLampDigitPreviousOnDutyUs(lampDigitNumber)
-                );
+                if (indexHalfByte >= IV18Display::DIGIT_STEPS_COUNT) {
+                    ++i;
+                    for (short j = 0; j < IV18Display::DIGIT_STEPS_COUNT; ++j) {
+                        animator->setLampDigitAction(
+                            j,
+                            IV18Animator::LAMP_DIGIT_IN,
+                            IV18Animator::convertDutyCycle(bunchedCommandsBuffer[i]),
+                            animator->getLampDigitPreviousOnDutyUs(j)
+                        );
+                    }
+                } else {
+                    animator->setLampDigitAction(
+                        indexHalfByte,
+                        IV18Animator::LAMP_DIGIT_IN,
+                        IV18Animator::convertDutyCycle(bunchedCommandsBuffer[++i]),
+                        animator->getLampDigitPreviousOnDutyUs(indexHalfByte)
+                    );
+                }
                 break;
             case CMD_MULTI_DIGIT_FADE_OUT:
-                lampDigitNumber = commandByte & 0x0F;
-                animator->setLampDigitAction(
-                    lampDigitNumber,
-                    IV18Animator::LAMP_DIGIT_OUT,
-                    animator->getLampDigitPreviousOnDutyUs(lampDigitNumber),
-                    IV18Animator::convertDutyCycle(bunchedCommandsBuffer[++i])
-                );
+                if (indexHalfByte >= IV18Display::DIGIT_STEPS_COUNT) {
+                    ++i;
+                    for (short j = 0; j < IV18Display::DIGIT_STEPS_COUNT; ++j) {
+                        animator->setLampDigitAction(
+                            j,
+                            IV18Animator::LAMP_DIGIT_OUT,
+                            animator->getLampDigitPreviousOnDutyUs(j),
+                            IV18Animator::convertDutyCycle(bunchedCommandsBuffer[i])
+                        );
+                    }
+                } else {
+                    animator->setLampDigitAction(
+                        indexHalfByte,
+                        IV18Animator::LAMP_DIGIT_OUT,
+                        animator->getLampDigitPreviousOnDutyUs(indexHalfByte),
+                        IV18Animator::convertDutyCycle(bunchedCommandsBuffer[++i])
+                    );
+                }
                 break;
             case CMD_MULTI_DIGIT_FADE_TIME:
-                animator->setLampDigitFramesPerAction(commandByte & 0x0F, bunchedCommandsBuffer[++i]);
+                if (indexHalfByte >= IV18Display::DIGIT_STEPS_COUNT) {
+                    ++i;
+                    for (short j = 0; j < IV18Display::DIGIT_STEPS_COUNT; ++j) {
+                        animator->setLampDigitFramesPerAction(
+                            j,
+                            bunchedCommandsBuffer[i]
+                        );
+                    }
+                } else {
+                    animator->setLampDigitFramesPerAction(
+                        indexHalfByte,
+                        bunchedCommandsBuffer[++i]
+                    );
+                }
                 break;
             default:
                 // TODO: throw exception for unsupported commands?
@@ -115,8 +166,6 @@ void IV18I2CCommandExecutor::executeBunchedCommands(IV18Animator *animator)
 void IV18I2CCommandExecutor::executeCommand(IV18Animator* animator, byte command)
 {
     IV18Display* display = animator->getDisplay();
-    byte emptyBytes[IV18Display::DIGIT_STEPS_COUNT] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, 0x00};
-    bool emptyCommas[IV18Display::DIGIT_STEPS_COUNT] = {false,false,false,false,false,false,false,false,false};
 
     switch (command) {
         case CMD_OFF:
@@ -130,21 +179,6 @@ void IV18I2CCommandExecutor::executeCommand(IV18Animator* animator, byte command
             break;
         case CMD_INTRO_OFF:
             animator->disableSequencing();
-            animator->setCurrentLampDigitDutyValue(0, IV18Animator::LAMP_DIGIT_MAX_DUTY_US);
-            animator->setCurrentLampDigitDutyValue(1, IV18Animator::LAMP_DIGIT_MAX_DUTY_US);
-            animator->setCurrentLampDigitDutyValue(2, IV18Animator::LAMP_DIGIT_MAX_DUTY_US);
-            animator->setCurrentLampDigitDutyValue(3, IV18Animator::LAMP_DIGIT_MAX_DUTY_US);
-            animator->setCurrentLampDigitDutyValue(4, IV18Animator::LAMP_DIGIT_MAX_DUTY_US);
-            animator->setCurrentLampDigitDutyValue(5, IV18Animator::LAMP_DIGIT_MAX_DUTY_US);
-            animator->setCurrentLampDigitDutyValue(6, IV18Animator::LAMP_DIGIT_MAX_DUTY_US);
-            animator->setCurrentLampDigitDutyValue(7, IV18Animator::LAMP_DIGIT_MAX_DUTY_US);
-            animator->setCurrentLampDigitDutyValue(8, IV18Animator::LAMP_DIGIT_MAX_DUTY_US);
-            break;
-        case CMD_CLEAR:
-            display->setChars("         ");
-            display->setBytes(emptyBytes);
-            display->setCommas(emptyCommas);
-            display->setMode(IV18Display::MODE_CHARS);
             break;
         case CMD_MULTI_FINISH:
             IV18I2CCommandExecutor::executeBunchedCommands(animator);

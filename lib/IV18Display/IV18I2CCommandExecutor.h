@@ -15,8 +15,7 @@ public:
     static const byte CMD_ON = 0x11; //turn the lamps on
 
     static const byte CMD_INTRO_ON = 0x12; //turn the intro on
-    static const byte CMD_INTRO_OFF = 0x13; //turn the intro off, set max brightness
-    static const byte CMD_CLEAR = 0x14; //clear all chars, bytes & commas, set chars mode
+    static const byte CMD_INTRO_OFF = 0x13; //turn the intro off
 
     static const byte CMD_MULTI_FINISH = 0x20; // sets up the next frame with all commands gathered in the bunched buffer
 
@@ -29,15 +28,16 @@ public:
     // TODO: do we want to reset commas every frame? or retain old commas and define a separate command to turn them off?
     //       DECISION: reset unset ones to no comma (on FIN)
     static const byte CMD_MULTI_DIGIT_POINT_R = 0xF0; // last 4 bits determine which right comma should be on
-    static const byte CMD_MULTI_DIGIT_DIMMER = 0x60; // the FOLLOWING byte sets the duty cycle; last 4 bits determine which digit
-    static const byte CMD_MULTI_DIGIT_FADE_IN = 0xA0; // the FOLLOWING byte sets target duty cycle; last 4 bits determine which digit
-    static const byte CMD_MULTI_DIGIT_FADE_OUT = 0xB0; // the FOLLOWING byte sets target duty cycle; last 4 bits determine which digit
-    static const byte CMD_MULTI_DIGIT_FADE_TIME = 0xC0; // the FOLLOWING byte sets target duration in frames; last 4 bits determine which digit
+    static const byte CMD_MULTI_DIGIT_DIMMER = 0x60; // the FOLLOWING byte sets the duty cycle; last 4 bits determine which digit; digit > 9 sets all digits
+    static const byte CMD_MULTI_DIGIT_FADE_IN = 0xA0; // the FOLLOWING byte sets target duty cycle; last 4 bits determine which digit; digit > 9 sets all digits
+    static const byte CMD_MULTI_DIGIT_FADE_OUT = 0xB0; // the FOLLOWING byte sets target duty cycle; last 4 bits determine which digit; digit > 9 sets all digits
+    static const byte CMD_MULTI_DIGIT_FADE_TIME = 0xC0; // the FOLLOWING byte sets target duration in frames; last 4 bits determine which digit; digit > 9 sets all digits
+    static const byte CMD_MULTI_DIGIT_CLEAR = 0xD0; //clear all chars, bytes & commas, set chars mode
 
 private:
     // TODO: why do strange things happen when buffer is above 511? even though there's still plenty of RAM?
     static const short BUNCHED_COMMANDS_BUFFER_LENGTH = 255;
-    static const short BUNCHABLE_COMMANDS_COUNT = 7;
+    static const short BUNCHABLE_COMMANDS_COUNT = 8;
     static const short FOLLOWED_COMMANDS_COUNT = 6;
 
     // CMD_MULTI_FINISH not included - it acts immediately by dispatching all the bunched commands
@@ -48,7 +48,8 @@ private:
         CMD_MULTI_DIGIT_POINT_R,
         CMD_MULTI_DIGIT_FADE_IN,
         CMD_MULTI_DIGIT_FADE_OUT,
-        CMD_MULTI_DIGIT_FADE_TIME
+        CMD_MULTI_DIGIT_FADE_TIME,
+        CMD_MULTI_DIGIT_CLEAR
     };
 
     static constexpr byte FOLLOWED_COMMANDS[FOLLOWED_COMMANDS_COUNT] = {
