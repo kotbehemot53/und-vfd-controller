@@ -56,19 +56,6 @@ private:
     unsigned short lampDigitCurrentFrameInCycle[IV18Display::DIGIT_STEPS_COUNT] =
         {0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-//    // holds previous frame duty cycle values for each digit (for reading)
-//    unsigned short lampDigitPreviousOnDutyUs[IV18Display::DIGIT_STEPS_COUNT] = {
-//        LAMP_DIGIT_MAX_DUTY_US,
-//        LAMP_DIGIT_MAX_DUTY_US,
-//        LAMP_DIGIT_MAX_DUTY_US,
-//        LAMP_DIGIT_MAX_DUTY_US,
-//        LAMP_DIGIT_MAX_DUTY_US,
-//        LAMP_DIGIT_MAX_DUTY_US,
-//        LAMP_DIGIT_MAX_DUTY_US,
-//        LAMP_DIGIT_MAX_DUTY_US,
-//        LAMP_DIGIT_MAX_DUTY_US
-//    };
-
     // sets max duty cycle per lamp grid (permanent dimming) for fade-in/fade-out
     unsigned short lampDigitMaxOnDutyUs[IV18Display::DIGIT_STEPS_COUNT] = {
         LAMP_DIGIT_MAX_DUTY_US,
