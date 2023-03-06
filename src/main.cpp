@@ -86,10 +86,16 @@ void setup()
 //    Serial.println(IV18Animator::convertDutyCycle(128));
 //    Serial.println(IV18Animator::convertDutyCycle(255));
 
-    I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_CHAR | 2);
-    I2CComms::addCommandToWriteBuffer('a');
-    I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_CHAR | 4);
-    I2CComms::addCommandToWriteBuffer('c');
+//    I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_CLEAR);
+//    I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_CHAR | 2);
+//    I2CComms::addCommandToWriteBuffer('a');
+//    I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_CHAR | 4);
+//    I2CComms::addCommandToWriteBuffer('c');
+//    I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_DIMMER | 10);
+//    I2CComms::addCommandToWriteBuffer(255);
+
+    I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_FADE_OUT | 10);
+    I2CComms::addCommandToWriteBuffer(0);
 }
 
 void loop()
@@ -115,7 +121,6 @@ void loop()
 // debug
     if (currentFrame % 500 == 499) {
         I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_INTRO_OFF);
-        I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_CLEAR);
         I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_FINISH);
 
 //        if (Display.isOn()) {
