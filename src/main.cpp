@@ -119,7 +119,7 @@ void loop()
 //    }
 
 // debug
-    if (currentFrame % 500 == 499) {
+    if (currentFrame == 499) {
         I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_INTRO_OFF);
         I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_FINISH);
 
@@ -128,6 +128,31 @@ void loop()
 //        } else {
 //            I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_ON);
 //        }
+    }
+
+    if (currentFrame == 1299) {
+        I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_FADE_IN | 2);
+        I2CComms::addCommandToWriteBuffer(255);
+        I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_FADE_IN | 4);
+        I2CComms::addCommandToWriteBuffer(255);
+        I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_FADE_IN | 6);
+        I2CComms::addCommandToWriteBuffer(255);
+        I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_FADE_IN | 8);
+        I2CComms::addCommandToWriteBuffer(255);
+        I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_FINISH);
+    }
+    if (currentFrame == 1399) {
+        I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_FADE_IN | 1);
+        I2CComms::addCommandToWriteBuffer(255);
+        I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_FADE_IN | 3);
+        I2CComms::addCommandToWriteBuffer(255);
+        I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_FADE_IN | 5);
+        I2CComms::addCommandToWriteBuffer(255);
+        I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_FADE_IN | 7);
+        I2CComms::addCommandToWriteBuffer(255);
+        I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_FADE_IN | 9);
+        I2CComms::addCommandToWriteBuffer(255);
+        I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_FINISH);
     }
 
     ++currentFrame;
