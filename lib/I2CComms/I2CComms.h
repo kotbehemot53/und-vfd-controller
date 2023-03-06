@@ -7,7 +7,7 @@
 class I2CComms
 {
 public:
-    static const short COMMAND_BUFFER_LENGTH = 128;
+    static const short COMMAND_BUFFER_LENGTH = 191;
 
     static void init(byte addr);
     static byte getCommandFromReadBuffer();
@@ -16,10 +16,13 @@ public:
 
     // it's public for debug purposes
     inline static void addCommandToWriteBuffer(byte command) {
+        if (commandCountsInBuffer[currentWriteBuffer] == COMMAND_BUFFER_LENGTH) {
+            // TODO: throw exception or prevent overflowing the buffer?
+            //       plain return for now
+            return;
+        }
         // add command to write buffer and increase the command count appropriately
         commandBuffers[currentWriteBuffer][commandCountsInBuffer[currentWriteBuffer]++] = command;
-
-        // TODO: throw exception or prevent overflowing the buffer?
     };
 private:
     // 2 buffers necessary: 1 for writing, when an interrupt comes, another for reading when necessary, even when new interrupts come

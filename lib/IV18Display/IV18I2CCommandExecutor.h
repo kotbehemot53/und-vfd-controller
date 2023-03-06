@@ -6,7 +6,6 @@
 
 class IV18Animator;
 
-// TODO: amend nixie commands appropriately (the way they work + names)
 class IV18I2CCommandExecutor
 {
 public:
@@ -20,14 +19,9 @@ public:
     static const byte CMD_MULTI_FINISH = 0x20; // sets up the next frame with all commands gathered in the bunched buffer
 
     // bunchable commands
-    // TODO: do we want to set only chosen digits and retain old ones? or always set all 9? taking dimmer into account,
-    //       maybe always set all or reset unset digits to space
-    //       DECISION: reset unset ones to space (on FIN)
-    static const byte CMD_MULTI_DIGIT_CHAR = 0x80; // the FOLLOWING byte sets char; last 4 bits determine which digit
-    static const byte CMD_MULTI_DIGIT_BYTE = 0x90; // the FOLLOWING byte sets raw segments byte; last 4 bits determine which digit
-    // TODO: do we want to reset commas every frame? or retain old commas and define a separate command to turn them off?
-    //       DECISION: reset unset ones to no comma (on FIN)
-    static const byte CMD_MULTI_DIGIT_POINT_R = 0xF0; // last 4 bits determine which right comma should be on
+    static const byte CMD_MULTI_DIGIT_CHAR = 0x80; // the FOLLOWING byte sets char; last 4 bits determine which digit; untouched chars will be off
+    static const byte CMD_MULTI_DIGIT_BYTE = 0x90; // the FOLLOWING byte sets raw segments byte; last 4 bits determine which digit; untouched digits will be off
+    static const byte CMD_MULTI_DIGIT_POINT_R = 0xF0; // last 4 bits determine which right comma should be on; untouched commas will be off
     static const byte CMD_MULTI_DIGIT_DIMMER = 0x60; // the FOLLOWING byte sets the duty cycle; last 4 bits determine which digit; digit > 9 sets all digits
     static const byte CMD_MULTI_DIGIT_FADE_IN = 0xA0; // the FOLLOWING byte sets target duty cycle; last 4 bits determine which digit; digit > 9 sets all digits
     static const byte CMD_MULTI_DIGIT_FADE_OUT = 0xB0; // the FOLLOWING byte sets target duty cycle; last 4 bits determine which digit; digit > 9 sets all digits
@@ -36,7 +30,7 @@ public:
 
 private:
     // TODO: why do strange things happen when buffer is above 511? even though there's still plenty of RAM?
-    static const short BUNCHED_COMMANDS_BUFFER_LENGTH = 255;
+    static const short BUNCHED_COMMANDS_BUFFER_LENGTH = 191;
     static const short BUNCHABLE_COMMANDS_COUNT = 8;
     static const short FOLLOWED_COMMANDS_COUNT = 6;
 
@@ -66,9 +60,14 @@ private:
 
     inline static void addCommandToBunchedBuffer(byte command)
     {
+        if (bunchedCommandsCount == BUNCHED_COMMANDS_BUFFER_LENGTH) {
+            // TODO: throw exception or prevent overflowing the buffer?
+            //       plain return for now
+            return;
+        }
+
         // add command to write buffer and increase the command count appropriately
         bunchedCommandsBuffer[bunchedCommandsCount++] = command;
-        // TODO: throw exception or prevent overflowing the buffer?
     };
 
     inline static bool isCommandBunchable(byte command)

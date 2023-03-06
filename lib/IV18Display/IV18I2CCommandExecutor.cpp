@@ -58,16 +58,22 @@ void IV18I2CCommandExecutor::executeBunchedCommands(IV18Animator *animator)
                 setCommas = true;
                 break;
             case CMD_MULTI_DIGIT_CHAR:
-                setChars = true;
-                charsBuffer[indexHalfByte] = (char) bunchedCommandsBuffer[++i];
+                if (indexHalfByte < IV18Display::DIGIT_STEPS_COUNT) {
+                    setChars = true;
+                    charsBuffer[indexHalfByte] = (char) bunchedCommandsBuffer[++i];
+                }
                 break;
             case CMD_MULTI_DIGIT_BYTE:
-                setBytes = true;
-                bytesBuffer[indexHalfByte] = bunchedCommandsBuffer[++i];
+                if (indexHalfByte < IV18Display::DIGIT_STEPS_COUNT) {
+                    setBytes = true;
+                    bytesBuffer[indexHalfByte] = bunchedCommandsBuffer[++i];
+                }
                 break;
             case CMD_MULTI_DIGIT_POINT_R:
-                setCommas = true;
-                commasBuffer[indexHalfByte] = true;
+                if (indexHalfByte < IV18Display::DIGIT_STEPS_COUNT) {
+                    setCommas = true;
+                    commasBuffer[indexHalfByte] = true;
+                }
                 break;
             case CMD_MULTI_DIGIT_DIMMER:
                 if (indexHalfByte >= IV18Display::DIGIT_STEPS_COUNT) {
