@@ -1,7 +1,5 @@
 #include "IV18Animator.h"
 
-#include "../DutyCycleGenerator/SinusoidalDutyCycleGenerator.h"
-
 // TODO: do we need this silliness?
 //void IV18Animator::shuffleArray(unsigned short * array, int size)
 //{
@@ -16,8 +14,10 @@
 //    array[last] = temp;
 //}
 
-IV18Animator::IV18Animator(IV18Display &display)
+IV18Animator::IV18Animator(IV18Display* display)
 {
+    this->display = display;
+
     // TODO: preprocessor could do it
     // determine longest multiframe animation cycle
     ledFramesPerLongestCycle = 0;
@@ -38,55 +38,58 @@ IV18Animator::IV18Animator(IV18Display &display)
     //       think about rectangular heartbeat with a non-colliding offsets instead
     auto heartbeatSteps = new DeviceAnimatorStep[2]{
         // waitUs values will be overriden on every frame by animateStatusLED
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::statusOn), 5000),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::statusOff), 5000)
+        DeviceAnimatorStep(this, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::statusOn), 5000),
+        DeviceAnimatorStep(this, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::statusOff), 5000)
     };
 
     // prepare must be at least 150 us - otherwise undertime happens constantly
-    auto lampDigitSteps = new DeviceAnimatorStep[IV18Display::DIGIT_STEPS_COUNT * 2 + 1]{
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextDigitStep),
+    auto lampDigitSteps = new DeviceAnimatorStep[IV18Display::DIGIT_STEPS_COUNT * 2 + 2]{
+        DeviceAnimatorStep(this, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextDigitStep),
                            LAMP_DIGIT_PREPARE_MIN_DUTY_US, 0),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doDigitStep),
+        DeviceAnimatorStep(this, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doDigitStep),
                            LAMP_DIGIT_MAX_DUTY_US, 0),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextDigitStep),
+        DeviceAnimatorStep(this, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextDigitStep),
                            LAMP_DIGIT_PREPARE_MIN_DUTY_US, 1),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doDigitStep),
+        DeviceAnimatorStep(this, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doDigitStep),
                            LAMP_DIGIT_MAX_DUTY_US, 1),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextDigitStep),
+        DeviceAnimatorStep(this, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextDigitStep),
                            LAMP_DIGIT_PREPARE_MIN_DUTY_US, 2),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doDigitStep),
+        DeviceAnimatorStep(this, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doDigitStep),
                            LAMP_DIGIT_MAX_DUTY_US, 2),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextDigitStep),
+        DeviceAnimatorStep(this, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextDigitStep),
                            LAMP_DIGIT_PREPARE_MIN_DUTY_US, 3),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doDigitStep),
+        DeviceAnimatorStep(this, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doDigitStep),
                            LAMP_DIGIT_MAX_DUTY_US, 3),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextDigitStep),
+        DeviceAnimatorStep(this, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextDigitStep),
                            LAMP_DIGIT_PREPARE_MIN_DUTY_US, 4),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doDigitStep),
+        DeviceAnimatorStep(this, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doDigitStep),
                            LAMP_DIGIT_MAX_DUTY_US, 4),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextDigitStep),
+        DeviceAnimatorStep(this, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextDigitStep),
                            LAMP_DIGIT_PREPARE_MIN_DUTY_US, 5),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doDigitStep),
+        DeviceAnimatorStep(this, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doDigitStep),
                            LAMP_DIGIT_MAX_DUTY_US, 5),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextDigitStep),
+        DeviceAnimatorStep(this, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextDigitStep),
                            LAMP_DIGIT_PREPARE_MIN_DUTY_US, 6),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doDigitStep),
+        DeviceAnimatorStep(this, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doDigitStep),
                            LAMP_DIGIT_MAX_DUTY_US, 6),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextDigitStep),
+        DeviceAnimatorStep(this, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextDigitStep),
                            LAMP_DIGIT_PREPARE_MIN_DUTY_US, 7),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doDigitStep),
+        DeviceAnimatorStep(this, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doDigitStep),
                            LAMP_DIGIT_MAX_DUTY_US, 7),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextDigitStep),
+        DeviceAnimatorStep(this, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::prepareNextDigitStep),
                            LAMP_DIGIT_PREPARE_MIN_DUTY_US + 1, 8),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doDigitStep),
+        DeviceAnimatorStep(this, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::doDigitStep),
                            LAMP_DIGIT_MAX_DUTY_US, 8),
-        DeviceAnimatorStep(&display, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::grid9OffAndCooldown),
-                           IV18Display::GRID9_COOLDOWN_US, 9)
+           //TODO: perhaps smaller, minimal cooldown should be set here (below 100)? especially now, that we have the command processing that takes time
+        DeviceAnimatorStep(this, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::grid9OffAndCooldown),
+                           IV18Display::GRID9_COOLDOWN_US, 9),
+        DeviceAnimatorStep(this, reinterpret_cast<void (*)(void*,int)>(&IV18I2CCommandExecutor::executeBufferedCommands),
+        IV18I2CCommandExecutor::MAX_EXECUTION_TIME, 10)
     };
 
     threads = new DeviceAnimatorThread[2]{
         DeviceAnimatorThread(heartbeatSteps, 2),
-        DeviceAnimatorThread(lampDigitSteps, IV18Display::DIGIT_STEPS_COUNT * 2 + 1)
+        DeviceAnimatorThread(lampDigitSteps, IV18Display::DIGIT_STEPS_COUNT * 2 + 2)
     };
     statusLedThread = &(threads[0]);
     lampDigitThread = &(threads[1]);
@@ -96,6 +99,11 @@ IV18Animator::IV18Animator(IV18Display &display)
     // TODO: do we need this silliness?
 //    randomSeed(analogRead(A2));
 //    shuffleArray(randomLampGridOrder, IV18Display::DIGIT_STEPS_COUNT);
+}
+
+IV18Display* IV18Animator::getDisplay()
+{
+    return this->display;
 }
 
 void IV18Animator::setFailureListener(AnimatorFailureListenerInterface *failureListener)
@@ -188,11 +196,11 @@ void IV18Animator::animateStatusLED()
         statusLedThread->steps[0].waitUs = SinusoidalDutyCycleGenerator::animateSinusoidalDutyCycle(
             LED_MIN_DUTY_US[ledAction],
             LED_MAX_DUTY_US[ledAction],
-            FRAME_LENGTH_US,
+            LED_FRAME_LENGTH_US,
             ledCurrentFrame,
             LED_FRAMES_PER_CYCLE[ledAction]
         );
-        statusLedThread->steps[1].waitUs = FRAME_LENGTH_US - statusLedThread->steps[0].waitUs;
+        statusLedThread->steps[1].waitUs = LED_FRAME_LENGTH_US - statusLedThread->steps[0].waitUs;
     } else {
         if (ledAction == LED_KILL) {
             // TODO: implement actual total kills somehow? omittable threads?
@@ -252,6 +260,35 @@ void IV18Animator::setLampDigitAction(
     this->lampDigitMinOffDutyUs[lampDigitNumber] = minDutyValue;
 
     this->lampDigitActions[lampDigitNumber] = action;
+}
+
+void IV18Animator::doCurrentSequencing()
+{
+    if (sequencingEnabled) {
+        sequencingCallback(this);
+    }
+}
+
+void IV18Animator::setSequencingCallback(void (*sequencingCallbackToSet)(IV18Animator *))
+{
+    sequencingCallback = sequencingCallbackToSet;
+    sequencingEnabled = true;
+}
+
+void IV18Animator::disableSequencing()
+{
+    sequencingEnabled = false;
+}
+
+unsigned short IV18Animator::getLampDigitPreviousOnDutyUs(byte lampGridNumber)
+{
+    // TODO: throw exception on unsupported index?
+    return this->lampDigitThread->steps[2 * lampGridNumber + 1].waitUs;
+}
+
+void IV18Animator::setLampDigitFramesPerAction(short lampDigitNumber, unsigned short lampDigitFramesPerAction)
+{
+    lampDigitFramesPerCycle[lampDigitNumber] = lampDigitFramesPerAction;
 }
 
 void IV18Animator::doFrame()

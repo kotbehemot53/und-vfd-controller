@@ -1,5 +1,7 @@
 // TODO: remove this include later?
 #include <Arduino.h>
+//#include "avr8-stub.h" // avr-stub
+//#include "app_api.h" // only needed with flash breakpoints
 
 #include "../lib/IV18Display/IV18Display.h"
 #include "../lib/I2CComms/I2CComms.h"
@@ -7,28 +9,22 @@
 #include "../lib/AnimatorFailureListener/IV18AnimatorSerialFailureListener.h"
 #include "../lib/AnimatorFailureListener/IV18AnimatorLedFailureListener.h"
 
-// TODO: intro mode? as special IV18Display subclass? just a different animation routine and a switch?
-// TODO: PWM brightness - special command + functions in IV18Display?
-// TODO: comms
-
 const byte I2C_ADDR = 0x5;
 
 IV18Animator* animator;
 AnimatorFailureListenerInterface* animatorFailureListener;
 
-unsigned long currentFrame = 0;
-int animSteps[4] = {0, 0, 0, 0,};
+long currentFrame = 0;
 
 void setup()
 {
     Serial.begin(115200);
     Serial.println("yo");
 
-    // TODO: or constructor maybe?
-    // TODO: make it minimal, just buffer data!
-    Comms.init(I2C_ADDR, Display); //wire begin, wire.onReceive
+//    debug_init(); //avr-stub
 
-    animator = new IV18Animator(Display);
+    animator = new IV18Animator(&Display);
+    I2CComms::init(I2C_ADDR);
 
     // TODO: use these for animation timing debug
 //    animatorFailureListener = new IV18AnimatorLedFailureListener(animator);
@@ -45,18 +41,72 @@ void setup()
 //    Display.setMode(IV18Display::MODE_BYTES);
 //    Display.setBytes(testBytes);
     animator->doWarning(10);
-    // TODO: why isn't minus dimming?
 //    for (int i = 0; i < IV18Display::DIGIT_STEPS_COUNT; ++i) {
 //        animator->setCurrentLampDigitDutyValue(i, IV18Animator::LAMP_DIGIT_CUTOUT_DUTY_US + 1);
 //    }
+
+    // TODO: command buffering debug - remove later
+//    I2CComms::addCommandToWriteBuffer(0x00);
+//    I2CComms::addCommandToWriteBuffer(0x01);
+//    I2CComms::addCommandToWriteBuffer(0x02);
+//
+//    I2CComms::resetBuffers();
+//    while (I2CComms::getReadBufferRemainingCommandCount()) {
+//        Serial.println(I2CComms::getCommandFromReadBuffer(), HEX);
+//    }
+//
+//    I2CComms::addCommandToWriteBuffer(0x03);
+//    I2CComms::addCommandToWriteBuffer(0x04);
+//
+//    Serial.println("Premature ejac");
+//    while (I2CComms::getReadBufferRemainingCommandCount()) {
+//        Serial.println(I2CComms::getCommandFromReadBuffer(), HEX);
+//    }
+//
+//    I2CComms::addCommandToWriteBuffer(0x05);
+//    I2CComms::addCommandToWriteBuffer(0x06);
+//
+//    Serial.println("Real ejac");
+//
+//    I2CComms::resetBuffers();
+//    while (I2CComms::getReadBufferRemainingCommandCount()) {
+//        Serial.println(I2CComms::getCommandFromReadBuffer(), HEX);
+//    }
+
+// debug
+//    Display.off();
+//    I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_OFF);
+
+    // run intro in the beginning
+    I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_INTRO_ON);
+
+    // debug
+//    Serial.println(IV18Animator::convertDutyCycle(0));
+//    Serial.println(IV18Animator::convertDutyCycle(100));
+//    Serial.println(IV18Animator::convertDutyCycle(128));
+//    Serial.println(IV18Animator::convertDutyCycle(255));
+
+//    I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_CLEAR);
+//    I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_CHAR | 2);
+//    I2CComms::addCommandToWriteBuffer('a');
+//    I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_CHAR | 4);
+//    I2CComms::addCommandToWriteBuffer('c');
+//    I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_DIMMER | 10);
+//    I2CComms::addCommandToWriteBuffer(255);
+
+    I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_FADE_OUT | 10);
+    I2CComms::addCommandToWriteBuffer(0);
 }
 
 void loop()
 {
     // TODO: disable interrupts here? would omit packets?
 
+    // run a frame of the basic animation
     animator->doFrame();
-    Comms.handleBufferedInput(); //if new_frame handleNewFrame...
+
+    // run high-level animation sequencing if applicable (e.g. if intro is on)
+    animator->doCurrentSequencing();
 
 //    if (currentFrame % 100 == 0 && currentFrame < 900) {
 //        short digitNumber = currentFrame / 100;
@@ -68,26 +118,41 @@ void loop()
 //        animator->setLampDigitAction(digitNumber, IV18Animator::LAMP_DIGIT_IN);
 //    }
 
-    if (currentFrame % 50 == 0) {
-        for (int i = 1; i < 4; ++i) {
-            animSteps[i] = animSteps[i - 1] - 2;
-            if (animSteps[i] < 0) {
-                animSteps[i] = animSteps[i] + 9;
-            }
-        }
+// debug
+    if (currentFrame == 499) {
+        I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_INTRO_OFF);
+        I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_FINISH);
 
-        animator->setLampDigitAction(animSteps[0], IV18Animator::LAMP_DIGIT_OUT, IV18Animator::LAMP_DIGIT_MAX_DUTY_US,
-                                     IV18Animator::LAMP_DIGIT_CUTOUT_DUTY_US + 1);
-        animator->setLampDigitAction(animSteps[1], IV18Animator::LAMP_DIGIT_IN, IV18Animator::LAMP_DIGIT_MAX_DUTY_US,
-                                     IV18Animator::LAMP_DIGIT_CUTOUT_DUTY_US + 1);
-        animator->setLampDigitAction(animSteps[2], IV18Animator::LAMP_DIGIT_OUT, IV18Animator::LAMP_DIGIT_MAX_DUTY_US,
-                                     IV18Animator::LAMP_DIGIT_CUTOUT_DUTY_US + 1);
-        animator->setLampDigitAction(animSteps[3], IV18Animator::LAMP_DIGIT_IN, IV18Animator::LAMP_DIGIT_MAX_DUTY_US,
-                                     IV18Animator::LAMP_DIGIT_CUTOUT_DUTY_US + 1);
-        ++animSteps[0];
-        if (animSteps[0] > 8) {
-            animSteps[0] = 0;
-        }
+//        if (Display.isOn()) {
+//            I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_OFF);
+//        } else {
+//            I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_ON);
+//        }
+    }
+
+    if (currentFrame == 1299) {
+        I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_FADE_IN | 2);
+        I2CComms::addCommandToWriteBuffer(255);
+        I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_FADE_IN | 4);
+        I2CComms::addCommandToWriteBuffer(255);
+        I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_FADE_IN | 6);
+        I2CComms::addCommandToWriteBuffer(255);
+        I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_FADE_IN | 8);
+        I2CComms::addCommandToWriteBuffer(255);
+        I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_FINISH);
+    }
+    if (currentFrame == 1399) {
+        I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_FADE_IN | 1);
+        I2CComms::addCommandToWriteBuffer(255);
+        I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_FADE_IN | 3);
+        I2CComms::addCommandToWriteBuffer(255);
+        I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_FADE_IN | 5);
+        I2CComms::addCommandToWriteBuffer(255);
+        I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_FADE_IN | 7);
+        I2CComms::addCommandToWriteBuffer(255);
+        I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_FADE_IN | 9);
+        I2CComms::addCommandToWriteBuffer(255);
+        I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_FINISH);
     }
 
     ++currentFrame;

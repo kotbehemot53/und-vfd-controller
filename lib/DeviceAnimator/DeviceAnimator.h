@@ -4,7 +4,6 @@
 #include "DeviceAnimatorThread.h"
 #include "../AnimatorFailureListener/AnimatorFailureListenerInterface.h"
 
-
 class DeviceAnimator
 {
 private:

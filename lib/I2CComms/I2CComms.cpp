@@ -1,13 +1,48 @@
 #include "I2CComms.h"
 
-I2CComms Comms;
+#include <Wire.h>
 
-void I2CComms::init(byte addr, IV18Display display)
+byte* I2CComms::commandBuffers[2] = {new byte[I2CComms::COMMAND_BUFFER_LENGTH], new byte[I2CComms::COMMAND_BUFFER_LENGTH]};
+short I2CComms::commandCountsInBuffer[2] = {0,0};
+short I2CComms::readBufferRemainingCommandCount = 0;
+short I2CComms::currentWriteBuffer = 0;
+short I2CComms::currentReadBuffer = 1;
+
+//I2CComms Comms;
+void I2CComms::init(byte addr)
 {
-    // TODO
+    Wire.begin(addr);
+
+    Wire.onReceive(receiveEvent); // register event
 }
 
-void I2CComms::handleBufferedInput()
+void I2CComms::receiveEvent(int howMany)
 {
-    // TODO
+    // buffers all commands
+    while(Wire.available()) // loop through all
+    {
+        byte c = Wire.read(); // receive byte
+        addCommandToWriteBuffer(c);
+    }
+}
+
+byte I2CComms::getCommandFromReadBuffer()
+{
+    // returns next command and decrements the remaining command count
+    return commandBuffers[currentReadBuffer][commandCountsInBuffer[currentReadBuffer] - readBufferRemainingCommandCount--];
+}
+
+short I2CComms::getReadBufferRemainingCommandCount()
+{
+    return readBufferRemainingCommandCount;
+}
+
+void I2CComms::resetBuffers()
+{
+    // flip buffers to initialize next command series
+    short temp = currentWriteBuffer;
+    currentWriteBuffer = currentReadBuffer;
+    currentReadBuffer = temp;
+    commandCountsInBuffer[currentWriteBuffer] = 0;
+    readBufferRemainingCommandCount = commandCountsInBuffer[currentReadBuffer];
 }
