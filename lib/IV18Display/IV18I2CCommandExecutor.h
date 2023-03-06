@@ -15,7 +15,8 @@ public:
     static const byte CMD_ON = 0x11; //turn the lamps on
 
     static const byte CMD_INTRO_ON = 0x12; //turn the intro on
-    static const byte CMD_INTRO_OFF = 0x13; //turn the intro off
+    static const byte CMD_INTRO_OFF = 0x13; //turn the intro off, set max brightness
+    static const byte CMD_CLEAR = 0x14; //clear all chars, bytes & commas, set chars mode
 
     static const byte CMD_MULTI_FINISH = 0x20; // sets up the next frame with all commands gathered in the bunched buffer
 

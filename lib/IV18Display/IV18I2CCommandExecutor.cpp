@@ -115,6 +115,8 @@ void IV18I2CCommandExecutor::executeBunchedCommands(IV18Animator *animator)
 void IV18I2CCommandExecutor::executeCommand(IV18Animator* animator, byte command)
 {
     IV18Display* display = animator->getDisplay();
+    byte emptyBytes[IV18Display::DIGIT_STEPS_COUNT] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, 0x00};
+    bool emptyCommas[IV18Display::DIGIT_STEPS_COUNT] = {false,false,false,false,false,false,false,false,false};
 
     switch (command) {
         case CMD_OFF:
@@ -128,6 +130,21 @@ void IV18I2CCommandExecutor::executeCommand(IV18Animator* animator, byte command
             break;
         case CMD_INTRO_OFF:
             animator->disableSequencing();
+            animator->setCurrentLampDigitDutyValue(0, IV18Animator::LAMP_DIGIT_MAX_DUTY_US);
+            animator->setCurrentLampDigitDutyValue(1, IV18Animator::LAMP_DIGIT_MAX_DUTY_US);
+            animator->setCurrentLampDigitDutyValue(2, IV18Animator::LAMP_DIGIT_MAX_DUTY_US);
+            animator->setCurrentLampDigitDutyValue(3, IV18Animator::LAMP_DIGIT_MAX_DUTY_US);
+            animator->setCurrentLampDigitDutyValue(4, IV18Animator::LAMP_DIGIT_MAX_DUTY_US);
+            animator->setCurrentLampDigitDutyValue(5, IV18Animator::LAMP_DIGIT_MAX_DUTY_US);
+            animator->setCurrentLampDigitDutyValue(6, IV18Animator::LAMP_DIGIT_MAX_DUTY_US);
+            animator->setCurrentLampDigitDutyValue(7, IV18Animator::LAMP_DIGIT_MAX_DUTY_US);
+            animator->setCurrentLampDigitDutyValue(8, IV18Animator::LAMP_DIGIT_MAX_DUTY_US);
+            break;
+        case CMD_CLEAR:
+            display->setChars("         ");
+            display->setBytes(emptyBytes);
+            display->setCommas(emptyCommas);
+            display->setMode(IV18Display::MODE_CHARS);
             break;
         case CMD_MULTI_FINISH:
             IV18I2CCommandExecutor::executeBunchedCommands(animator);
