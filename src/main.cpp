@@ -9,9 +9,6 @@
 #include "../lib/AnimatorFailureListener/IV18AnimatorSerialFailureListener.h"
 #include "../lib/AnimatorFailureListener/IV18AnimatorLedFailureListener.h"
 
-// TODO: PWM brightness - special command + functions in IV18Display?
-// TODO: comms
-
 const byte I2C_ADDR = 0x5;
 
 IV18Animator* animator;
