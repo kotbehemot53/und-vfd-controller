@@ -23,6 +23,8 @@ public:
     static const short LAMP_DIGIT_PREPARE_MIN_DUTY_US = 150;
     static const short LAMP_DIGIT_MAX_DUTY_US = 961;
     static const short LAMP_DIGIT_CUTOUT_DUTY_US = 100;
+
+    static const unsigned short DEFAULT_LAMP_DIGIT_FRAMES_PER_CYCLE = 100;
 private:
     static const unsigned long LED_FRAME_LENGTH_US = 10000; // 1/100 s
 
@@ -39,15 +41,35 @@ private:
 //    static const unsigned short LAMP_GRID_FRAMES_PER_CYCLE = 75;
     // TODO: add setter for this to use via command
     //       recalculate lampGridFramesPerLongestCycle on set
-    unsigned short lampDigitFramesPerCycle[IV18Display::DIGIT_STEPS_COUNT] =
-        {100, 100, 100, 100, 100, 100, 100, 100, 100};
+    unsigned short lampDigitFramesPerCycle[IV18Display::DIGIT_STEPS_COUNT] = {
+        DEFAULT_LAMP_DIGIT_FRAMES_PER_CYCLE,
+        DEFAULT_LAMP_DIGIT_FRAMES_PER_CYCLE,
+        DEFAULT_LAMP_DIGIT_FRAMES_PER_CYCLE,
+        DEFAULT_LAMP_DIGIT_FRAMES_PER_CYCLE,
+        DEFAULT_LAMP_DIGIT_FRAMES_PER_CYCLE,
+        DEFAULT_LAMP_DIGIT_FRAMES_PER_CYCLE,
+        DEFAULT_LAMP_DIGIT_FRAMES_PER_CYCLE,
+        DEFAULT_LAMP_DIGIT_FRAMES_PER_CYCLE,
+        DEFAULT_LAMP_DIGIT_FRAMES_PER_CYCLE
+    };
 
     unsigned short lampDigitCurrentFrameInCycle[IV18Display::DIGIT_STEPS_COUNT] =
         {0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-    // TODO: add setter for this to use via command
-    // sets max duty cycle per lamp grid (permanent dimming)
-    // TODO: minus/dot duty cycle doesn't seem to work properly
+//    // holds previous frame duty cycle values for each digit (for reading)
+//    unsigned short lampDigitPreviousOnDutyUs[IV18Display::DIGIT_STEPS_COUNT] = {
+//        LAMP_DIGIT_MAX_DUTY_US,
+//        LAMP_DIGIT_MAX_DUTY_US,
+//        LAMP_DIGIT_MAX_DUTY_US,
+//        LAMP_DIGIT_MAX_DUTY_US,
+//        LAMP_DIGIT_MAX_DUTY_US,
+//        LAMP_DIGIT_MAX_DUTY_US,
+//        LAMP_DIGIT_MAX_DUTY_US,
+//        LAMP_DIGIT_MAX_DUTY_US,
+//        LAMP_DIGIT_MAX_DUTY_US
+//    };
+
+    // sets max duty cycle per lamp grid (permanent dimming) for fade-in/fade-out
     unsigned short lampDigitMaxOnDutyUs[IV18Display::DIGIT_STEPS_COUNT] = {
         LAMP_DIGIT_MAX_DUTY_US,
         LAMP_DIGIT_MAX_DUTY_US,
@@ -60,6 +82,7 @@ private:
         LAMP_DIGIT_MAX_DUTY_US
     };
 
+    // sets min duty cycle per lamp grid (permanent dimming) for fade-in/fade-out
     unsigned short lampDigitMinOffDutyUs[IV18Display::DIGIT_STEPS_COUNT] = {
         LAMP_DIGIT_CUTOUT_DUTY_US,
         LAMP_DIGIT_CUTOUT_DUTY_US,
@@ -128,14 +151,28 @@ public:
 
 //    void setLampDigitOnDutyValues(const unsigned short * values);
 
+    // TODO: maybe use this INSIDE the functions that require it?
+    /**
+     * Converts byte duty cycle (value from 0 to 255) to actual time in US required by
+     * setLampDigitAction() & setCurrentLampDigitValue()
+     *
+     * @param byte dutyCycle
+     * @return
+     */
+    inline static short convertDutyCycle(byte dutyCycle)
+    {
+        return LAMP_DIGIT_CUTOUT_DUTY_US + (dutyCycle/255.0 * (LAMP_DIGIT_MAX_DUTY_US - LAMP_DIGIT_CUTOUT_DUTY_US));
+    }
+
+    unsigned short getLampDigitPreviousOnDutyUs(byte lampGridNumber);
+
     void setCurrentLampDigitDutyValue(short lampGridNumber, unsigned short dutyValue);
-
     void setLampDigitAction(short lampDigitNumber, short action, unsigned short maxDutyValue = LAMP_DIGIT_MAX_DUTY_US, unsigned short minDutyValue = LAMP_DIGIT_CUTOUT_DUTY_US);
-
-    IV18Display* getDisplay();
-
+    void setLampDigitFramesPerAction(short lampDigitNumber, unsigned short lampDigitFramesPerAction = DEFAULT_LAMP_DIGIT_FRAMES_PER_CYCLE);
     void setSequencingCallback(void (*sequencingCallbackToSet)(IV18Animator*));
     void disableSequencing();
+
+    IV18Display* getDisplay();
 };
 
 #endif //PIUCNTVFD1_IV18ANIMATOR_H

@@ -157,6 +157,9 @@ void IV18Animator::animateLampDigitBrightnesses()
                 );
                 lampDigitThread->steps[j - 1].waitUs = frameLength - lampDigitThread->steps[j].waitUs;
 
+//                // record current duty cycle for reading
+//                lampDigitPreviousOnDutyUs[i] = lampDigitThread->steps[j].waitUs;
+
                 // digit frame counting
                 ++lampDigitCurrentFrameInCycle[i];
                 if (lampDigitCurrentFrameInCycle[i] >= lampDigitFramesPerCycle[i]) {
@@ -177,6 +180,9 @@ void IV18Animator::animateLampDigitBrightnesses()
                     LAMP_DIGIT_CUTOUT_DUTY_US
                 );
                 lampDigitThread->steps[j - 1].waitUs = frameLength - lampDigitThread->steps[j].waitUs;
+
+//                // record current duty cycle for reading
+//                lampDigitPreviousOnDutyUs[i] = lampDigitThread->steps[j].waitUs;
 
                 ++lampDigitCurrentFrameInCycle[i];
                 if (lampDigitCurrentFrameInCycle[i] >= lampDigitFramesPerCycle[i]) {
@@ -247,6 +253,9 @@ void IV18Animator::setCurrentLampDigitDutyValue(short lampGridNumber, unsigned s
     unsigned long frameLength = LAMP_DIGIT_MAX_DUTY_US + LAMP_DIGIT_PREPARE_MIN_DUTY_US;
     this->lampDigitThread->steps[2 * lampGridNumber + 1].waitUs = dutyValue;
     this->lampDigitThread->steps[2 * lampGridNumber].waitUs = frameLength - dutyValue;
+
+//    // record current duty cycle for reading
+//    lampDigitPreviousOnDutyUs[lampGridNumber] = dutyValue;
 }
 
 void IV18Animator::setLampDigitAction(
@@ -278,6 +287,18 @@ void IV18Animator::setSequencingCallback(void (*sequencingCallbackToSet)(IV18Ani
 void IV18Animator::disableSequencing()
 {
     sequencingEnabled = false;
+}
+
+unsigned short IV18Animator::getLampDigitPreviousOnDutyUs(byte lampGridNumber)
+{
+    // TODO: throw exception on unsupported index?
+    return this->lampDigitThread->steps[2 * lampGridNumber + 1].waitUs;
+//    return lampDigitPreviousOnDutyUs[lampGridNumber];
+}
+
+void IV18Animator::setLampDigitFramesPerAction(short lampDigitNumber, unsigned short lampDigitFramesPerAction)
+{
+    lampDigitFramesPerCycle[lampDigitNumber] = lampDigitFramesPerAction;
 }
 
 void IV18Animator::doFrame()

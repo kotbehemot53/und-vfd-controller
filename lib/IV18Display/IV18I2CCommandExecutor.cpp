@@ -2,25 +2,13 @@
 
 #include "../I2CComms/I2CComms.h"
 #include "IV18IntroSequencer.h"
+#include "IV18Display.h"
 
 short IV18I2CCommandExecutor::bunchedCommandsCount = 0;
 byte IV18I2CCommandExecutor::bunchedCommandsBuffer[IV18I2CCommandExecutor::BUNCHED_COMMANDS_BUFFER_LENGTH];
 
 void IV18I2CCommandExecutor::executeBufferedCommands(IV18Animator *animator, int sequenceNumber)
 {
-    // TODO
-    // TODO: buffer all commands that require a "FIN" to be executed (like setting chars, dimming, etc)
-    //       IN THE HIGH LEVEL self::bunchedCommandsBuffer NOT LOW LEVEL I2CComms buffer!
-    // TODO:
-    //       pseudocode:
-    //          1. I2CComms::resetBuffers()
-    //          2. read all buffered commands & react:
-    //              while (I2CComms::getReadBufferRemainingCommandCount()) {
-    //                  I2CComms::getCommandFromReadBuffer() ...
-    //              }
-    //          2.1. if command read is instantaneous (incl. FIN) - just do what needs to be done
-    //          2.3. if command read is bunchable - add it to bunched commands buffer
-
     I2CComms::resetBuffers();
 
     byte currentCommand;
@@ -35,13 +23,83 @@ void IV18I2CCommandExecutor::executeBufferedCommands(IV18Animator *animator, int
     }
 }
 
+void IV18I2CCommandExecutor::executeBunchedCommands(IV18Animator *animator)
+{
+    short lampDigitNumber;
+    byte commandByte;
+
+    bool setBytes = false;
+    bool setChars = false;
+    bool setCommas = false;
+
+    byte bytesBuffer[IV18Display::DIGIT_STEPS_COUNT] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+    char charsBuffer[IV18Display::DIGIT_STEPS_COUNT + 1] = "         ";
+    bool commasBuffer[IV18Display::DIGIT_STEPS_COUNT] = {false,false,false,false,false,false,false,false,false};
+
+    // TODO: throw exception/handle improper commands count (above buffer or not including supplementary commands with values?)
+    for (short i = 0; i < bunchedCommandsCount; ++i) {
+        commandByte = bunchedCommandsBuffer[i];
+        switch (commandByte & 0xF0) { //mask out the last 4 bits
+            case CMD_MULTI_DIGIT_CHAR:
+                setChars = true;
+                charsBuffer[commandByte & 0x0F] = (char) bunchedCommandsBuffer[++i];
+                break;
+            case CMD_MULTI_DIGIT_BYTE:
+                setBytes = true;
+                bytesBuffer[commandByte & 0x0F] = bunchedCommandsBuffer[++i];
+                break;
+            case CMD_MULTI_DIGIT_POINT_R:
+                setCommas = true;
+                commasBuffer[commandByte & 0x0F] = true;
+                break;
+            case CMD_MULTI_DIGIT_DIMMER:
+                animator->setCurrentLampDigitDutyValue(
+                    commandByte & 0x0F,
+                    IV18Animator::convertDutyCycle(bunchedCommandsBuffer[++i])
+                );
+                break;
+            case CMD_MULTI_DIGIT_FADE_IN:
+                lampDigitNumber = commandByte & 0x0F;
+                animator->setLampDigitAction(
+                    lampDigitNumber,
+                    IV18Animator::LAMP_DIGIT_IN,
+                    IV18Animator::convertDutyCycle(bunchedCommandsBuffer[++i]),
+                    animator->getLampDigitPreviousOnDutyUs(lampDigitNumber)
+                );
+                break;
+            case CMD_MULTI_DIGIT_FADE_OUT:
+                lampDigitNumber = commandByte & 0x0F;
+                animator->setLampDigitAction(
+                    lampDigitNumber,
+                    IV18Animator::LAMP_DIGIT_OUT,
+                    animator->getLampDigitPreviousOnDutyUs(lampDigitNumber),
+                    IV18Animator::convertDutyCycle(bunchedCommandsBuffer[++i])
+                );
+                break;
+            case CMD_MULTI_DIGIT_FADE_TIME:
+                animator->setLampDigitFramesPerAction(commandByte & 0x0F, bunchedCommandsBuffer[++i]);
+                break;
+            default:
+                // TODO: throw exception for unsupported commands?
+                break;
+        }
+    }
+
+    IV18Display* display = animator->getDisplay();
+    if (setBytes) {
+        display->setBytes(bytesBuffer);
+    }
+    if (setChars) {
+        display->setChars(charsBuffer);
+    }
+    if (setCommas) {
+        display->setCommas(commasBuffer);
+    }
+}
+
 void IV18I2CCommandExecutor::executeCommand(IV18Animator* animator, byte command)
 {
     IV18Display* display = animator->getDisplay();
-
-//    if (command == CMD_OFF) {
-//        display->off();
-//    }
 
     switch (command) {
         case CMD_OFF:
@@ -56,7 +114,12 @@ void IV18I2CCommandExecutor::executeCommand(IV18Animator* animator, byte command
         case CMD_INTRO_OFF:
             animator->disableSequencing();
             break;
-        // TODO...
+        case CMD_MULTI_FINISH:
+            IV18I2CCommandExecutor::executeBunchedCommands(animator);
+            break;
+        default:
+            // TODO: throw exception for unsupported commands?
+            break;
     }
 }
 

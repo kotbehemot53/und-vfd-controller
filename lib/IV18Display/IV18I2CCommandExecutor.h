@@ -20,9 +20,6 @@ public:
     static const byte CMD_MULTI_FINISH = 0x20; // sets up the next frame with all commands gathered in the bunched buffer
 
     // bunchable commands
-    // TODO: maybe set duty cycle by separate byte for more precision?
-    //       DECISION: yes
-    static const byte CMD_MULTI_DIGIT_DIMMER = 0x60; // the FOLLOWING byte sets the duty cycle; last 4 bits determine which digit
     // TODO: do we want to set only chosen digits and retain old ones? or always set all 9? taking dimmer into account,
     //       maybe always set all or reset unset digits to space
     //       DECISION: reset unset ones to space (on FIN)
@@ -31,12 +28,14 @@ public:
     // TODO: do we want to reset commas every frame? or retain old commas and define a separate command to turn them off?
     //       DECISION: reset unset ones to no comma (on FIN)
     static const byte CMD_MULTI_DIGIT_POINT_R = 0xF0; // last 4 bits determine which right comma should be on
+    static const byte CMD_MULTI_DIGIT_DIMMER = 0x60; // the FOLLOWING byte sets the duty cycle; last 4 bits determine which digit
     static const byte CMD_MULTI_DIGIT_FADE_IN = 0xA0; // the FOLLOWING byte sets target duty cycle; last 4 bits determine which digit
     static const byte CMD_MULTI_DIGIT_FADE_OUT = 0xB0; // the FOLLOWING byte sets target duty cycle; last 4 bits determine which digit
+    static const byte CMD_MULTI_DIGIT_FADE_TIME = 0xC0; // the FOLLOWING byte sets target duration in frames; last 4 bits determine which digit
 
 private:
-    static const short BUNCHED_COMMANDS_BUFFER_LENGTH = 128;
-    static const short BUNCHABLE_COMMANDS_COUNT = 6;
+    static const short BUNCHED_COMMANDS_BUFFER_LENGTH = 1024;
+    static const short BUNCHABLE_COMMANDS_COUNT = 7;
 
     // CMD_MULTI_FINISH not included - it acts immediately by dispatching all the bunched commands
     static constexpr byte BUNCHABLE_COMMANDS[BUNCHABLE_COMMANDS_COUNT] = {
@@ -45,7 +44,8 @@ private:
         CMD_MULTI_DIGIT_BYTE,
         CMD_MULTI_DIGIT_POINT_R,
         CMD_MULTI_DIGIT_FADE_IN,
-        CMD_MULTI_DIGIT_FADE_OUT
+        CMD_MULTI_DIGIT_FADE_OUT,
+        CMD_MULTI_DIGIT_FADE_TIME
     };
 
     static byte bunchedCommandsBuffer[BUNCHED_COMMANDS_BUFFER_LENGTH];
@@ -72,6 +72,8 @@ private:
     }
 
     static void executeCommand(IV18Animator* animator, byte command);
+
+    static void executeBunchedCommands(IV18Animator* animator);
 
 public:
     // TODO: check if it's actually sufficient (no undertimes in typical scenarios, no led of course)

@@ -80,6 +80,12 @@ void setup()
 
     // run intro in the beginning
     I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_INTRO_ON);
+
+    // debug
+//    Serial.println(IV18Animator::convertDutyCycle(0));
+//    Serial.println(IV18Animator::convertDutyCycle(100));
+//    Serial.println(IV18Animator::convertDutyCycle(128));
+//    Serial.println(IV18Animator::convertDutyCycle(255));
 }
 
 void loop()
