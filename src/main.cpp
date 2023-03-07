@@ -57,6 +57,8 @@ void loop()
     }
 
     if (currentFrame == 1299) {
+        I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_FADE_IN | 0);
+        I2CComms::addCommandToWriteBuffer(255);
         I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_FADE_IN | 2);
         I2CComms::addCommandToWriteBuffer(255);
         I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_FADE_IN | 4);
@@ -69,15 +71,17 @@ void loop()
     }
     if (currentFrame == 1399) {
         I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_FADE_IN | 1);
-        I2CComms::addCommandToWriteBuffer(255);
+        I2CComms::addCommandToWriteBuffer(1);
         I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_FADE_IN | 3);
-        I2CComms::addCommandToWriteBuffer(255);
+        I2CComms::addCommandToWriteBuffer(1);
         I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_FADE_IN | 5);
-        I2CComms::addCommandToWriteBuffer(255);
+        I2CComms::addCommandToWriteBuffer(1);
         I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_FADE_IN | 7);
-        I2CComms::addCommandToWriteBuffer(255);
-        I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_FADE_IN | 9);
-        I2CComms::addCommandToWriteBuffer(255);
+        I2CComms::addCommandToWriteBuffer(1);
+
+        // TODO: this caused accidental simultaneous FADE_INs (9 covers all digits) and all hell broke loose
+//        I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_FADE_IN | 9);
+//        I2CComms::addCommandToWriteBuffer(25);
         I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_FINISH);
     }
 
