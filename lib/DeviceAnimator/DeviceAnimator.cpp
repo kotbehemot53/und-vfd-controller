@@ -96,7 +96,7 @@ void DeviceAnimator::doFrame()
         }
 
         preExecTimeUs = micros();
-        stepsMerged[i]->callback(stepsMerged[i]->devicePtr, stepsMerged[i]->sequenceNumber);
+        stepsMerged[i]->runCallback();
         postExecTimeUs = micros();
         execTimeDiffUs = postExecTimeUs >= preExecTimeUs ? postExecTimeUs - preExecTimeUs + EXEC_TIME_OVERHEAD_US : 0;
 

@@ -4,7 +4,6 @@
 #include "../lib/I2CComms/I2CComms.h"
 #include "../lib/IV18Display/IV18Animator.h"
 #include "../lib/AnimatorFailureListener/IV18AnimatorSerialFailureListener.h"
-#include "../lib/AnimatorFailureListener/IV18AnimatorLedFailureListener.h"
 
 const byte I2C_ADDR = 0x5;
 
