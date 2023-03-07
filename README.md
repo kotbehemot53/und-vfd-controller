@@ -32,5 +32,3 @@ TODO
 
 - add CMakeLists.txt to git?
 - make a fresh platformio deployment instruction;
-- cleanup main.cpp for production;
-- get rid of the smooth heartbeat (to avoid animation clashes)?
