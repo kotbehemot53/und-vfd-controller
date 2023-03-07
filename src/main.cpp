@@ -21,8 +21,7 @@ void setup()
     animator = new IV18Animator(&Display);
     I2CComms::init(I2C_ADDR);
 
-    // TODO: use these for animation timing debug
-//    animatorFailureListener = new IV18AnimatorLedFailureListener(animator);
+    // TODO: use this for animation timing debug
 //    animatorFailureListener = new IV18AnimatorSerialFailureListener(animator);
 
     // TODO: enable it by command, not here! Or disable by command?

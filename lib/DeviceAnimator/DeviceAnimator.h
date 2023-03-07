@@ -4,6 +4,14 @@
 #include "DeviceAnimatorThread.h"
 #include "../AnimatorFailureListener/AnimatorFailureListenerInterface.h"
 
+/**
+ * A generic device animation planner/executor. It's initialised with a number of parallel animation threads
+ * consisting of animation steps.
+ * It merges all threads into a single thread and runs the steps in the appropriate sequence, maintaning intended
+ * step durations.
+ *
+ * Caution: "undertimes" may occur, when 2 steps have too little time planned between them to run them.
+ */
 class DeviceAnimator
 {
 private:
@@ -35,7 +43,7 @@ public:
     void setFailureListener(AnimatorFailureListenerInterface* failureListener);
 
     /**
-     * Animate a frame.
+     * Animate a frame (perform all steps from all threads in the correct order, for the correct time).
      */
     void doFrame();
 };

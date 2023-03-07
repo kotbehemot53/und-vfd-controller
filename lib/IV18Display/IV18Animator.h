@@ -8,8 +8,9 @@
 #include "IV18Display.h"
 
 /**
- * Main animator class for the display. Animates the digits and the status LED. Can run intros, fade digits in and out.
+ * Main animator class for the IV18Display. Animates the digits and the status LED. Can run intros, fade digits in and out.
  * Governs each frame of the main loop.
+ * It uses the DeviceAnimator internally to perform the animation on the concrete display.
  */
 class IV18Animator
 {
@@ -121,7 +122,7 @@ public:
     explicit IV18Animator(IV18Display* display);
 
     /**
-     * Sets a listener to notify when there's an undertime in the animation
+     * Sets a listener to notify when there's an undertime in the animation. Attaches it to the nested DeviceAnimator.
      *
      * @param failureListener
      */

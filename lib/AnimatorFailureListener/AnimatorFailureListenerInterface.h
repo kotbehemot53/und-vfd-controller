@@ -1,13 +1,13 @@
 #ifndef PIUCNTVFD1_ANIMATORFAILURELISTENERINTERFACE_H
 #define PIUCNTVFD1_ANIMATORFAILURELISTENERINTERFACE_H
 
-
+/**
+ * A generic interface for failure listeners that can be notified of DeviceAnimator undertimes.
+ */
 class AnimatorFailureListenerInterface
 {
 public:
-    static const short WARNING_UNDERTIME = 0;
-
-    virtual void failureWarning(short warningCode, unsigned long expectedTime, unsigned long actualTime) = 0;
+    virtual void undertimeFailureWarning(unsigned long expectedTime, unsigned long actualTime) = 0;
 };
 
 

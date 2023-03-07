@@ -56,7 +56,7 @@ void DeviceAnimator::initFrame()
         unsigned long currentPointInTimeInThreadUs = 0;
         for (int j = 0; j < threads[i].numberOfSteps; ++j) {
             threads[i].steps[j].timeWithinFrameUs = currentPointInTimeInThreadUs;
-            currentPointInTimeInThreadUs += threads[i].steps[j].waitUs;
+            currentPointInTimeInThreadUs += threads[i].steps[j].runningTimeUs;
 
             if (currentPointInTimeInThreadUs > frameEndTimeUs) {
                 frameEndTimeUs = currentPointInTimeInThreadUs;
@@ -91,7 +91,7 @@ void DeviceAnimator::doFrame()
 
     for (int i = 0; i < totalSteps; ++i) {
         // omit steps that should take 0 time
-        if (stepsMerged[i]->waitUs <= 0) {
+        if (stepsMerged[i]->runningTimeUs <= 0) {
             continue;
         }
 
@@ -109,8 +109,7 @@ void DeviceAnimator::doFrame()
             lastFrameCummulativeUndertime += execTimeDiffUs - stepsMerged[i]->timeToNextMergedStepUs;
 //            Serial.println(lastFrameCummulativeUndertime, DEC);
             if (hasFailureListener) {
-                this->failureListener->failureWarning(
-                    AnimatorFailureListenerInterface::WARNING_UNDERTIME,
+                this->failureListener->undertimeFailureWarning(
                     stepsMerged[i]->timeToNextMergedStepUs,
                     execTimeDiffUs
                 );

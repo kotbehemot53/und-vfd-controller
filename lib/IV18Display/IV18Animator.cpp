@@ -23,7 +23,7 @@ IV18Animator::IV18Animator(IV18Display* display)
     // TODO: these cause undertime - due to collision with lampDigitSteps
     //       think about rectangular heartbeat with a non-colliding offsets instead
     auto heartbeatSteps = new DeviceAnimatorStep[2]{
-        // waitUs values will be overriden on every frame by animateStatusLED
+        // runningTimeUs values will be overriden on every frame by animateStatusLED
         DeviceAnimatorStep(this, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::statusOn), 5000),
         DeviceAnimatorStep(this, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::statusOff), 5000)
     };
@@ -103,7 +103,7 @@ void IV18Animator::animateLampDigitBrightnesses()
             case LAMP_DIGIT_STATIC:
                 break;
             case LAMP_DIGIT_IN:
-                lampDigitThread->steps[j].waitUs = SinusoidalDutyCycleGenerator::animateSinusoidalDutyCycle(
+                lampDigitThread->steps[j].runningTimeUs = SinusoidalDutyCycleGenerator::animateSinusoidalDutyCycle(
                     lampDigitMinOffDutyUs[i],
                     lampDigitMaxOnDutyUs[i],
                     frameLength,
@@ -113,7 +113,7 @@ void IV18Animator::animateLampDigitBrightnesses()
                     true,
                     LAMP_DIGIT_CUTOUT_DUTY_US
                 );
-                lampDigitThread->steps[j - 1].waitUs = frameLength - lampDigitThread->steps[j].waitUs;
+                lampDigitThread->steps[j - 1].runningTimeUs = frameLength - lampDigitThread->steps[j].runningTimeUs;
 
                 // digit frame counting
                 ++lampDigitCurrentFrameInCycle[i];
@@ -124,7 +124,7 @@ void IV18Animator::animateLampDigitBrightnesses()
                 }
                 break;
             case LAMP_DIGIT_OUT:
-                lampDigitThread->steps[j].waitUs = SinusoidalDutyCycleGenerator::animateSinusoidalDutyCycle(
+                lampDigitThread->steps[j].runningTimeUs = SinusoidalDutyCycleGenerator::animateSinusoidalDutyCycle(
                     lampDigitMinOffDutyUs[i],
                     lampDigitMaxOnDutyUs[i],
                     frameLength,
@@ -134,7 +134,7 @@ void IV18Animator::animateLampDigitBrightnesses()
                     false,
                     LAMP_DIGIT_CUTOUT_DUTY_US
                 );
-                lampDigitThread->steps[j - 1].waitUs = frameLength - lampDigitThread->steps[j].waitUs;
+                lampDigitThread->steps[j - 1].runningTimeUs = frameLength - lampDigitThread->steps[j].runningTimeUs;
 
                 ++lampDigitCurrentFrameInCycle[i];
                 if (lampDigitCurrentFrameInCycle[i] >= lampDigitFramesPerCycle[i]) {
@@ -149,22 +149,22 @@ void IV18Animator::animateLampDigitBrightnesses()
 
 void IV18Animator::animateStatusLED()
 {
-    // TODO: maybe make a waitUs setter, only getters for the rest and make them private?
+    // TODO: maybe make a runningTimeUs setter, only getters for the rest and make them private?
     if (ledAction < LED_SINUS_MODES_COUNT) {
-        statusLedThread->steps[0].waitUs = SinusoidalDutyCycleGenerator::animateSinusoidalDutyCycle(
+        statusLedThread->steps[0].runningTimeUs = SinusoidalDutyCycleGenerator::animateSinusoidalDutyCycle(
             LED_MIN_DUTY_US[ledAction],
             LED_MAX_DUTY_US[ledAction],
             LED_FRAME_LENGTH_US,
             ledCurrentFrame,
             LED_FRAMES_PER_CYCLE[ledAction]
         );
-        statusLedThread->steps[1].waitUs = LED_FRAME_LENGTH_US - statusLedThread->steps[0].waitUs;
+        statusLedThread->steps[1].runningTimeUs = LED_FRAME_LENGTH_US - statusLedThread->steps[0].runningTimeUs;
     } else {
         if (ledAction == LED_KILL) {
             // TODO: implement actual total kills somehow? omittable threads?
             // can't set it to 0 now, because of potential undertime
-            statusLedThread->steps[0].waitUs = 200;
-            statusLedThread->steps[1].waitUs = 8800;
+            statusLedThread->steps[0].runningTimeUs = 200;
+            statusLedThread->steps[1].runningTimeUs = 8800;
         }
     }
 }
@@ -194,8 +194,8 @@ void IV18Animator::setCurrentLampDigitDutyValue(short lampDigitNumber, unsigned 
 {
     // TODO: calculate it in constructor?
     unsigned long frameLength = LAMP_DIGIT_MAX_DUTY_US + LAMP_DIGIT_PREPARE_MIN_DUTY_US;
-    this->lampDigitThread->steps[2 * lampDigitNumber + 1].waitUs = dutyValue;
-    this->lampDigitThread->steps[2 * lampDigitNumber].waitUs = frameLength - dutyValue;
+    this->lampDigitThread->steps[2 * lampDigitNumber + 1].runningTimeUs = dutyValue;
+    this->lampDigitThread->steps[2 * lampDigitNumber].runningTimeUs = frameLength - dutyValue;
 }
 
 void IV18Animator::setLampDigitAction(
@@ -232,7 +232,7 @@ void IV18Animator::disableSequencing()
 unsigned short IV18Animator::getLampDigitPreviousOnDutyUs(byte lampDigitNumber)
 {
     // TODO: throw exception on unsupported index?
-    return this->lampDigitThread->steps[2 * lampDigitNumber + 1].waitUs;
+    return this->lampDigitThread->steps[2 * lampDigitNumber + 1].runningTimeUs;
 }
 
 void IV18Animator::setLampDigitFramesPerAction(short lampDigitNumber, unsigned short lampDigitFramesPerAction)
