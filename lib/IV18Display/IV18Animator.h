@@ -7,6 +7,9 @@
 #include "IV18I2CCommandExecutor.h"
 #include "IV18Display.h"
 
+/**
+ * Main animator class for the display. Animates the digits and the status LED. Can run intros, fade digits in and out.
+ */
 class IV18Animator
 {
 public:
@@ -98,7 +101,6 @@ private:
 
     // TODO: how to make it static and initialize it? preprocessor?
     unsigned short ledFramesPerLongestCycle;
-//    unsigned short lampGridFramesPerLongestCycle;
 
     DeviceAnimatorThread* threads;
 
@@ -111,48 +113,108 @@ private:
     void animateStatusLED();
     void decreaseWarningBleeps();
 
-    // TODO: do we need this silliness?
-//    unsigned short randomLampGridOrder[IV18Display::DIGIT_STEPS_COUNT] = {1, 3, 5, 7, 9, 11, 13, 15, 17};
-//    unsigned short lampCycleNumber = 0;
-//    static int randomCompare(const void *cmp1, const void *cmp2);
-//    static void shuffleArray(unsigned short * array, int size);
-
     void animateLampDigitBrightnesses();
 
 public:
 
     explicit IV18Animator(IV18Display* display);
 
+    /**
+     * Sets a listener to notify when there's an undertime in the animation
+     *
+     * @param failureListener
+     */
     void setFailureListener(AnimatorFailureListenerInterface* failureListener);
 
+    /**
+     * Runs a warning animation on the status LED.
+     *
+     * @param bleepsCount How many bleeps?
+     */
     void doWarning(short bleepsCount = 10);
-    void doKillLED();
-    void doFrame();
-    void doCurrentSequencing();
 
-//    void setLampDigitOnDutyValues(const unsigned short * values);
+    /**
+     * Dim the status LED.
+     */
+    void doKillLED();
+
+    /**
+     * Do a frame of the current animation.
+     */
+    void doFrame();
+
+    /**
+     * Do current sequencing (based on the current sequencingCallback set). Prepares a sequence for a following set of frames.
+     * It may be used for intros and other complex animations.
+     */
+    void doCurrentSequencing();
 
     // TODO: maybe use this INSIDE the functions that require it?
     /**
      * Converts byte duty cycle (value from 0 to 255) to actual time in US required by
      * setLampDigitAction() & setCurrentLampDigitValue()
      *
-     * @param byte dutyCycle
-     * @return
+     * @param byte dutyCycle A value between 0 and 255
+     * @return short On-duty time in microseconds.
      */
     inline static short convertDutyCycle(byte dutyCycle)
     {
         return LAMP_DIGIT_CUTOUT_DUTY_US + (dutyCycle/255.0 * (LAMP_DIGIT_MAX_DUTY_US - LAMP_DIGIT_CUTOUT_DUTY_US));
     }
 
-    unsigned short getLampDigitPreviousOnDutyUs(byte lampGridNumber);
+    /**
+     * Get the on-duty time for the previous frame, for a given digit.
+     *
+     * @param lampDigitNumber
+     *
+     * @return Number of microseconds
+     */
+    unsigned short getLampDigitPreviousOnDutyUs(byte lampDigitNumber);
 
-    void setCurrentLampDigitDutyValue(short lampGridNumber, unsigned short dutyValue);
+    /**
+     * Set the on-duty time for a given digit.
+     *
+     * @param lampDigitNumber
+     *
+     * @param dutyValue Time in microseconds
+     */
+    void setCurrentLampDigitDutyValue(short lampDigitNumber, unsigned short dutyValue);
+
+    /**
+     * Set the action for a lamp digit.
+     *
+     * @param lampDigitNumber
+     * @param action the action; set to one of: LAMP_DIGIT_STATIC (static shine), LAMP_DIGIT_IN (fade-in), LAMP_DIGIT_OUT (fade-out).
+     * @param maxDutyValue Max on-duty time for the given action (in microseconds).
+     * @param minDutyValue Min on-duty time for the given action (in microseconds).
+     */
     void setLampDigitAction(short lampDigitNumber, short action, unsigned short maxDutyValue = LAMP_DIGIT_MAX_DUTY_US, unsigned short minDutyValue = LAMP_DIGIT_CUTOUT_DUTY_US);
+
+    /**
+     * Set the number of frames for the current action on a given digit.
+     *
+     * @param lampDigitNumber
+     * @param lampDigitFramesPerAction How many frames should the current action take (works for fade-in and fade-out).
+     */
     void setLampDigitFramesPerAction(short lampDigitNumber, unsigned short lampDigitFramesPerAction = DEFAULT_LAMP_DIGIT_FRAMES_PER_CYCLE);
+
+    /**
+     * Sets the current sequencing callback (see doCurrentSequencing). Can be used for intros and other complex animations.
+     *
+     * @param sequencingCallbackToSet
+     */
     void setSequencingCallback(void (*sequencingCallbackToSet)(IV18Animator*));
+
+    /**
+     * Disables sequencing (see doCurrentSequencing).
+     */
     void disableSequencing();
 
+    /**
+     * Returns the display object pointer.
+     *
+     * @return IV18Display*
+     */
     IV18Display* getDisplay();
 };
 

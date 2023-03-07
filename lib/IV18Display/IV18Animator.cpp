@@ -1,19 +1,5 @@
 #include "IV18Animator.h"
 
-// TODO: do we need this silliness?
-//void IV18Animator::shuffleArray(unsigned short * array, int size)
-//{
-//    int last = 0;
-//    unsigned short temp = array[last];
-//    for (int i = 0; i < size; ++i)
-//    {
-//        int index = random(size);
-//        array[last] = array[index];
-//        last = index;
-//    }
-//    array[last] = temp;
-//}
-
 IV18Animator::IV18Animator(IV18Display* display)
 {
     this->display = display;
@@ -95,10 +81,6 @@ IV18Animator::IV18Animator(IV18Display* display)
     lampDigitThread = &(threads[1]);
 
     animator.setThreads(threads, 2);
-
-    // TODO: do we need this silliness?
-//    randomSeed(analogRead(A2));
-//    shuffleArray(randomLampGridOrder, IV18Display::DIGIT_STEPS_COUNT);
 }
 
 IV18Display* IV18Animator::getDisplay()
@@ -110,30 +92,6 @@ void IV18Animator::setFailureListener(AnimatorFailureListenerInterface *failureL
 {
     animator.setFailureListener(failureListener);
 }
-
-// TODO: do we need this silliness?
-/**
- * This is just a silly animation of the grids
- */
-//void IV18Animator::animateLampDigitBrightnesses()
-//{
-//    // TODO: add more animations/effects based on a state property
-//
-//    unsigned short j;
-//
-//    // 4 just because
-//    for (short i = 0; i < 4; ++i) {
-//        j = randomLampGridOrder[i];
-//        lampDigitThread->steps[j].waitUs = SinusoidalDutyCycleGenerator::animateSinusoidalDutyCycle(
-//            10,
-//            LAMP_DIGIT_MAX_DUTY_US,
-//            LAMP_DIGIT_MAX_DUTY_US + LAMP_DIGIT_PREPARE_MIN_DUTY_US,
-//            ledCurrentFrame + 30 * i, // just because TODO: add some randomness?
-//            LAMP_GRID_FRAMES_PER_CYCLE // just because
-//        );
-//        lampDigitThread->steps[j-1].waitUs = LAMP_DIGIT_MAX_DUTY_US + LAMP_DIGIT_PREPARE_MIN_DUTY_US - lampDigitThread->steps[i].waitUs;
-//    }
-//}
 
 void IV18Animator::animateLampDigitBrightnesses()
 {
@@ -211,8 +169,6 @@ void IV18Animator::animateStatusLED()
     }
 }
 
-//void IV18Animator::animate
-
 void IV18Animator::doWarning(short bleepsCount)
 {
     ledAction = LED_WARNING;
@@ -234,19 +190,12 @@ void IV18Animator::decreaseWarningBleeps()
     }
 }
 
-//void IV18Animator::setLampGridOnDutyValues(const unsigned short *values)
-//{
-//    for (short i = 0; i < IV18Display::DIGIT_STEPS_COUNT; ++i) {
-//        this->lampDigitMaxOnDutyUs[i] = values[i];
-//    }
-//}
-
-void IV18Animator::setCurrentLampDigitDutyValue(short lampGridNumber, unsigned short dutyValue)
+void IV18Animator::setCurrentLampDigitDutyValue(short lampDigitNumber, unsigned short dutyValue)
 {
     // TODO: calculate it in constructor?
     unsigned long frameLength = LAMP_DIGIT_MAX_DUTY_US + LAMP_DIGIT_PREPARE_MIN_DUTY_US;
-    this->lampDigitThread->steps[2 * lampGridNumber + 1].waitUs = dutyValue;
-    this->lampDigitThread->steps[2 * lampGridNumber].waitUs = frameLength - dutyValue;
+    this->lampDigitThread->steps[2 * lampDigitNumber + 1].waitUs = dutyValue;
+    this->lampDigitThread->steps[2 * lampDigitNumber].waitUs = frameLength - dutyValue;
 }
 
 void IV18Animator::setLampDigitAction(
@@ -280,10 +229,10 @@ void IV18Animator::disableSequencing()
     sequencingEnabled = false;
 }
 
-unsigned short IV18Animator::getLampDigitPreviousOnDutyUs(byte lampGridNumber)
+unsigned short IV18Animator::getLampDigitPreviousOnDutyUs(byte lampDigitNumber)
 {
     // TODO: throw exception on unsupported index?
-    return this->lampDigitThread->steps[2 * lampGridNumber + 1].waitUs;
+    return this->lampDigitThread->steps[2 * lampDigitNumber + 1].waitUs;
 }
 
 void IV18Animator::setLampDigitFramesPerAction(short lampDigitNumber, unsigned short lampDigitFramesPerAction)
