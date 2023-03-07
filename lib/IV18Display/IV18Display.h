@@ -3,13 +3,16 @@
 
 #include <Arduino.h>
 
+/**
+ * Low level control of the display.
+ */
 class IV18Display
 {
 public:
-    static const int DIGIT_STEPS_COUNT = 9; //main grids + dot/minus
-    static const byte MODE_CHARS = 0;
-    static const byte MODE_BYTES = 1;
-    static const int GRID9_COOLDOWN_US = 100;
+    static const int DIGIT_STEPS_COUNT = 9; // main grids + dot/minus
+    static const byte MODE_CHARS = 0; // display chars from their buffer
+    static const byte MODE_BYTES = 1; // display raw bytes from their buffer
+    static const int GRID9_COOLDOWN_US = 100; // how long cooldown grid9 needs to avoid ghosting (it's separately multiplexed)
 
 private:
     // grids/subframes count
@@ -101,22 +104,89 @@ private:
 public:
     IV18Display();
 
+    /**
+     * Turns the display on
+     */
     static void on();
+
+    /**
+     * Turns the display off
+     */
     static void off();
+
+    /**
+     * Checks if display is on
+     * @return bool
+     */
     static bool isOn();
+
+    /**
+     * Sets the status LED to on
+     */
     static void statusOn();
+
+    /**
+     * Sets the status LED to off
+     */
     static void statusOff();
 
+    /**
+     * Lights up segments for a given digit, depending on current display mode (char or byte). Also turns on commas.
+     *
+     * @param sequenceNumber Digit number (counting from the right)
+     */
     void prepareDigitSegments(int sequenceNumber);
+
+    /**
+     * Clears all segments
+     */
     static void clearChar();
+
+    /**
+     * Lights up the next digit grid in the multiplexing cycle.
+     *
+     * @param isFirst Whether it's the first cycle (sends a new "1" to the shift register).
+     */
     static void multiplexViaShiftRegister(bool isFirst = false);
+
+    /**
+     * Turns grid 9 off (it must be multiplexed separately)
+     */
     static void Grid9Off();
+
+    /**
+     * Turns grid 9 on (it must be multiplexed separately)
+     *
+     * @param isGrid9
+     */
     static void Grid9OnWhenNeeded(bool isGrid9 = false);
 
-    // TODO: remember to append first empty value to those passed or introduce the empty frame otherwise
+    /**
+     * Sets current bytes (for byte display mode). It copies values from given source to the device's own buffer.
+     *
+     * @param bytesBuffer Source buffer (values are copied from there)
+     */
     void setBytes(byte* bytesBuffer);
+
+    /**
+     * Sets current chars (for char display mode). It copies values from given source to the device's own buffer.
+     *
+     * @param charsBuffer Source buffer (values are copied from there)
+     */
     void setChars(char const *charsBuffer);
+
+    /**
+     * Sets current commas. It copies values from given source to the device's own buffer.
+     *
+     * @param commasBuffer Source buffer (values are copied from there)
+     */
     void setCommas(bool* commasBuffer);
+
+    /**
+     * Display mode (use MODE_BYTES or MODE_CHARS).
+     *
+     * @param mode
+     */
     void setMode(byte mode);
 };
 

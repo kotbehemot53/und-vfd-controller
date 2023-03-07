@@ -106,13 +106,11 @@ void IV18Display::prepareDigitSegments(int sequenceNumber)
 
 void IV18Display::on()
 {
-//    Serial.println("Turning on");
     digitalWrite(HV_ENABLE, HIGH);
 }
 
 void IV18Display::off()
 {
-//    Serial.println("Turning off");
     digitalWrite(HV_ENABLE, LOW);
 }
 
