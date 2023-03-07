@@ -97,7 +97,7 @@ void IV18I2CCommandExecutor::executeBunchedCommands(IV18Animator *animator)
                     for (short j = 0; j < IV18Display::DIGIT_STEPS_COUNT; ++j) {
                         animator->setLampDigitAction(
                             j,
-                            IV18Animator::LAMP_DIGIT_IN,
+                            IV18Animator::LAMP_MODE_DIGIT_IN,
                             IV18Animator::convertDutyCycle(bunchedCommandsBuffer[i]),
                             animator->getLampDigitPreviousOnDutyUs(j)
                         );
@@ -105,7 +105,7 @@ void IV18I2CCommandExecutor::executeBunchedCommands(IV18Animator *animator)
                 } else {
                     animator->setLampDigitAction(
                         indexHalfByte,
-                        IV18Animator::LAMP_DIGIT_IN,
+                        IV18Animator::LAMP_MODE_DIGIT_IN,
                         IV18Animator::convertDutyCycle(bunchedCommandsBuffer[++i]),
                         animator->getLampDigitPreviousOnDutyUs(indexHalfByte)
                     );
@@ -117,7 +117,7 @@ void IV18I2CCommandExecutor::executeBunchedCommands(IV18Animator *animator)
                     for (short j = 0; j < IV18Display::DIGIT_STEPS_COUNT; ++j) {
                         animator->setLampDigitAction(
                             j,
-                            IV18Animator::LAMP_DIGIT_OUT,
+                            IV18Animator::LAMP_MODE_DIGIT_OUT,
                             animator->getLampDigitPreviousOnDutyUs(j),
                             IV18Animator::convertDutyCycle(bunchedCommandsBuffer[i])
                         );
@@ -125,7 +125,7 @@ void IV18I2CCommandExecutor::executeBunchedCommands(IV18Animator *animator)
                 } else {
                     animator->setLampDigitAction(
                         indexHalfByte,
-                        IV18Animator::LAMP_DIGIT_OUT,
+                        IV18Animator::LAMP_MODE_DIGIT_OUT,
                         animator->getLampDigitPreviousOnDutyUs(indexHalfByte),
                         IV18Animator::convertDutyCycle(bunchedCommandsBuffer[++i])
                     );
@@ -172,6 +172,7 @@ void IV18I2CCommandExecutor::executeBunchedCommands(IV18Animator *animator)
 void IV18I2CCommandExecutor::executeCommand(IV18Animator* animator, byte command)
 {
     IV18Display* display = animator->getDisplay();
+    short ledMode;
 
     switch (command) {
         case CMD_OFF:
@@ -188,6 +189,15 @@ void IV18I2CCommandExecutor::executeCommand(IV18Animator* animator, byte command
             break;
         case CMD_MULTI_FINISH:
             IV18I2CCommandExecutor::executeBunchedCommands(animator);
+            break;
+        case CMD_STATUS_LED_MODE | IV18Animator::LED_MODE_HEARTBEAT:
+        case CMD_STATUS_LED_MODE | IV18Animator::LED_MODE_SQUARE_HEARTBEAT:
+        case CMD_STATUS_LED_MODE | IV18Animator::LED_MODE_DIM:
+            ledMode = command & 0x0F;
+            animator->setLEDMode(ledMode);
+            break;
+        case CMD_STATUS_LED_MODE | IV18Animator::LED_MODE_WARNING:
+            animator->setLEDModeWarning(8);
             break;
         default:
             // TODO: throw exception for unsupported commands?
