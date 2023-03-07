@@ -14,13 +14,15 @@ class IV18I2CCommandExecutor
 {
 public:
     // instant commands
-    static const byte CMD_OFF = 0x10; //turn the lamps off
-    static const byte CMD_ON = 0x11; //turn the lamps on
+    static const byte CMD_OFF = 0x10; // turn the lamps off
+    static const byte CMD_ON = 0x11; // turn the lamps on
 
-    static const byte CMD_INTRO_ON = 0x12; //turn the intro on
-    static const byte CMD_INTRO_OFF = 0x13; //turn the intro off
+    static const byte CMD_INTRO_ON = 0x12; // turn the intro on
+    static const byte CMD_INTRO_OFF = 0x13; // turn the intro off
 
     static const byte CMD_MULTI_FINISH = 0x20; // sets up the next frame with all commands gathered in the bunched buffer
+
+    static const byte CMD_STATUS_LED_MODE = 0x30; // sets status led mode; last 4 bits determine one of the available modes in IV18Animator
 
     // bunchable commands
     static const byte CMD_MULTI_DIGIT_CHAR = 0x80; // the FOLLOWING byte sets char; last 4 bits determine which digit; untouched chars will be off

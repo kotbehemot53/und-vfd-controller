@@ -16,10 +16,10 @@ class IV18Animator
 {
 public:
     // available status led animation modes
-    static const short LED_MODE_HEARTBEAT = 0;
-    static const short LED_MODE_WARNING = 1;
-    static const short LED_MODE_SQUARE_HEARTBEAT = 3;
-    static const short LED_MODE_DIM = 100;
+    static const short LED_MODE_HEARTBEAT = 0; // smooth sinusoidal heartbeat (may cause undertimes and clash with dimmed digits!)
+    static const short LED_MODE_WARNING = 1; // quick sinusoidal bleeps (lasts only for the bleep count set in warningBleepsLeft)
+    static const short LED_MODE_SQUARE_HEARTBEAT = 3; // square heartbeat (less undertimes and no visible clashing with dimmed digits)
+    static const short LED_MODE_DIM = 100; // square heartbeat (less undertimes and no visible clashing with dimmed digits)
 
     static const short LED_MODE_DEFAULT = LED_MODE_SQUARE_HEARTBEAT;
 
@@ -211,7 +211,10 @@ public:
      */
     void setLEDModeWarning(short bleepsCount = 10);
 
-    // TODO: setters for other LED modes? use them in a command?
+    /**
+     * Sets status LED to a smooth sinusoidal heartbeat (may cause undertimes and clash with dimmed digits!)
+     */
+    void setLEDMode(short ledMode);
 
     /**
      * Returns the display object pointer.

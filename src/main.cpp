@@ -27,8 +27,7 @@ void setup()
 //    delay(100);
     Display.on();
 
-    // TODO: rly? a command for warning maybe?
-    animator->setLEDModeWarning(10);
+    I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_STATUS_LED_MODE | IV18Animator::LED_MODE_WARNING);
 
     // run intro in the beginning
     I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_INTRO_ON);

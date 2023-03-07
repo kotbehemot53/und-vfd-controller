@@ -176,6 +176,11 @@ void IV18Animator::setLEDModeWarning(short bleepsCount)
     warningBleepsLeft = bleepsCount;
 }
 
+void IV18Animator::setLEDMode(short ledMode)
+{
+    ledAction = ledMode;
+}
+
 void IV18Animator::decreaseWarningBleeps()
 {
     if (warningBleepsLeft > 0) {

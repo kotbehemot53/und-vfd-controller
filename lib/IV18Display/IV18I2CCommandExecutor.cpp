@@ -172,6 +172,7 @@ void IV18I2CCommandExecutor::executeBunchedCommands(IV18Animator *animator)
 void IV18I2CCommandExecutor::executeCommand(IV18Animator* animator, byte command)
 {
     IV18Display* display = animator->getDisplay();
+    short ledMode;
 
     switch (command) {
         case CMD_OFF:
@@ -188,6 +189,15 @@ void IV18I2CCommandExecutor::executeCommand(IV18Animator* animator, byte command
             break;
         case CMD_MULTI_FINISH:
             IV18I2CCommandExecutor::executeBunchedCommands(animator);
+            break;
+        case CMD_STATUS_LED_MODE | IV18Animator::LED_MODE_HEARTBEAT:
+        case CMD_STATUS_LED_MODE | IV18Animator::LED_MODE_SQUARE_HEARTBEAT:
+        case CMD_STATUS_LED_MODE | IV18Animator::LED_MODE_DIM:
+            ledMode = command & 0x0F;
+            animator->setLEDMode(ledMode);
+            break;
+        case CMD_STATUS_LED_MODE | IV18Animator::LED_MODE_WARNING:
+            animator->setLEDModeWarning(8);
             break;
         default:
             // TODO: throw exception for unsupported commands?
