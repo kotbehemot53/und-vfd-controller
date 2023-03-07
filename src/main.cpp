@@ -27,16 +27,8 @@ void setup()
 //    delay(100);
     Display.on();
 
-    I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_STATUS_LED_MODE | IV18Animator::LED_MODE_WARNING);
-
     // run intro in the beginning
     I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_INTRO_ON);
-
-    // debug
-    I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_FADE_OUT | 10);
-    I2CComms::addCommandToWriteBuffer(0);
-    I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_FADE_TIME | 10);
-    I2CComms::addCommandToWriteBuffer(255);
 }
 
 void loop()
@@ -48,42 +40,5 @@ void loop()
 
     // run high-level animation sequencing if applicable (e.g. if intro is on)
     animator->doCurrentSequencing();
-
-// debug
-    if (currentFrame == 499) {
-        I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_INTRO_OFF);
-        I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_FINISH);
-    }
-
-    if (currentFrame == 1299) {
-        I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_FADE_IN | 0);
-        I2CComms::addCommandToWriteBuffer(255);
-        I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_FADE_IN | 2);
-        I2CComms::addCommandToWriteBuffer(255);
-        I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_FADE_IN | 4);
-        I2CComms::addCommandToWriteBuffer(255);
-        I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_FADE_IN | 6);
-        I2CComms::addCommandToWriteBuffer(255);
-        I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_FADE_IN | 8);
-        I2CComms::addCommandToWriteBuffer(255);
-        I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_FINISH);
-    }
-    if (currentFrame == 1399) {
-        I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_FADE_IN | 1);
-        I2CComms::addCommandToWriteBuffer(1);
-        I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_FADE_IN | 3);
-        I2CComms::addCommandToWriteBuffer(1);
-        I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_FADE_IN | 5);
-        I2CComms::addCommandToWriteBuffer(1);
-        I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_FADE_IN | 7);
-        I2CComms::addCommandToWriteBuffer(1);
-
-        // TODO: this caused accidental simultaneous FADE_INs (9 covers all digits) and all hell broke loose
-//        I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_FADE_IN | 9);
-//        I2CComms::addCommandToWriteBuffer(25);
-        I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_FINISH);
-    }
-
-    ++currentFrame;
 }
 
