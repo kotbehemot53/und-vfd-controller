@@ -3,6 +3,9 @@
 
 #include "IV18Animator.h"
 
+/**
+ * Sequencer class providing a callback to do intro sequencing in the IV18Animator
+ */
 class IV18IntroSequencer
 {
 private:

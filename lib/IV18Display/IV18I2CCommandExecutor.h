@@ -6,6 +6,10 @@
 
 class IV18Animator;
 
+/**
+ * Main I2C Command Executor. Gets buffered commands from I2CComms and executes them. Meant to be run by IV18Animator
+ * in an appropriate section of each frame.
+ */
 class IV18I2CCommandExecutor
 {
 public:
@@ -97,8 +101,15 @@ private:
 
 public:
     // TODO: check if it's actually sufficient (no undertimes in typical scenarios, no led of course)
-    static const short MAX_EXECUTION_TIME = 500;
+    static const short MAX_EXECUTION_TIME = 500; // max execution time for the commands (used by the animator in the command step).
 
+    /**
+     * Execute all commands that have been buffered in I2CComms. Meant to be used as DeviceAnimatorStep callback,
+     * as part of the lamp animation.
+     *
+     * @param animator
+     * @param sequenceNumber
+     */
     static void executeBufferedCommands(IV18Animator* animator, int sequenceNumber);
 };
 

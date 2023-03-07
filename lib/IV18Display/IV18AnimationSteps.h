@@ -5,6 +5,10 @@
 
 class IV18Animator;
 
+/**
+ * A collection of methods to be run as steps of the main animation by IV18Animator. Meant to be used as callbacks
+ * in DeviceAnimationStep.
+ */
 class IV18AnimationSteps
 {
 private:
