@@ -25,10 +25,18 @@ private:
     void initFrame();
 
 public:
-    // TODO: turn these into constructor?
-    void setThreads(DeviceAnimatorThread threadsToSet[], int numberOfThreadsToSet);
+    DeviceAnimator(DeviceAnimatorThread threadsToSet[], int numberOfThreadsToSet);
+
+    /**
+     * Set a listener to react to timing failures (undertimes in the merged animation sequence).
+     *
+     * @param failureListener
+     */
     void setFailureListener(AnimatorFailureListenerInterface* failureListener);
 
+    /**
+     * Animate a frame.
+     */
     void doFrame();
 };
 

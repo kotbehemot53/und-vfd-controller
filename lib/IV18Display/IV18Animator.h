@@ -9,6 +9,7 @@
 
 /**
  * Main animator class for the display. Animates the digits and the status LED. Can run intros, fade digits in and out.
+ * Governs each frame of the main loop.
  */
 class IV18Animator
 {
@@ -40,6 +41,7 @@ private:
     static constexpr unsigned long LED_MAX_DUTY_US[LED_SINUS_MODES_COUNT] = {7000, 9000};
 
     IV18Display* display;
+    DeviceAnimator* animator;
     DeviceAnimatorThread* statusLedThread;
     DeviceAnimatorThread* lampDigitThread;
 
@@ -96,7 +98,6 @@ private:
         LAMP_DIGIT_STATIC,
     };
 
-    DeviceAnimator animator;
     unsigned short ledCurrentFrame = 0;
 
     // TODO: how to make it static and initialize it? preprocessor?

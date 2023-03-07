@@ -38,6 +38,8 @@ void setup()
     // debug
     I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_FADE_OUT | 10);
     I2CComms::addCommandToWriteBuffer(0);
+    I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_MULTI_DIGIT_FADE_TIME | 10);
+    I2CComms::addCommandToWriteBuffer(255);
 }
 
 void loop()

@@ -80,7 +80,7 @@ IV18Animator::IV18Animator(IV18Display* display)
     statusLedThread = &(threads[0]);
     lampDigitThread = &(threads[1]);
 
-    animator.setThreads(threads, 2);
+    animator = new DeviceAnimator(threads, 2);
 }
 
 IV18Display* IV18Animator::getDisplay()
@@ -90,7 +90,7 @@ IV18Display* IV18Animator::getDisplay()
 
 void IV18Animator::setFailureListener(AnimatorFailureListenerInterface *failureListener)
 {
-    animator.setFailureListener(failureListener);
+    animator->setFailureListener(failureListener);
 }
 
 void IV18Animator::animateLampDigitBrightnesses()
@@ -246,7 +246,7 @@ void IV18Animator::doFrame()
     animateStatusLED();
     animateLampDigitBrightnesses();
 
-    animator.doFrame();
+    animator->doFrame();
 
     ++ledCurrentFrame;
     // for now, we're doing uniform cycles per all threads (applies only to heartbeat atm)

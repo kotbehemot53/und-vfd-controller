@@ -2,6 +2,30 @@
 
 #include <Arduino.h>
 
+DeviceAnimator::DeviceAnimator(DeviceAnimatorThread *threadsToSet, int numberOfThreadsToSet)
+{
+    threads = threadsToSet;
+    numberOfThreads = numberOfThreadsToSet;
+    totalSteps = 0;
+
+    // determine number of steps to preallocate merged steps pointers array
+    for (int i = 0; i < numberOfThreads; ++i) {
+        totalSteps += threads[i].numberOfSteps;
+    }
+    stepsMerged = new DeviceAnimatorStep*[totalSteps];
+    int k = 0;
+
+    // prepare the merged array of steps; it still needs to be sorted before each frame.
+    for (int i = 0; i < numberOfThreads; ++i) {
+        for (int j = 0; j < threads[i].numberOfSteps; ++j) {
+            stepsMerged[k] = &threads[i].steps[j];
+            // now they are set arbitrarily by user
+//            stepsMerged[k]->sequenceNumber = j;
+            ++k;
+        }
+    }
+}
+
 int DeviceAnimator::compareMergedSteps(const void *cmp1, const void *cmp2)
 {
     auto a = (DeviceAnimatorStep **) cmp1;
@@ -15,28 +39,6 @@ int DeviceAnimator::compareMergedSteps(const void *cmp1, const void *cmp2)
         return 1;
     }
     return 0;
-}
-
-void DeviceAnimator::setThreads(DeviceAnimatorThread threadsToSet[], int numberOfThreadsToSet)
-{
-    threads = threadsToSet;
-    numberOfThreads = numberOfThreadsToSet;
-    totalSteps = 0;
-
-    // determine number of steps to preallocate merged steps pointers array
-    for (int i = 0; i < numberOfThreads; ++i) {
-        totalSteps += threads[i].numberOfSteps;
-    }
-    stepsMerged = new DeviceAnimatorStep*[totalSteps];
-    int k = 0;
-    for (int i = 0; i < numberOfThreads; ++i) {
-        for (int j = 0; j < threads[i].numberOfSteps; ++j) {
-            stepsMerged[k] = &threads[i].steps[j];
-            // now they are set arbitrarily by user
-//            stepsMerged[k]->sequenceNumber = j;
-            ++k;
-        }
-    }
 }
 
 void DeviceAnimator::setFailureListener(AnimatorFailureListenerInterface* failureListenerToSet)
