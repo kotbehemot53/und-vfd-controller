@@ -16,13 +16,17 @@ class IV18Animator
 {
 public:
     // available status led animation modes
-    static const short LED_HEARTBEAT = 0;
-    static const short LED_WARNING = 1;
+    static const short LED_MODE_HEARTBEAT = 0;
+    static const short LED_MODE_WARNING = 1;
+    static const short LED_MODE_SQUARE_HEARTBEAT = 3;
+    static const short LED_MODE_DIM = 100;
+
+    static const short LED_MODE_DEFAULT = LED_MODE_SQUARE_HEARTBEAT;
 
     // available lamp grid animation modes
-    static const short LAMP_DIGIT_STATIC = 0;    // constant state
-    static const short LAMP_DIGIT_IN = 1;        // fade-in
-    static const short LAMP_DIGIT_OUT = 2;       // fade-out
+    static const short LAMP_MODE_DIGIT_STATIC = 0;    // constant state
+    static const short LAMP_MODE_DIGIT_IN = 1;        // fade-in
+    static const short LAMP_MODE_DIGIT_OUT = 2;       // fade-out
 
     // lamp grid duty cycle bounds
     static const short LAMP_DIGIT_PREPARE_MIN_DUTY_US = 150;
@@ -35,11 +39,14 @@ private:
 
     static const short LED_SINUS_MODES_COUNT = 2;
 
-    static const short LED_KILL = 100;
-
     static constexpr unsigned short LED_FRAMES_PER_CYCLE[LED_SINUS_MODES_COUNT] = {150, 30};
+    static const unsigned short LED_FRAMES_PER_CYCLE_MAX = 300; // LED_FRAMES_PER_CYCLE values should be divisors of this one!
+
     static constexpr unsigned long LED_MIN_DUTY_US[LED_SINUS_MODES_COUNT] = {500, 0};
     static constexpr unsigned long LED_MAX_DUTY_US[LED_SINUS_MODES_COUNT] = {7000, 9000};
+    static const unsigned long LED_MAX_DUTY_SQUARE_US = 1000;
+    static const unsigned long LED_MIN_DUTY_SQUARE_US = 500;
+    static const unsigned long LED_DUTY_DIM_US = 400;
 
     IV18Display* display;
     DeviceAnimator* animator;
@@ -88,25 +95,22 @@ private:
     };
 
     unsigned short lampDigitActions[IV18Display::DIGIT_STEPS_COUNT] = {
-        LAMP_DIGIT_STATIC,
-        LAMP_DIGIT_STATIC,
-        LAMP_DIGIT_STATIC,
-        LAMP_DIGIT_STATIC,
-        LAMP_DIGIT_STATIC,
-        LAMP_DIGIT_STATIC,
-        LAMP_DIGIT_STATIC,
-        LAMP_DIGIT_STATIC,
-        LAMP_DIGIT_STATIC,
+        LAMP_MODE_DIGIT_STATIC,
+        LAMP_MODE_DIGIT_STATIC,
+        LAMP_MODE_DIGIT_STATIC,
+        LAMP_MODE_DIGIT_STATIC,
+        LAMP_MODE_DIGIT_STATIC,
+        LAMP_MODE_DIGIT_STATIC,
+        LAMP_MODE_DIGIT_STATIC,
+        LAMP_MODE_DIGIT_STATIC,
+        LAMP_MODE_DIGIT_STATIC,
     };
 
-    unsigned short ledCurrentFrame = 0;
-
-    // TODO: how to make it static and initialize it? preprocessor?
-    unsigned short ledFramesPerLongestCycle;
+    unsigned short ledCurrentFrameInCycle = 0;
 
     DeviceAnimatorThread* threads;
 
-    unsigned short ledAction = LED_HEARTBEAT;
+    unsigned short ledAction = LED_MODE_DEFAULT;
     unsigned short warningBleepsLeft = 0;
 
     void (*sequencingCallback)(IV18Animator* animator);
@@ -127,18 +131,6 @@ public:
      * @param failureListener
      */
     void setFailureListener(AnimatorFailureListenerInterface* failureListener);
-
-    /**
-     * Runs a warning animation on the status LED.
-     *
-     * @param bleepsCount How many bleeps?
-     */
-    void doWarning(short bleepsCount = 10);
-
-    /**
-     * Dim the status LED.
-     */
-    void doKillLED();
 
     /**
      * Do a frame of the current animation.
@@ -186,7 +178,7 @@ public:
      * Set the action for a lamp digit.
      *
      * @param lampDigitNumber
-     * @param action the action; set to one of: LAMP_DIGIT_STATIC (static shine), LAMP_DIGIT_IN (fade-in), LAMP_DIGIT_OUT (fade-out).
+     * @param action the action; set to one of: LAMP_MODE_DIGIT_STATIC (static shine), LAMP_MODE_DIGIT_IN (fade-in), LAMP_MODE_DIGIT_OUT (fade-out).
      * @param maxDutyValue Max on-duty time for the given action (in microseconds).
      * @param minDutyValue Min on-duty time for the given action (in microseconds).
      */
@@ -211,6 +203,15 @@ public:
      * Disables sequencing (see doCurrentSequencing).
      */
     void disableSequencing();
+
+    /**
+     * Runs a warning animation on the status LED.
+     *
+     * @param bleepsCount How many bleeps?
+     */
+    void setLEDModeWarning(short bleepsCount = 10);
+
+    // TODO: setters for other LED modes? use them in a command?
 
     /**
      * Returns the display object pointer.

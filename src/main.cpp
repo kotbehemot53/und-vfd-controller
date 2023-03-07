@@ -28,7 +28,7 @@ void setup()
     Display.on();
 
     // TODO: rly? a command for warning maybe?
-    animator->doWarning(10);
+    animator->setLEDModeWarning(10);
 
     // run intro in the beginning
     I2CComms::addCommandToWriteBuffer(IV18I2CCommandExecutor::CMD_INTRO_ON);

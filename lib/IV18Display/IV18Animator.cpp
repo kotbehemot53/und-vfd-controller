@@ -4,22 +4,6 @@ IV18Animator::IV18Animator(IV18Display* display)
 {
     this->display = display;
 
-    // TODO: preprocessor could do it
-    // determine longest multiframe animation cycle
-    ledFramesPerLongestCycle = 0;
-    for (unsigned short i : LED_FRAMES_PER_CYCLE) {
-        if (i > ledFramesPerLongestCycle) {
-            ledFramesPerLongestCycle = i;
-        }
-    }
-    // TODO: not needed, right?
-//    lampGridFramesPerLongestCycle = 0;
-//    for (unsigned short i : lampDigitFramesPerCycle) {
-//        if (i > lampGridFramesPerLongestCycle) {
-//            lampGridFramesPerLongestCycle = i;
-//        }
-//    }
-
     // TODO: these cause undertime - due to collision with lampDigitSteps
     //       think about rectangular heartbeat with a non-colliding offsets instead
     auto heartbeatSteps = new DeviceAnimatorStep[2]{
@@ -100,9 +84,9 @@ void IV18Animator::animateLampDigitBrightnesses()
     for (short i = 0; i < IV18Display::DIGIT_STEPS_COUNT; ++i) {
         j = 2*i + 1; //step number
         switch (lampDigitActions[i]) {
-            case LAMP_DIGIT_STATIC:
+            case LAMP_MODE_DIGIT_STATIC:
                 break;
-            case LAMP_DIGIT_IN:
+            case LAMP_MODE_DIGIT_IN:
                 lampDigitThread->steps[j].runningTimeUs = SinusoidalDutyCycleGenerator::animateSinusoidalDutyCycle(
                     lampDigitMinOffDutyUs[i],
                     lampDigitMaxOnDutyUs[i],
@@ -120,10 +104,10 @@ void IV18Animator::animateLampDigitBrightnesses()
                 if (lampDigitCurrentFrameInCycle[i] >= lampDigitFramesPerCycle[i]) {
                     // switch to static on last frame
                     lampDigitCurrentFrameInCycle[i] = 0;
-                    lampDigitActions[i] = LAMP_DIGIT_STATIC;
+                    lampDigitActions[i] = LAMP_MODE_DIGIT_STATIC;
                 }
                 break;
-            case LAMP_DIGIT_OUT:
+            case LAMP_MODE_DIGIT_OUT:
                 lampDigitThread->steps[j].runningTimeUs = SinusoidalDutyCycleGenerator::animateSinusoidalDutyCycle(
                     lampDigitMinOffDutyUs[i],
                     lampDigitMaxOnDutyUs[i],
@@ -140,7 +124,7 @@ void IV18Animator::animateLampDigitBrightnesses()
                 if (lampDigitCurrentFrameInCycle[i] >= lampDigitFramesPerCycle[i]) {
                     // switch to static on last frame
                     lampDigitCurrentFrameInCycle[i] = 0;
-                    lampDigitActions[i] = LAMP_DIGIT_STATIC;
+                    lampDigitActions[i] = LAMP_MODE_DIGIT_STATIC;
                 }
                 break;
         }
@@ -150,42 +134,53 @@ void IV18Animator::animateLampDigitBrightnesses()
 void IV18Animator::animateStatusLED()
 {
     // TODO: maybe make a runningTimeUs setter, only getters for the rest and make them private?
-    if (ledAction < LED_SINUS_MODES_COUNT) {
-        statusLedThread->steps[0].runningTimeUs = SinusoidalDutyCycleGenerator::animateSinusoidalDutyCycle(
-            LED_MIN_DUTY_US[ledAction],
-            LED_MAX_DUTY_US[ledAction],
-            LED_FRAME_LENGTH_US,
-            ledCurrentFrame,
-            LED_FRAMES_PER_CYCLE[ledAction]
-        );
-        statusLedThread->steps[1].runningTimeUs = LED_FRAME_LENGTH_US - statusLedThread->steps[0].runningTimeUs;
-    } else {
-        if (ledAction == LED_KILL) {
-            // TODO: implement actual total kills somehow? omittable threads?
-            // can't set it to 0 now, because of potential undertime
-            statusLedThread->steps[0].runningTimeUs = 200;
-            statusLedThread->steps[1].runningTimeUs = 8800;
-        }
+    switch (ledAction) {
+        case LED_MODE_HEARTBEAT:
+        case LED_MODE_WARNING:
+            statusLedThread->steps[0].runningTimeUs = SinusoidalDutyCycleGenerator::animateSinusoidalDutyCycle(
+                LED_MIN_DUTY_US[ledAction],
+                LED_MAX_DUTY_US[ledAction],
+                LED_FRAME_LENGTH_US,
+                ledCurrentFrameInCycle,
+                LED_FRAMES_PER_CYCLE[ledAction]
+            );
+            break;
+        case LED_MODE_SQUARE_HEARTBEAT:
+            if (ledCurrentFrameInCycle < LED_FRAMES_PER_CYCLE_MAX / 2) {
+                statusLedThread->steps[0].runningTimeUs = LED_MAX_DUTY_SQUARE_US;
+            } else {
+                statusLedThread->steps[0].runningTimeUs = LED_MIN_DUTY_SQUARE_US;
+            }
+            break;
+        case LED_MODE_DIM:
+            // can't set it to 0 now, because of potential undertime (?orly?)
+            statusLedThread->steps[0].runningTimeUs = LED_DUTY_DIM_US; // TODO: use a constant here?
+            break;
+    }
+    statusLedThread->steps[1].runningTimeUs = LED_FRAME_LENGTH_US - statusLedThread->steps[0].runningTimeUs;
+
+    ++ledCurrentFrameInCycle;
+    // for now, we're doing uniform cycles per all threads (applies only to heartbeat atm)
+    if (ledCurrentFrameInCycle >= LED_FRAMES_PER_CYCLE_MAX) {
+        ledCurrentFrameInCycle = 0;
+    }
+
+    if ((ledAction == LED_MODE_WARNING) && (ledCurrentFrameInCycle % LED_FRAMES_PER_CYCLE[LED_MODE_WARNING] == 0)) {
+        decreaseWarningBleeps();
     }
 }
 
-void IV18Animator::doWarning(short bleepsCount)
+void IV18Animator::setLEDModeWarning(short bleepsCount)
 {
-    ledAction = LED_WARNING;
+    ledAction = LED_MODE_WARNING;
     warningBleepsLeft = bleepsCount;
-}
-
-void IV18Animator::doKillLED()
-{
-    ledAction = LED_KILL;
-    warningBleepsLeft = 1;
 }
 
 void IV18Animator::decreaseWarningBleeps()
 {
     if (warningBleepsLeft > 0) {
         if(--warningBleepsLeft == 0) {
-            ledAction = LED_HEARTBEAT;
+            ledAction = LED_MODE_DEFAULT;
         }
     }
 }
@@ -244,18 +239,8 @@ void IV18Animator::doFrame()
 {
     // multiframe animation of the heartbeat
     animateStatusLED();
+    // multiframe digit brightness animation (static, fade-in, fade-out etc.)
     animateLampDigitBrightnesses();
 
     animator->doFrame();
-
-    ++ledCurrentFrame;
-    // for now, we're doing uniform cycles per all threads (applies only to heartbeat atm)
-    if (ledCurrentFrame >= ledFramesPerLongestCycle) {
-        ledCurrentFrame = 0;
-    }
-
-    // TODO: separate cycle & bleeps for LED_KILL?
-    if (ledCurrentFrame % LED_FRAMES_PER_CYCLE[LED_WARNING] == 0) {
-        decreaseWarningBleeps();
-    }
 }
