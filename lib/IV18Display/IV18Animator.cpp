@@ -70,7 +70,7 @@ IV18Animator::IV18Animator(IV18Display* display)
         DeviceAnimatorStep(this, reinterpret_cast<void (*)(void*,int)>(&IV18AnimationSteps::grid9OffAndCooldown),
                            IV18Display::GRID9_COOLDOWN_US, 9),
         DeviceAnimatorStep(this, reinterpret_cast<void (*)(void*,int)>(&IV18I2CCommandExecutor::executeBufferedCommands),
-        IV18I2CCommandExecutor::MAX_EXECUTION_TIME, 10)
+                           IV18I2CCommandExecutor::MAX_EXECUTION_TIME_US, 10)
     };
 
     threads = new DeviceAnimatorThread[2]{

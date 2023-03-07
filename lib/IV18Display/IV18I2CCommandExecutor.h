@@ -100,8 +100,8 @@ private:
     static void executeBunchedCommands(IV18Animator* animator);
 
 public:
-    // TODO: check if it's actually sufficient (no undertimes in typical scenarios, no led of course)
-    static const short MAX_EXECUTION_TIME = 500; // max execution time for the commands (used by the animator in the command step).
+    // 8 char commands + FIN take about 170 us
+    static const short MAX_EXECUTION_TIME_US = 500; // max execution time for the commands (used by the animator in the command step).
 
     /**
      * Execute all commands that have been buffered in I2CComms. Meant to be used as DeviceAnimatorStep callback,

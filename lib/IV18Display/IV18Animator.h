@@ -106,7 +106,7 @@ private:
 
     DeviceAnimatorThread* threads;
 
-    unsigned short ledAction = 0;
+    unsigned short ledAction = LED_HEARTBEAT;
     unsigned short warningBleepsLeft = 0;
 
     void (*sequencingCallback)(IV18Animator* animator);
