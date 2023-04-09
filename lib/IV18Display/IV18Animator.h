@@ -19,7 +19,7 @@ public:
     static const short LED_MODE_HEARTBEAT = 0; // smooth sinusoidal heartbeat (may cause undertimes and clash with dimmed digits!)
     static const short LED_MODE_WARNING = 1; // quick sinusoidal bleeps (lasts only for the bleep count set in warningBleepsLeft)
     static const short LED_MODE_SQUARE_HEARTBEAT = 3; // square heartbeat (less undertimes and no visible clashing with dimmed digits)
-    static const short LED_MODE_DIM = 100; // square heartbeat (less undertimes and no visible clashing with dimmed digits)
+    static const short LED_MODE_DIM = 100; // led is dim
 
     static const short LED_MODE_DEFAULT = LED_MODE_SQUARE_HEARTBEAT;
 
