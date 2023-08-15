@@ -36,7 +36,7 @@ public:
 
 private:
     // TODO: why do strange things happen when buffer is above 511? even though there's still plenty of RAM?
-    static const short BUNCHED_COMMANDS_BUFFER_LENGTH = 64;
+    static const short BUNCHED_COMMANDS_BUFFER_LENGTH = 191;
     static const short BUNCHABLE_COMMANDS_COUNT = 8;
     static const short FOLLOWED_COMMANDS_COUNT = 6;
 
