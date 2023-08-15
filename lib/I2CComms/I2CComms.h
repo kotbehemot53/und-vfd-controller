@@ -10,7 +10,7 @@
 class I2CComms
 {
 public:
-    static const short COMMAND_BUFFER_LENGTH = 191;
+    static const short COMMAND_BUFFER_LENGTH = 64;
 
     /**
      * Initialize I2C communication on a given address.

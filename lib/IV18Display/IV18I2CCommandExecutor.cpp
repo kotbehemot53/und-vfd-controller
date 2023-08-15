@@ -12,7 +12,7 @@ void IV18I2CCommandExecutor::executeBufferedCommands(IV18Animator *animator, int
     bool bufferFollowerCommand = false;
 
     I2CComms::disableReceiving();
-    I2CComms::resetBuffers();
+    I2CComms::resetBuffers(); // TODO: this is wrong? when we're mid-bunch - what then?
 
     byte currentCommand;
     while (I2CComms::getReadBufferRemainingCommandCount()) {
