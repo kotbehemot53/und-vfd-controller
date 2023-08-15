@@ -47,7 +47,7 @@ void IV18I2CCommandExecutor::executeBunchedCommands(IV18Animator *animator)
     bool setCommas = false;
 
     byte bytesBuffer[IV18Display::DIGIT_STEPS_COUNT] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-    char charsBuffer[IV18Display::DIGIT_STEPS_COUNT + 1] = "         ";
+    char charsBuffer[IV18Display::DIGIT_STEPS_COUNT + 1] = "---------";
     bool commasBuffer[IV18Display::DIGIT_STEPS_COUNT] = {false,false,false,false,false,false,false,false,false};
 
     // TODO: throw exception/handle improper commands count (above buffer or not including supplementary commands with values?)
