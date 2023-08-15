@@ -11,6 +11,7 @@ void IV18I2CCommandExecutor::executeBufferedCommands(IV18Animator *animator, int
 {
     bool bufferFollowerCommand = false;
 
+    I2CComms::disableReceiving();
     I2CComms::resetBuffers();
 
     byte currentCommand;
@@ -32,6 +33,8 @@ void IV18I2CCommandExecutor::executeBufferedCommands(IV18Animator *animator, int
             executeCommand(animator, currentCommand);
         }
     }
+
+    I2CComms::enableReceiving();
 }
 
 void IV18I2CCommandExecutor::executeBunchedCommands(IV18Animator *animator)

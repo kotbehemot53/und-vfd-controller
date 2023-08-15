@@ -38,6 +38,18 @@ public:
      */
     static void resetBuffers();
 
+    /**
+     * Receiving events will be paused - receiveEvent will do nothing (keeping received bytes in Wire buffer for later
+     * reading). Useful before resetting buffers and reading stuff.
+     */
+    static void disableReceiving();
+
+    /**
+     * Receiving events will be enabled again. Calls receiveEvent to process bytes received when it was disabled.
+     * Useful after resetting buffers and reading stuff.
+     */
+    static void enableReceiving();
+
     // it's public for debug purposes
     /**
      * Adds a command to the current write buffer. Should be run when a new command is received via I2C.
@@ -60,6 +72,7 @@ private:
     static short readBufferRemainingCommandCount;
     static short currentWriteBuffer;
     static short currentReadBuffer;
+    static bool receivingEnabled;
 
     static void receiveEvent(int howMany);
 };
