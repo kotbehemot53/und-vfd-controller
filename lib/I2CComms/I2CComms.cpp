@@ -7,6 +7,7 @@ short I2CComms::commandCountsInBuffer[2] = {0,0};
 short I2CComms::readBufferRemainingCommandCount = 0;
 short I2CComms::currentWriteBuffer = 0;
 short I2CComms::currentReadBuffer = 1;
+bool I2CComms::receivingEnabled = true;
 
 //I2CComms Comms;
 void I2CComms::init(byte addr)
@@ -18,6 +19,10 @@ void I2CComms::init(byte addr)
 
 void I2CComms::receiveEvent(int howMany)
 {
+    if (!receivingEnabled) {
+        return;
+    }
+
     // buffers all commands
     while(Wire.available()) // loop through all
     {
@@ -45,4 +50,15 @@ void I2CComms::resetBuffers()
     currentReadBuffer = temp;
     commandCountsInBuffer[currentWriteBuffer] = 0;
     readBufferRemainingCommandCount = commandCountsInBuffer[currentReadBuffer];
+}
+
+void I2CComms::disableReceiving()
+{
+    receivingEnabled = false;
+}
+
+void I2CComms::enableReceiving()
+{
+    receivingEnabled = true;
+    I2CComms::receiveEvent(0); // TODO: what about the howMany argument? unused for now
 }

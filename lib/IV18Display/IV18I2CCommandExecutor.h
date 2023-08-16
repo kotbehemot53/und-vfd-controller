@@ -63,6 +63,7 @@ private:
 
     static byte bunchedCommandsBuffer[BUNCHED_COMMANDS_BUFFER_LENGTH];
     static short bunchedCommandsCount;
+    static bool awaitingBunchedCommandFollower;
 
     inline static void addCommandToBunchedBuffer(byte command)
     {

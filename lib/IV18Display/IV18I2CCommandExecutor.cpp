@@ -6,32 +6,34 @@
 
 short IV18I2CCommandExecutor::bunchedCommandsCount = 0;
 byte IV18I2CCommandExecutor::bunchedCommandsBuffer[IV18I2CCommandExecutor::BUNCHED_COMMANDS_BUFFER_LENGTH];
+bool IV18I2CCommandExecutor::awaitingBunchedCommandFollower = false;
 
 void IV18I2CCommandExecutor::executeBufferedCommands(IV18Animator *animator, int sequenceNumber)
 {
-    bool bufferFollowerCommand = false;
-
+    I2CComms::disableReceiving();
     I2CComms::resetBuffers();
 
     byte currentCommand;
     while (I2CComms::getReadBufferRemainingCommandCount()) {
         currentCommand = I2CComms::getCommandFromReadBuffer();
 
-        if (bufferFollowerCommand) {
+        if (awaitingBunchedCommandFollower) {
             addCommandToBunchedBuffer(currentCommand);
-            bufferFollowerCommand = false;
+            awaitingBunchedCommandFollower = false;
             continue;
         }
 
         if (isCommandBunchable(currentCommand)) {
             addCommandToBunchedBuffer(currentCommand);
             if (isCommandFollowed(currentCommand)) {
-                bufferFollowerCommand = true;
+                awaitingBunchedCommandFollower = true;
             }
         } else {
             executeCommand(animator, currentCommand);
         }
     }
+
+    I2CComms::enableReceiving();
 }
 
 void IV18I2CCommandExecutor::executeBunchedCommands(IV18Animator *animator)
@@ -44,7 +46,7 @@ void IV18I2CCommandExecutor::executeBunchedCommands(IV18Animator *animator)
     bool setCommas = false;
 
     byte bytesBuffer[IV18Display::DIGIT_STEPS_COUNT] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-    char charsBuffer[IV18Display::DIGIT_STEPS_COUNT + 1] = "         ";
+    char charsBuffer[IV18Display::DIGIT_STEPS_COUNT + 1] = "---------";
     bool commasBuffer[IV18Display::DIGIT_STEPS_COUNT] = {false,false,false,false,false,false,false,false,false};
 
     // TODO: throw exception/handle improper commands count (above buffer or not including supplementary commands with values?)
