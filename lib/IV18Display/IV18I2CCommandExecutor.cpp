@@ -6,11 +6,10 @@
 
 short IV18I2CCommandExecutor::bunchedCommandsCount = 0;
 byte IV18I2CCommandExecutor::bunchedCommandsBuffer[IV18I2CCommandExecutor::BUNCHED_COMMANDS_BUFFER_LENGTH];
+bool IV18I2CCommandExecutor::awaitingBunchedCommandFollower = false;
 
 void IV18I2CCommandExecutor::executeBufferedCommands(IV18Animator *animator, int sequenceNumber)
 {
-    bool bufferFollowerCommand = false;
-
     I2CComms::disableReceiving();
     I2CComms::resetBuffers(); // TODO: this is wrong? when we're mid-bunch - what then?
 
@@ -18,16 +17,16 @@ void IV18I2CCommandExecutor::executeBufferedCommands(IV18Animator *animator, int
     while (I2CComms::getReadBufferRemainingCommandCount()) {
         currentCommand = I2CComms::getCommandFromReadBuffer();
 
-        if (bufferFollowerCommand) {
+        if (awaitingBunchedCommandFollower) {
             addCommandToBunchedBuffer(currentCommand);
-            bufferFollowerCommand = false;
+            awaitingBunchedCommandFollower = false;
             continue;
         }
 
         if (isCommandBunchable(currentCommand)) {
             addCommandToBunchedBuffer(currentCommand);
             if (isCommandFollowed(currentCommand)) {
-                bufferFollowerCommand = true;
+                awaitingBunchedCommandFollower = true;
             }
         } else {
             executeCommand(animator, currentCommand);
